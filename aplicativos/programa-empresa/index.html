@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <!--
+    CSP também no documento, além do cabeçalho aplicado pelo processo principal.
+    Cinto e suspensório: a meta protege este arquivo; o cabeçalho protege
+    qualquer resposta que chegue à sessão.
+  -->
+  <!--
+    A CSP é gerada pelo build a partir da origem configurada. Fixá-la no código
+    quebrava o ambiente local: `connect-src http://localhost:*` não cobre
+    `127.0.0.1`, e a diferença só aparece em execução, como um genérico "sem
+    conexão com o servidor".
+  -->
+  <meta http-equiv="Content-Security-Policy" content="__CSP__">
+  <title>PegaNaFrota</title>
+  <script src="./aplicar-tema.js"></script>
+  <link rel="stylesheet" href="./estilos/cores-e-espacamentos.css">
+  <link rel="stylesheet" href="./estilos/estilo-principal.css">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <div id="app" aria-busy="true">
+    <div class="boot"><p class="boot-text">Carregando…</p></div>
+  </div>
+  <script type="module" src="./iniciar-aplicativo.mjs"></script>
+</body>
+</html>

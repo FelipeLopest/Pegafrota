@@ -1,0 +1,27 @@
+{
+  "ambiente": "Chrome real; BrasilAPI e Supabase simulados para cenários reproduzíveis",
+  "resultados": [
+    {
+      "cenario": "Preenchimento automático, endereço, cache, proteção de credenciais e envio explícito",
+      "aprovado": true,
+      "consultas": 1,
+      "gravacao": "simulada; nenhum cadastro real"
+    },
+    {
+      "cenario": "Preserva edição manual durante requisição pendente",
+      "aprovado": true
+    },
+    {
+      "cenario": "Troca de CNPJ cancela resposta antiga e não mistura empresas",
+      "aprovado": true
+    },
+    {
+      "cenario": "CNPJ inválido sem chamada externa e erro 429 com nova tentativa",
+      "aprovado": true
+    },
+    {
+      "cenario": "CNPJ não encontrado permite seguir com cadastro manual",
+      "aprovado": true
+    }
+  ]
+}

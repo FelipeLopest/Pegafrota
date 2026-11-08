@@ -1,0 +1,8 @@
+{
+  "name": "@peganafrota/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "exportar-regras.mjs",
+  "exports": "./exportar-regras.mjs"
+}

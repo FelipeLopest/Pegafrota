@@ -1,0 +1,33 @@
+{
+  "versao": "v15",
+  "objetivo": "Traduzir identificadores internos para português sem alterar comportamento, contratos externos ou banco de dados.",
+  "simbolos_renomeados_aprox": 2828,
+  "ocorrencias_alteradas_minimas": 11476,
+  "arquivos_codigo_e_testes_alterados": 73,
+  "preservado_sem_renomear": [
+    "nomes de tabelas, colunas, RPCs e schemas do PostgreSQL/Supabase",
+    "chaves JSON e campos retornados pelo backend",
+    "nomes de variáveis de ambiente",
+    "headers HTTP e rotas REST/Edge Functions",
+    "APIs nativas do navegador, Node.js e Electron",
+    "valores de enums/status persistidos no banco",
+    "identificadores técnicos curtos ou universais como id, URL, API, SQL, HTML, CSS, SVG, UUID, JWT"
+  ],
+  "garantias_verificadas": [
+    "89/89 testes unitários",
+    "55/55 testes unitários da Edge Function admin-users",
+    "lint PASS",
+    "contratos Desktop↔Banco PASS",
+    "configuração PASS",
+    "zero CDN PASS",
+    "fronteiras PASS",
+    "segurança Electron 35/35 PASS",
+    "scanner de segredos PASS",
+    "build Admin PASS",
+    "build Desktop PASS",
+    "smoke Admin 31/31 PASS",
+    "strings literais de produção idênticas à v14",
+    "migrations, seed.sql e config.toml idênticos à v14"
+  ],
+  "observacao": "O smoke do Electron não foi executado porque o pacote Electron não está instalado no ambiente de validação; o build Desktop e as 35 invariantes de segurança passaram."
+}

@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+**/dist/
+**/.temp/
+*.log
+.DS_Store
+Thumbs.db
+coverage/
+artifacts/
+
+# Pacotes de entrega não pertencem ao repositório-fonte
+*.zip
+*.tar.gz

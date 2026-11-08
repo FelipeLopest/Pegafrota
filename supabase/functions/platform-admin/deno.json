@@ -1,0 +1,6 @@
+{
+  "//": "Mapa de importação da Edge Function. O especificador `npm:` é suportado tanto pelo runtime hospedado do Supabase quanto pelo Deno local, então UMA configuração serve aos dois — sem manter duas cópias, que é como uma correção acaba aplicada só de um lado.",
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2"
+  }
+}

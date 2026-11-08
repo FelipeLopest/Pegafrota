@@ -1,0 +1,22 @@
+{
+  "servico": "BrasilAPI",
+  "endereco": "https://brasilapi.com.br/api/cnpj/v1/19131243000197",
+  "verificadoEm": "2026-11-07",
+  "metodo": "Consulta pelo navegador de pesquisa; separada dos testes automatizados da aplicação",
+  "resultado": "JSON recebido sem autenticação; campos compatíveis com o adaptador implementado",
+  "camposConferidos": [
+    "cnpj",
+    "razao_social",
+    "nome_fantasia",
+    "email",
+    "ddd_telefone_1",
+    "logradouro",
+    "numero",
+    "complemento",
+    "bairro",
+    "municipio",
+    "uf",
+    "cep"
+  ],
+  "limitacao": "Não representa consulta feita na instalação do usuário nem validação de cadastro no Supabase real."
+}

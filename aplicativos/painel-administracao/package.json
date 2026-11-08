@@ -1,0 +1,10 @@
+{
+  "name": "@peganafrota/platform-admin-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@peganafrota/contracts": "1.0.0",
+    "@peganafrota/validation": "1.0.0"
+  }
+}

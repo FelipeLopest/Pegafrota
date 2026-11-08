@@ -1,0 +1,12 @@
+{
+  "name": "@peganafrota/company-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "sistema/abrir-janela.cjs",
+  "dependencies": {
+    "@peganafrota/contracts": "1.0.0",
+    "@peganafrota/validation": "1.0.0",
+    "electron": "^43.2.0"
+  }
+}

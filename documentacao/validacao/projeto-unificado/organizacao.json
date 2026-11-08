@@ -1,0 +1,13 @@
+{
+  "origem": "PegaNaFrota_Reorganizado (2).zip",
+  "estrutura": "Uma única pasta raiz PegaNaFrota_Reorganizado; sem projeto aninhado",
+  "fontes": "Cópia externa atualizada; nenhuma alteração de código exclusiva do usuário foi identificada na cópia interna",
+  "configuracao": "Arquivo .env da cópia interna preservado integralmente na raiz; valores não incluídos neste relatório",
+  "compilacao": "Painel e programa da empresa recompilados usando a configuração preservada",
+  "testesUnitarios": 278,
+  "verificacoesEquipeServidor": 55,
+  "cenariosCnpjNavegador": 5,
+  "servicosNoTesteNavegador": "BrasilAPI e Supabase simulados; nenhuma escrita no banco real",
+  "migrations": "49 originais conferidas",
+  "dependencias": "node_modules não incluído; package-lock.json preservado"
+}

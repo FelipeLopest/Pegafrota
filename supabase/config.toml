@@ -1,0 +1,123 @@
+# =============================================================================
+# PegaNaFrota — configuração do Supabase local
+# =============================================================================
+# IMPORTANTE: o schema "private" NÃO está em db.schemas. Ele nunca é exposto
+# pelo PostgREST — é a base do modelo de segurança (SECURITY_MODEL.md §5.2).
+# O schema "audit" também não é exposto: a leitura acontece pela view
+# public.audit_events, que usa security_invoker.
+# =============================================================================
+
+project_id = "peganafrota"
+
+[api]
+enabled = true
+port = 54321
+# `platform` é endereçável pelo PostgREST porque a Edge Function precisa chamar
+# suas RPCs via supabase-js. A segurança NÃO vem da invisibilidade: anon e
+# authenticated não têm USAGE no schema nem EXECUTE nas funções, então para eles
+# o endereço existe e não leva a nada (ver 20260802000800).
+# `private` e `audit` permanecem fora da API.
+schemas = ["public", "platform"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[realtime]
+# ADR/DATA_ACCESS.md §6: Realtime não é usado globalmente no MVP.
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+# Retenção de imagem desabilitada por padrão (OPEN_QUESTIONS.md §2).
+enabled = false
+
+[auth]
+enabled = true
+# `site_url` é o destino padrão de qualquer link do Auth. Aponta para o Admin
+# Web, que é quem hospeda a rota pública de convite.
+site_url = "http://127.0.0.1:5174"
+
+# Lista de destinos permitidos para `redirectTo` (achado R3-004).
+#
+# O GoTrue RECUSA silenciosamente um `redirectTo` fora desta lista e manda a
+# pessoa para o `site_url` — sem o token de negócio na query. O convite então
+# abre uma tela que não sabe o que fazer, e o erro parece ser do link.
+#
+# `INVITE_BASE_URL` da Edge Function PRECISA estar aqui. O script
+# `ferramentas/verificacoes/verificar-configuracao.mjs` falha o build quando não está.
+#
+# Produção: substituir pelos domínios reais no painel do projeto hospedado, em
+# Authentication → URL Configuration. Ver documentacao/instalacao-e-publicacao/DEPLOY_SUPABASE.md.
+additional_redirect_urls = [
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5174/**",
+  "http://localhost:5174",
+  "http://localhost:5174/**",
+  "peganafrota://auth-callback",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = false          # criação de usuário só por Edge Function administrativa
+enable_anonymous_sign_ins = false
+minimum_password_length = 12
+
+[auth.email]
+enable_signup = false
+double_confirm_changes = true
+enable_confirmations = false
+secure_password_change = true
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+
+[auth.external.apple]
+enabled = false
+
+[analytics]
+enabled = false
+
+[functions.admin-users]
+verify_jwt = true
+
+[edge_runtime]
+enabled = true
+policy = "oneshot"
+
+# =============================================================================
+# Edge Functions
+# =============================================================================
+# Declarar a função é o que faz `supabase functions deploy` e o runtime local a
+# reconhecerem (achado R3-009). Sem esta seção ela nunca é implantada, e o
+# painel inteiro fica sem backend.
+
+[functions.platform-admin]
+# `verify_jwt = true`: o gateway recusa a requisição SEM token antes mesmo de
+# invocar a função. É uma barreira a mais, não a principal — a função revalida o
+# papel global consultando o banco a cada chamada, porque um JWT válido de
+# usuário comum também passa por aqui.
+verify_jwt = true

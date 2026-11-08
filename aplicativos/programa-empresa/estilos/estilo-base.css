@@ -1,0 +1,112 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--pnf-fundo-aplicativo);
+  color: var(--pnf-texto);
+  font: var(--pnf-texto-corpo);
+  -webkit-font-smoothing: antialiased;
+
+  font-feature-settings: 'cv11', 'ss01';
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pnf-destaque);
+  outline-offset: 2px;
+  border-radius: var(--pnf-raio-pequeno);
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+h1 {
+  font: var(--pnf-texto-destaque);
+  letter-spacing: var(--pnf-compacto);
+  margin: 0 0 var(--pnf-espaco-4);
+}
+h2 {
+  font: var(--pnf-texto-secao);
+  letter-spacing: var(--pnf-compacto);
+  margin: var(--pnf-espaco-6) 0 var(--pnf-espaco-3);
+}
+h2:first-child {
+  margin-top: 0;
+}
+h3 {
+  font: var(--pnf-texto-cartao);
+  margin: 0 0 var(--pnf-espaco-2);
+}
+p {
+  margin: 0 0 var(--pnf-espaco-3);
+}
+p:last-child {
+  margin-bottom: 0;
+}
+code {
+  font-family: var(--pnf-fonte-monoespacada);
+  font-size: 12px;
+  background: var(--pnf-superficie-alternativa);
+  border-radius: var(--pnf-raio-pequeno);
+  padding: 2px 6px;
+  color: var(--pnf-texto-suave);
+}
+.muted {
+  color: var(--pnf-texto-suave);
+}
+.mono {
+  font-family: var(--pnf-fonte-monoespacada);
+  font-variant-ligatures: none;
+}
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: var(--pnf-espaco-2);
+  z-index: 100;
+  background: var(--pnf-superficie);
+  padding: var(--pnf-espaco-2) var(--pnf-espaco-4);
+  border: 1px solid var(--pnf-borda-forte);
+  border-radius: var(--pnf-raio-medio);
+}
+.skip-link:focus {
+  left: var(--pnf-espaco-4);
+}
+
+.boot {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+.boot-text {
+  color: var(--pnf-texto-suave);
+}
+
+.icon {
+  width: var(--pnf-icone-tamanho);
+  height: var(--pnf-icone-tamanho);
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: var(--pnf-icone-espessura);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-sm {
+  width: var(--pnf-icone-tamanho-pequeno);
+  height: var(--pnf-icone-tamanho-pequeno);
+}
+.icon-lg {
+  width: var(--pnf-icone-tamanho-grande);
+  height: var(--pnf-icone-tamanho-grande);
+}

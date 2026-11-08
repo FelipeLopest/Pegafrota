@@ -1,0 +1,7 @@
+{
+  "//": "Configuração do runtime Deno das Edge Functions. `nodeModulesDir: auto` permite verificar tipos e executar localmente resolvendo os pacotes npm — o registro JSR não é alcançável em todos os ambientes de build.",
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.45.0"
+  }
+}

@@ -1,0 +1,6 @@
+/* A ordem preserva exatamente a precedência visual da versão original. */
+@import './estilo-base.css';
+@import './estilo-menu-e-janela.css';
+@import './estilo-componentes.css';
+@import './estilo-login.css';
+@import './estilo-ajustes-visuais.css';

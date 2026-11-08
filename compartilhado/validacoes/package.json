@@ -1,0 +1,11 @@
+{
+  "name": "@peganafrota/validation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "exportar-validacoes.mjs",
+  "exports": {
+    ".": "./exportar-validacoes.mjs",
+    "./importacao": "./validar-importacao.mjs"
+  }
+}

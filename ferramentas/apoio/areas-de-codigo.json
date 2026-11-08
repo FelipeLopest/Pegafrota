@@ -1,0 +1,162 @@
+{
+  "aplicativos/programa-empresa/telas/exportar-telas.mjs": [
+    "aplicativos/programa-empresa/componentes/listas-resumos-e-detalhes.mjs",
+    "aplicativos/programa-empresa/telas/tela-patio.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-movimentacao.mjs",
+    "aplicativos/programa-empresa/telas/tela-veiculos.mjs",
+    "aplicativos/programa-empresa/telas/tela-detalhes-veiculo.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-veiculo.mjs",
+    "aplicativos/programa-empresa/telas/tela-motoristas.mjs",
+    "aplicativos/programa-empresa/telas/tela-detalhes-motorista.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-motorista.mjs",
+    "aplicativos/programa-empresa/telas/tela-viagens.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-viagem.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-informar-odometro.mjs",
+    "aplicativos/programa-empresa/telas/tela-abastecimentos.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-abastecimento.mjs",
+    "aplicativos/programa-empresa/telas/tela-manutencoes.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-agendar-manutencao.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-concluir-manutencao.mjs",
+    "aplicativos/programa-empresa/telas/tela-locais.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-local.mjs",
+    "aplicativos/programa-empresa/telas/tela-movimentacoes.mjs",
+    "aplicativos/programa-empresa/telas/tela-empresa.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-empresa.mjs",
+    "aplicativos/programa-empresa/telas/tela-equipe.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-integrante-equipe.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-permissao-integrante.mjs",
+    "aplicativos/programa-empresa/telas/tela-meu-perfil.mjs"
+  ],
+  "aplicativos/programa-empresa/telas/exportar-telas-analise.mjs": [
+    "aplicativos/programa-empresa/componentes/indicadores-e-relatorios.mjs",
+    "aplicativos/programa-empresa/telas/tela-inicial.mjs",
+    "aplicativos/programa-empresa/telas/tela-odometro.mjs",
+    "aplicativos/programa-empresa/formularios/formulario-ajuste-odometro.mjs",
+    "aplicativos/programa-empresa/telas/tela-relatorios.mjs",
+    "aplicativos/programa-empresa/dados/exportar-relatorios.mjs"
+  ],
+  "aplicativos/painel-administracao/telas/exportar-telas.mjs": [
+    "aplicativos/painel-administracao/componentes/listas-resumos-e-detalhes.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-alterar-senha.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-excluir-integrante.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-excluir-empresa.mjs",
+    "aplicativos/painel-administracao/telas/tela-inicial.mjs",
+    "aplicativos/painel-administracao/telas/tela-empresas.mjs",
+    "aplicativos/painel-administracao/telas/tela-detalhes-empresa.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-empresa.mjs",
+    "aplicativos/painel-administracao/telas/tela-cadastrar-empresa.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-acompanhar-cadastro-empresa.mjs",
+    "aplicativos/painel-administracao/telas/tela-administradores.mjs",
+    "aplicativos/painel-administracao/telas/tela-provisionamentos.mjs",
+    "aplicativos/painel-administracao/telas/tela-detalhes-provisionamento.mjs",
+    "aplicativos/painel-administracao/telas/tela-auditoria.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-detalhes-auditoria.mjs",
+    "aplicativos/painel-administracao/formularios/formulario-transferir-administracao.mjs",
+    "aplicativos/painel-administracao/telas/tela-meu-perfil.mjs"
+  ],
+  "aplicativos/painel-administracao/telas/exportar-telas-convite.mjs": [
+    "aplicativos/painel-administracao/acesso/interpretar-convite.mjs",
+    "aplicativos/painel-administracao/telas/tela-aceitar-convite-administracao.mjs",
+    "aplicativos/painel-administracao/telas/tela-aceitar-convite-equipe.mjs"
+  ],
+  "aplicativos/programa-empresa/iniciar-aplicativo.mjs": [
+    "aplicativos/programa-empresa/componentes/conteiner-do-aplicativo.mjs",
+    "aplicativos/programa-empresa/navegacao/menu-lateral.mjs",
+    "aplicativos/programa-empresa/navegacao/estrutura-da-janela.mjs",
+    "aplicativos/programa-empresa/telas/tela-login.mjs",
+    "aplicativos/programa-empresa/telas/tela-sem-empresa.mjs",
+    "aplicativos/programa-empresa/navegacao/enderecos-das-telas.mjs",
+    "aplicativos/programa-empresa/telas/tela-erro-configuracao.mjs"
+  ],
+  "aplicativos/painel-administracao/iniciar-aplicativo.mjs": [
+    "aplicativos/painel-administracao/componentes/conteiner-do-aplicativo.mjs",
+    "aplicativos/painel-administracao/telas/tela-login.mjs",
+    "aplicativos/painel-administracao/telas/tela-sem-acesso.mjs",
+    "aplicativos/painel-administracao/navegacao/enderecos-das-telas.mjs"
+  ],
+  "aplicativos/painel-administracao/navegacao/trocar-tela.mjs": [
+    "aplicativos/painel-administracao/navegacao/menu-lateral.mjs",
+    "aplicativos/painel-administracao/navegacao/estrutura-da-janela.mjs"
+  ],
+  "aplicativos/programa-empresa/componentes/componentes-do-programa.mjs": [
+    "aplicativos/programa-empresa/componentes/criar-elemento.mjs",
+    "aplicativos/programa-empresa/componentes/formatar-valores.mjs",
+    "aplicativos/programa-empresa/componentes/indicador-de-situacao.mjs",
+    "aplicativos/programa-empresa/componentes/campos.mjs",
+    "aplicativos/programa-empresa/componentes/botoes.mjs",
+    "aplicativos/programa-empresa/componentes/carregamento-e-erros.mjs",
+    "aplicativos/programa-empresa/componentes/cabecalhos-e-cartoes.mjs",
+    "aplicativos/programa-empresa/componentes/mensagens.mjs",
+    "aplicativos/programa-empresa/componentes/janelas-de-confirmacao.mjs",
+    "aplicativos/programa-empresa/navegacao/trocar-tela.mjs"
+  ],
+  "aplicativos/programa-empresa/acesso/sessao-e-permissoes.mjs": [
+    "aplicativos/programa-empresa/sistema/carregar-configuracao-da-interface.mjs",
+    "aplicativos/programa-empresa/comunicacao/verificar-conexao.mjs",
+    "aplicativos/programa-empresa/acesso/sessao-do-usuario.mjs",
+    "aplicativos/programa-empresa/comunicacao/enviar-requisicao.mjs",
+    "aplicativos/programa-empresa/acesso/entrar-e-sair.mjs",
+    "aplicativos/programa-empresa/acesso/empresa-e-permissoes-do-usuario.mjs",
+    "aplicativos/programa-empresa/estilos/preferencias-de-tema.mjs"
+  ],
+  "compartilhado/validacoes/exportar-validacoes.mjs": [
+    "compartilhado/validacoes/validar-documentos.mjs",
+    "compartilhado/validacoes/validar-empresa.mjs",
+    "compartilhado/validacoes/validar-veiculo.mjs",
+    "compartilhado/validacoes/validar-abastecimento.mjs",
+    "compartilhado/validacoes/validar-viagem.mjs",
+    "compartilhado/validacoes/validar-odometro.mjs",
+    "compartilhado/validacoes/validar-senha.mjs"
+  ],
+  "aplicativos/programa-empresa/dados/dados-do-programa.mjs": [
+    "aplicativos/programa-empresa/comunicacao/consultar-e-guardar-dados.mjs",
+    "aplicativos/programa-empresa/dados/dados-tela-inicial.mjs",
+    "aplicativos/programa-empresa/dados/dados-veiculos.mjs",
+    "aplicativos/programa-empresa/dados/dados-motoristas.mjs",
+    "aplicativos/programa-empresa/dados/dados-locais.mjs",
+    "aplicativos/programa-empresa/dados/dados-viagens.mjs",
+    "aplicativos/programa-empresa/dados/dados-abastecimentos.mjs",
+    "aplicativos/programa-empresa/dados/dados-manutencoes.mjs",
+    "aplicativos/programa-empresa/dados/dados-patio.mjs",
+    "aplicativos/programa-empresa/dados/dados-movimentacoes.mjs",
+    "aplicativos/programa-empresa/dados/dados-odometro.mjs",
+    "aplicativos/programa-empresa/dados/dados-empresa.mjs",
+    "aplicativos/programa-empresa/dados/dados-equipe.mjs",
+    "aplicativos/programa-empresa/dados/dados-relatorios.mjs",
+    "aplicativos/programa-empresa/dados/dados-auditoria.mjs",
+    "aplicativos/programa-empresa/dados/dados-ultimo-acesso.mjs"
+  ],
+  "aplicativos/programa-empresa/compilar-aplicativo.mjs": ["ferramentas/apoio/compilar-aplicativo.mjs"],
+  "aplicativos/painel-administracao/compilar-aplicativo.mjs": ["ferramentas/apoio/compilar-aplicativo.mjs"],
+  "aplicativos/programa-empresa/estilos/estilo-principal.css": [
+    "aplicativos/programa-empresa/estilos/estilo-base.css",
+    "aplicativos/programa-empresa/estilos/estilo-menu-e-janela.css",
+    "aplicativos/programa-empresa/estilos/estilo-componentes.css",
+    "aplicativos/programa-empresa/estilos/estilo-login.css",
+    "aplicativos/programa-empresa/estilos/estilo-ajustes-visuais.css",
+    "aplicativos/programa-empresa/estilos/estilo-importacao.css"
+  ],
+  "aplicativos/painel-administracao/estilos/estilo-principal.css": [
+    "aplicativos/painel-administracao/estilos/estilo-base.css",
+    "aplicativos/painel-administracao/estilos/estilo-menu-e-janela.css",
+    "aplicativos/painel-administracao/estilos/estilo-componentes.css",
+    "aplicativos/painel-administracao/estilos/estilo-login.css",
+    "aplicativos/painel-administracao/estilos/estilo-ajustes-visuais.css"
+  ],
+  "aplicativos/painel-administracao/comunicacao/comunicacao-com-servidor.mjs": [
+    "aplicativos/painel-administracao/comunicacao/carregar-configuracao.mjs",
+    "aplicativos/painel-administracao/comunicacao/verificar-conexao.mjs",
+    "aplicativos/painel-administracao/acesso/sessao-do-usuario.mjs",
+    "aplicativos/painel-administracao/comunicacao/enviar-requisicao.mjs",
+    "aplicativos/painel-administracao/acesso/entrar-e-sair.mjs",
+    "aplicativos/painel-administracao/comunicacao/guardar-consultas-temporarias.mjs",
+    "aplicativos/painel-administracao/dados/dados-do-painel.mjs",
+    "aplicativos/painel-administracao/comunicacao/acompanhar-provisionamento.mjs",
+    "aplicativos/painel-administracao/dados/dados-tela-inicial.mjs",
+    "aplicativos/painel-administracao/dados/dados-empresas.mjs",
+    "aplicativos/painel-administracao/dados/dados-usuarios-das-empresas.mjs",
+    "aplicativos/painel-administracao/dados/dados-provisionamentos.mjs",
+    "aplicativos/painel-administracao/dados/dados-administradores.mjs",
+    "aplicativos/painel-administracao/dados/dados-auditoria.mjs"
+  ]
+}

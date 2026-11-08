@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PegaNaFrota — Administração da Plataforma</title>
+
+  <!--
+    CSP restritiva. `script-src 'self'` é o que torna "zero CDN" verificável:
+    nenhuma origem remota carrega script, mesmo que alguém escreva a tag.
+    `connect-src` é reescrito pelo build a partir da URL configurada.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="__CSP__">
+
+  <!--
+    Anti-flash. O tema é aplicado ANTES do primeiro paint, senão o painel pisca
+    branco ao abrir no escuro. Precisa ser inline e síncrono — por isso o build
+    calcula o hash e o injeta na CSP, em vez de liberar 'unsafe-inline'.
+  -->
+  <script src="./aplicar-tema.js"></script>
+
+  <link rel="stylesheet" href="./estilos/cores-e-espacamentos.css">
+  <link rel="stylesheet" href="./estilos/estilo-principal.css">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!--
+    O container começa vazio de propósito. O main.mjs decide de forma síncrona
+    se deve mostrar o login e só aguarda rede quando já existe uma sessão.
+    Evita qualquer tela intermediária visível sem esconder erros de boot.
+  -->
+  <div id="app" aria-busy="true"></div>
+
+  <!-- Configuração injetada pelo build; não compilada no bundle. -->
+  <script type="application/json" id="pnf-admin-config">__CONFIG__</script>
+
+  <script src="./mostrar-erro-ao-iniciar.js"></script>
+
+  <script type="module" src="./iniciar-aplicativo.mjs"></script>
+</body>
+</html>

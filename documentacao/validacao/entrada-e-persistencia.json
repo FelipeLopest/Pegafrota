@@ -1,0 +1,23 @@
+[
+  {
+    "produto": "programa-empresa",
+    "manterConectado": false,
+    "gravacoesProtegidas": 0,
+    "entradaConcluida": true,
+    "errosJavaScript": []
+  },
+  {
+    "produto": "programa-empresa",
+    "manterConectado": true,
+    "gravacoesProtegidas": 1,
+    "entradaConcluida": true,
+    "errosJavaScript": []
+  },
+  {
+    "produto": "painel-administracao",
+    "manterConectado": false,
+    "gravacoesProtegidas": 0,
+    "entradaConcluida": true,
+    "errosJavaScript": []
+  }
+]
