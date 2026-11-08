@@ -58,7 +58,9 @@
     "compilar:painel": "node aplicativos/painel-administracao/compilar-aplicativo.mjs",
     "abrir:painel": "node aplicativos/painel-administracao/abrir-visualizacao-local.mjs",
     "testar": "node ferramentas/testes/testar-unidades.mjs",
-    "verificar:organizacao": "node ferramentas/verificacoes/verificar-organizacao.mjs"
+    "verificar:organizacao": "node ferramentas/verificacoes/verificar-organizacao.mjs",
+    "gerar:instalador": "node ferramentas/compilacao/gerar-instalador.mjs",
+    "compilar:vercel": "node ferramentas/compilacao/compilar-painel-vercel.mjs"
   },
   "devDependencies": {
     "electron-builder": "^26.15.3",

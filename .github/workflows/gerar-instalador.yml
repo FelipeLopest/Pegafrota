@@ -1,0 +1,22 @@
+name: Gerar instalador Windows
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  instalador:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run gerar:instalador
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PegaNaFrota-Instalador-Windows
+          path: instaladores/*.exe
+          if-no-files-found: error

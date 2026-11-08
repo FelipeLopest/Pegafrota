@@ -2,6 +2,10 @@
 
 Data: 7 de novembro de 2026. Origem: `PegaNaFrota_Corrigido-main (4).zip`. O ZIP recebido foi preservado; esta entrega é uma cópia reorganizada.
 
+## Preparação para distribuição e Vercel
+
+Nesta entrega a conexão pública foi incorporada em arquivo próprio, sem exigir a criação de .env. Foram aprovados 282 testes unitários e as verificações do projeto. A saída estática da Vercel e a compilação Desktop foram conferidas sem .env. Há script e workflow para o instalador, mas nenhum .exe foi gerado: a instalação de dependências foi impedida por EPERM no Windows desta sessão. O deploy Vercel e o workflow GitHub ainda não foram executados na conta do usuário. Evidências em `documentacao/validacao/publicacao/`.
+
 ## Pacote completo unificado
 
 A duplicação de projeto no ZIP recebido foi resolvida mantendo a fonte atualizada e preservando o `.env` anterior em uma única raiz. As duas pastas `dist` foram geradas novamente a partir desta versão. Foram repetidos os 278 testes, as verificações mínimas do projeto e os cinco cenários de CNPJ no Chrome com serviços simulados. Consulte `LEIA_PRIMEIRO.md` para abrir esta entrega; as evidências estão em `documentacao/validacao/projeto-unificado/`. O banco e a autenticação reais não foram testados.

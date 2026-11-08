@@ -36,12 +36,12 @@ Não há alteração de banco, migrations, Edge Functions, credenciais nem regra
 
 ## Pacote completo unificado
 
-Neste pacote, a consulta já está integrada e o `.env` anterior foi preservado. Siga `LEIA_PRIMEIRO.md`; não é necessário aplicar o ZIP de atualização separado. Os arquivos `dist` foram recompilados desta versão.
+Neste pacote, a consulta já está integrada e a configuração pública já está incorporada. Siga `LEIA_PRIMEIRO.md`; não é necessário aplicar o ZIP de atualização separado. Os arquivos `dist` foram recompilados desta versão.
 
 ## Instalar apenas a atualização na versão reorganizada
 
 1. Feche o servidor do painel com Ctrl+C.
-2. Extraia o ZIP de atualização dentro da pasta do projeto que contém `package.json`, `aplicativos` e `ferramentas`. Aceite substituir os arquivos correspondentes. O ZIP de atualização isolado não contém `.env`, credenciais ou `node_modules`; esta observação não se aplica ao pacote completo unificado, que preserva seu `.env`.
+2. Extraia o ZIP de atualização dentro da pasta do projeto que contém `package.json`, `aplicativos` e `ferramentas`. Aceite substituir os arquivos correspondentes. O ZIP de atualização isolado não contém `.env`, credenciais ou `node_modules`; esta observação não se aplica ao pacote completo unificado, que inclui apenas a configuração pública.
 3. Nessa pasta, execute:
 
 ```powershell

@@ -475,5 +475,9 @@ O guia principal é `GUIA_DO_PROJETO.md` na raiz. Este índice lista cada arquiv
 ## Pacote unificado
 
 - `LEIA_PRIMEIRO.md`: instruções para abrir esta entrega sem misturar versões.
-- `.env`: configuração preservada da cópia enviada pelo usuário; não é reproduzida na documentação.
+- `.env`: opcional para substituições locais; não faz parte do ZIP atual. A conexão padrão está em `configuracao-publica.json`.
 - `aplicativos/*/dist/`: arquivos gerados novamente das fontes atualizadas; não são uma segunda cópia do projeto.
+
+## Distribuição Desktop e Vercel
+
+Consulte `GUIA_DO_PROJETO.md` e `PUBLICAR_E_GERAR_APLICATIVO.md` para os novos arquivos de configuração pública, compilação e GitHub Actions. O instalador é gerado em `instaladores/` e a Vercel recebe `.vercel/output/`; essas pastas geradas não fazem parte do fonte versionado.

@@ -1,0 +1,9 @@
+{
+  "semEnv": true,
+  "configuracaoPublica": true,
+  "saidaVercel": true,
+  "cabecalhosCsp": true,
+  "painelSemElectron": true,
+  "instaladorGerado": false,
+  "deployReal": false
+}

@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+node_modules
+instaladores
+artifacts
+**/dist
+supabase
+documentacao/historico
+aplicativos/programa-empresa
+*.zip

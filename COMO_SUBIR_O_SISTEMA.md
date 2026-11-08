@@ -2,7 +2,7 @@
 
 1. Extraia o pacote e abra um terminal na pasta que contém `package.json`.
 2. Use Node.js 22 ou superior e execute `npm ci`. Isso instala as dependências das mesmas versões do lockfile; não é necessário instalar pacotes dentro de cada aplicativo.
-3. Este pacote unificado já preserva seu `.env` na raiz. Em uma instalação sem configuração existente, copie `.env.example` para `.env`. Preencha `PNF_SUPABASE_URL` e `PNF_SUPABASE_ANON_KEY` com a configuração pública do seu projeto Supabase. Nunca coloque a chave privilegiada nesses campos.
+3. A configuração pública já está em `configuracao-publica.json`. Não é necessário criar `.env`. Se precisar substituir a conexão, use as variáveis PNF_SUPABASE_URL e PNF_SUPABASE_ANON_KEY ou um `.env` local; use somente chave pública.
 4. O backend precisa ter as migrations e as funções da versão compatível já aplicadas. A reorganização não aplica mudanças ao banco automaticamente.
 
 ## Programa da empresa

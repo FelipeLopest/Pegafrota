@@ -1,3 +1,4 @@
+import { lerConfiguracaoPublica } from './configuracao-publica.mjs';
 import {
   cpSync as copiar,
   existsSync as existe,
@@ -76,22 +77,9 @@ export function validarImportsLocais(pasta) {
 export function compilarAplicativo(enderecoEntrada, programaEmpresa = false) {
   const pastaAplicativo = pastaPai(caminhoDoEndereco(enderecoEntrada));
   const raizProjeto = resolver(pastaAplicativo, '../..');
-  const ambiente = { ...process.env };
-  const arquivoAmbiente = juntar(raizProjeto, '.env');
-  if (existe(arquivoAmbiente)) {
-    for (const linha of lerArquivo(arquivoAmbiente, 'utf8').split(/\r?\n/)) {
-      const partes = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(linha);
-      if (partes && ambiente[partes[1]] == null)
-        ambiente[partes[1]] = partes[2].replace(/^["']|["']$/g, '');
-    }
-  }
-  const enderecoServidor = ambiente.PNF_SUPABASE_URL;
-  const chavePublica = ambiente.PNF_SUPABASE_ANON_KEY;
-  if (!enderecoServidor || !chavePublica)
-    throw new Error('Defina PNF_SUPABASE_URL e PNF_SUPABASE_ANON_KEY no .env ou no ambiente.');
+  const { supabaseUrl: enderecoServidor, anonKey: chavePublica } =
+    lerConfiguracaoPublica(raizProjeto);
   const origem = new URL(enderecoServidor).origin;
-  if (!/^https?:$/.test(new URL(enderecoServidor).protocol))
-    throw new Error('O endereço do servidor precisa usar HTTP ou HTTPS.');
   const argumentos = process.argv.slice(2);
   const indiceSaida = argumentos.indexOf('--out');
   const pastaSaida =

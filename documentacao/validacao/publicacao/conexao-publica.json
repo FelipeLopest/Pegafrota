@@ -1,0 +1,7 @@
+{
+  "verificacao": "GET /auth/v1/settings com apikey pública; sem autenticar usuário ou gravar dados",
+  "resultadoHttp": 200,
+  "rlsVerificadaNoBancoReal": false,
+  "deployVercelExecutado": false,
+  "instaladorExecutado": false
+}

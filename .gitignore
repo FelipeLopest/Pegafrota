@@ -13,3 +13,6 @@ artifacts/
 # Pacotes de entrega não pertencem ao repositório-fonte
 *.zip
 *.tar.gz
+
+.vercel/
+instaladores/

@@ -159,3 +159,13 @@ Os comandos anteriores em inglês continuam disponíveis para compatibilidade. `
 O inventário completo de arquivos está em `documentacao/organizacao/MAPA_DOS_ARQUIVOS.md`. O caminho de cada arquivo original e seu destino estão em `documentacao/organizacao/ARQUIVOS_ANTES_E_DEPOIS.csv`. A documentação recebida foi preservada e sinalizada como referência anterior quando necessário.
 
 A cópia antiga `v8.mjs`, o módulo MFA vazio e o pacote de tipos sem consumidor foram retirados do código ativo; o motivo consta no mapa. Os cenários úteis dos testes antigos foram preservados/adaptados; dez pares idênticos de arquivos de teste foram consolidados.
+
+## Distribuição e hospedagem
+
+- `configuracao-publica.json`: URL e chave pública incorporadas; sem dados administrativos.
+- `ferramentas/apoio/configuracao-publica.mjs`: prioridade da configuração e rejeição de chaves privilegiadas.
+- `ferramentas/compilacao/gerar-instalador.mjs`: pacote Electron para Windows x64, somente o produto compilado.
+- `.github/workflows/gerar-instalador.yml`: geração manual do instalador no GitHub Actions.
+- `ferramentas/compilacao/compilar-painel-vercel.mjs`: saída estática da Vercel com cabeçalhos CSP.
+- `vercel.json` e `.vercelignore`: comandos de build e exclusões do envio.
+- `PUBLICAR_E_GERAR_APLICATIVO.md`: instruções de instalação, Vercel e autorização do domínio no Supabase.

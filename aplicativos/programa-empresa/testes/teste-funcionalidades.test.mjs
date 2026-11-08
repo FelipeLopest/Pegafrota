@@ -97,7 +97,7 @@ testar('listas não possuem o antigo limite silencioso de 200', () => {
 
 testar('builds exigem configuração remota e não usam fallback localhost', () => {
   for (const compilar of ['../painel-administracao/compilar-aplicativo.mjs', 'compilar-aplicativo.mjs']) {
-    const textoItem = ler(compilar);
+    const textoItem = ler(compilar) + '\n' + lerArquivoSincrono(resolverCaminho(repositorio, 'ferramentas/apoio/configuracao-publica.mjs'), 'utf8');
     verificarCondicao.match(textoItem, /PNF_SUPABASE_URL/);
     verificarCondicao.match(textoItem, /PNF_SUPABASE_ANON_KEY/);
     verificarCondicao.doesNotMatch(textoItem, /localhost:54321/);

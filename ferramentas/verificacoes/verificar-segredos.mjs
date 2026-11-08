@@ -5,7 +5,11 @@ import {
   readFileSync as lerArquivoSincrono,
   statSync as consultarArquivoSincrono,
 } from 'node:fs';
-import { join as juntarCaminhos, relative as caminhoRelativo, extname as obterExtensao } from 'node:path';
+import {
+  join as juntarCaminhos,
+  relative as caminhoRelativo,
+  extname as obterExtensao,
+} from 'node:path';
 
 const RAIZ = process.argv[2] || process.cwd();
 
@@ -101,6 +105,16 @@ function examinarArquivo(arquivo) {
       regra.pattern.lastIndex = 0;
       const correspondencia = regra.pattern.exec(linha);
       if (!correspondencia) return;
+      if (regra.id === 'service-role-jwt') {
+        try {
+          const dados = JSON.parse(
+            Buffer.from(correspondencia[0].split('.')[1], 'base64url').toString(),
+          );
+          if (dados.role === 'anon') return;
+        } catch {
+          /* JWT desconhecido continua sendo sinalizado. */
+        }
+      }
       if (LISTA_PERMITIDA.some((permitido) => permitido.test(linha))) return;
       achados.push({
         file: caminhoRelativo(RAIZ, arquivo),
