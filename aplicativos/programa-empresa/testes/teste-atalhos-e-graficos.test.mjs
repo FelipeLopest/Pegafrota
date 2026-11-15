@@ -3,9 +3,18 @@ import verificarCondicao from 'node:assert/strict';
 import { readFileSync as lerArquivoSincrono } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 
 const principal = lerArquivoSincrono(new URL('../iniciar-aplicativo.mjs', import.meta.url), 'utf8');
-const painel = lerArquivoSincrono(new URL('../telas/exportar-telas-analise.mjs', import.meta.url), 'utf8');
-const estilosCss = lerArquivoSincrono(new URL('../estilos/estilo-principal.css', import.meta.url), 'utf8');
-const processoPrincipal = lerArquivoSincrono(new URL('../sistema/abrir-janela.cjs', import.meta.url), 'utf8');
+const painel = lerArquivoSincrono(
+  new URL('../telas/exportar-telas-analise.mjs', import.meta.url),
+  'utf8',
+);
+const estilosCss = lerArquivoSincrono(
+  new URL('../estilos/estilo-principal.css', import.meta.url),
+  'utf8',
+);
+const processoPrincipal = lerArquivoSincrono(
+  new URL('../sistema/abrir-janela.cjs', import.meta.url),
+  'utf8',
+);
 
 testar('v11 Desktop possui menu lateral compactável e atalho Ctrl+B', () => {
   verificarCondicao.match(principal, /sidebar-collapsed/);

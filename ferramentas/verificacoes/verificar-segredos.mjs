@@ -15,6 +15,8 @@ const RAIZ = process.argv[2] || process.cwd();
 
 const PASTAS_IGNORADAS = new Set([
   'node_modules',
+  'compilado',
+  '__pycache__',
   '.git',
   'dist',
   'build',

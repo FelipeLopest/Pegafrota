@@ -1,0 +1,14 @@
+{
+  "cenarios": [
+    "Cadastro sem automação por padrão",
+    "Pareamento exige modelo e Wi-Fi",
+    "Exportação de configuração sem credenciais administrativas",
+    "Revisão com seleção de veículo e motivo",
+    "Monitoramento recebe imagem e conclui leitura",
+    "Parada do monitoramento",
+    "Pátio manual preservado"
+  ],
+  "errosJavaScript": [],
+  "apis": "Simuladas; nenhuma escrita em produção",
+  "ponteElectron": "Simulada; processador real testado separadamente"
+}

@@ -17,7 +17,13 @@ for (const [nome, comando] of Object.entries(pacote.scripts)) {
     if (!existe(juntar(raiz, trecho[1])))
       problemas.push(`Comando ${nome} aponta para arquivo ausente: ${trecho[1]}`);
 }
-for (const pasta of ['aplicativos', 'compartilhado', 'ferramentas', 'supabase/functions', 'supabase/tests']) {
+for (const pasta of [
+  'aplicativos',
+  'compartilhado',
+  'ferramentas',
+  'supabase/functions',
+  'supabase/tests',
+]) {
   for (const arquivo of listarArquivos(juntar(raiz, pasta), {
     ignorar: new Set(['dist', 'node_modules', 'artifacts']),
   }).filter((arquivo) => /\.(mjs|cjs|js|ts)$/.test(arquivo))) {
@@ -35,7 +41,14 @@ const assinaturas = JSON.parse(
 );
 for (const [nome, esperado] of Object.entries(assinaturas)) {
   const arquivo = juntar(raiz, 'supabase/migrations', nome);
-  if (!existe(arquivo) || criarResumo('sha256').update(lerArquivo(arquivo)).digest('hex') !== esperado)
+  if (
+    !existe(arquivo) ||
+    ![
+      lerArquivo(arquivo),
+      Buffer.from(lerArquivo(arquivo, 'utf8').replace(/\r?\n/g, '\r\n')),
+      Buffer.from(lerArquivo(arquivo, 'utf8').replace(/\r\n/g, '\n')),
+    ].some((conteudo) => criarResumo('sha256').update(conteudo).digest('hex') === esperado)
+  )
     problemas.push('Migration original alterada: ' + nome);
 }
 for (const aplicativo of ['programa-empresa', 'painel-administracao']) {

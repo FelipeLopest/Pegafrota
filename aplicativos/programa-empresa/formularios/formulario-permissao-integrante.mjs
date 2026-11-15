@@ -23,7 +23,11 @@ export function abrirAlteracaoPapel(usuarioItem, aoConcluir) {
         ['operator', 'Operador'],
         ['viewer', 'Visualizador'],
       ].map(([veiculoItem, linhaItem]) =>
-        criarElemento('option', { value: veiculoItem, text: linhaItem, selected: veiculoItem === papel }),
+        criarElemento('option', {
+          value: veiculoItem,
+          text: linhaItem,
+          selected: veiculoItem === papel,
+        }),
       ),
     ),
   });

@@ -4,7 +4,10 @@ import { readFileSync as lerArquivoSincrono } from '../../../ferramentas/apoio/l
 
 const telas = lerArquivoSincrono(new URL('../telas/exportar-telas.mjs', import.meta.url), 'utf8');
 const principal = lerArquivoSincrono(new URL('../iniciar-aplicativo.mjs', import.meta.url), 'utf8');
-const estilosCss = lerArquivoSincrono(new URL('../estilos/estilo-principal.css', import.meta.url), 'utf8');
+const estilosCss = lerArquivoSincrono(
+  new URL('../estilos/estilo-principal.css', import.meta.url),
+  'utf8',
+);
 
 testar('listas operacionais usam explorador com busca, filtros e paginação', () => {
   verificarCondicao.match(telas, /function exploradorColecao/);

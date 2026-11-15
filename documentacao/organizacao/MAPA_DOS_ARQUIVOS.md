@@ -481,3 +481,96 @@ O guia principal é `GUIA_DO_PROJETO.md` na raiz. Este índice lista cada arquiv
 ## Distribuição Desktop e Vercel
 
 Consulte `GUIA_DO_PROJETO.md` e `PUBLICAR_E_GERAR_APLICATIVO.md` para os novos arquivos de configuração pública, compilação e GitHub Actions. O instalador é gerado em `instaladores/` e a Vercel recebe `.vercel/output/`; essas pastas geradas não fazem parte do fonte versionado.
+
+## Arquivos acrescentados nas atualizações e integração 1.1.0
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `.github/workflows/gerar-instalador.yml` | Arquivo da atualização: gerar instalador.yml. |
+| `.github/workflows/verificar-camera.yml` | Compilação verificável do firmware no Linux. |
+| `.vercelignore` | Arquivo da atualização: .vercelignore. |
+| `ATIVAR_CAMERAS.md` | Ativação, configuração inicial, operação e limites da integração ESP32-S3. |
+| `aplicativos/painel-administracao/testes/teste-configuracao-publica.test.mjs` | Teste automatizado do comportamento indicado pelo nome do arquivo. |
+| `aplicativos/programa-empresa/comunicacao/monitorar-cameras.mjs` | Reserva e processamento da fila durante a sessão autorizada. |
+| `aplicativos/programa-empresa/dados/dados-cameras.mjs` | Consultas, RPCs da câmera e acesso autenticado às imagens privadas. |
+| `aplicativos/programa-empresa/formularios/formulario-camera.mjs` | Cadastro de local, sentido, enquadramento, confiança e limites da câmera. |
+| `aplicativos/programa-empresa/formularios/formulario-parear-camera.mjs` | Seleção da placa, Wi-Fi e geração única da configuração serial. |
+| `aplicativos/programa-empresa/formularios/formulario-revisar-leitura.mjs` | Revisão de imagem, escolha de veículo e motivo obrigatório. |
+| `aplicativos/programa-empresa/sistema/processar-imagem.cjs` | Subprocesso OCR de caminho fixo, com validação, timeout e encerramento. |
+| `aplicativos/programa-empresa/telas/tela-cameras.mjs` | Tela de câmeras, estado do dispositivo, imagens, fila e revisão. |
+| `aplicativos/programa-empresa/testes/teste-parametros-sql.test.mjs` | Teste automatizado do comportamento indicado pelo nome do arquivo. |
+| `aplicativos/programa-empresa/testes/teste-processador-imagem.test.mjs` | Teste automatizado do comportamento indicado pelo nome do arquivo. |
+| `dispositivos/esp32-s3/peganafrota-camera/peganafrota-camera.ino` | Firmware: câmera, Wi-Fi, HTTPS, relógio, movimento, fila e pareamento. |
+| `dispositivos/esp32-s3/peganafrota-camera/perfis_camera.h` | Pinos oficiais dos dois modelos suportados; rejeita perfil desconhecido. |
+| `documentacao/validacao/cameras/RELATORIO_INTEGRACAO_ESP32.md` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/autoteste-executavel.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/banco.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/interface.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/leitor-executavel.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/ocr-sintetico.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/python.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/compilar-empresa.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/compilar-painel.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/configuracao.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/contratos.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/electron.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/fronteiras.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/funcao-servidor.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/inicializacao-painel.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/organizacao.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/prototipos.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/recursos-locais.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/resultados.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/segredos.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/sintaxe-e-imports.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/cameras/verificacoes/testes-unitarios.log` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/consulta-cnpj/consulta-publica.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/consulta-cnpj/navegador.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/consulta-cnpj/verificacoes.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/projeto-unificado/cnpj-navegador.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/projeto-unificado/organizacao.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/projeto-unificado/resultados.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/publicacao/cnpj-navegador.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/publicacao/conexao-publica.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/publicacao/resultados.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `documentacao/validacao/publicacao/sem-env.json` | Evidência de revisão ou teste; consulte o relatório da respectiva atualização. |
+| `ferramentas/administracao/agendar-limpeza-cameras.sql` | Agendamento de manutenção usando segredos exclusivos do Vault. |
+| `ferramentas/apoio/configuracao-publica.mjs` | Arquivo da atualização: configuracao publica.mjs. |
+| `ferramentas/apoio/interpretar-lista-sql.mjs` | Leitura de parâmetros SQL respeitando aspas, vírgulas e parênteses. |
+| `ferramentas/compilacao/compilar-painel-vercel.mjs` | Arquivo da atualização: compilar painel vercel.mjs. |
+| `ferramentas/compilacao/gerar-instalador.mjs` | Arquivo da atualização: gerar instalador.mjs. |
+| `ferramentas/compilacao/gerar-leitor-placas.mjs` | Empacotamento Windows do leitor com modelos e licenças. |
+| `ferramentas/testes/cameras/ambiente-descartavel.sql` | Estruturas simuladas de Auth/Storage somente para testes isolados. |
+| `ferramentas/testes/cameras/testar-banco.mjs` | Teste das migrations e garantias transacionais em PostgreSQL descartável. |
+| `servicos/leitor-placas/licencas/Modelos-PPOCR-APACHE-2.0.txt` | Licença e atribuição do motor ou modelo OCR redistribuído. |
+| `servicos/leitor-placas/licencas/RapidOCR-APACHE-2.0.txt` | Licença e atribuição do motor ou modelo OCR redistribuído. |
+| `servicos/leitor-placas/reconhecer_placa.py` | Motor OCR local, recorte e extração de placas brasileiras. |
+| `servicos/leitor-placas/requirements.txt` | Versões fixadas das dependências do leitor e empacotamento. |
+| `servicos/leitor-placas/teste_reconhecimento.py` | Testes de formato, ambiguidades e agrupamento do reconhecimento. |
+| `servicos/leitor-placas/verificar_executavel.py` | Autoteste do leitor Windows empacotado com imagem sintética. |
+| `supabase/functions/camera-intake/deno.json` | Configuração de compilação Deno da função de servidor. |
+| `supabase/functions/camera-intake/deno.lock` | Dependências de servidor fixadas para instalação reproduzível. |
+| `supabase/functions/camera-intake/index.ts` | Entrada de dispositivo, armazenamento e comunicação com o banco. |
+| `supabase/functions/camera-intake/receber-captura.ts` | Validação de corpo JPEG, dimensões, identidade e fluxo HTTP testável. |
+| `supabase/functions/camera-maintenance/deno.json` | Configuração de compilação Deno da função de servidor. |
+| `supabase/functions/camera-maintenance/deno.lock` | Dependências de servidor fixadas para instalação reproduzível. |
+| `supabase/functions/camera-maintenance/index.ts` | Limpeza de arquivos expirados autorizada somente ao servidor. |
+| `supabase/migrations/20261109000100_camera_capture_pipeline.sql` | Credenciais privadas, fila, retenção, RLS, consenso e movimentação transacional. |
+| `supabase/tests/edge/camera-intake.test.mjs` | Testes locais da recepção de imagens, limites e autenticação. |
+| `vercel.json` | Arquivo da atualização: vercel.json. |
+
+## Marca e apresentação — versão 1.1.1
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `aplicativos/programa-empresa/componentes/apresentacao-do-login.mjs` | Marca, apresentação, ilustração e cartões de recursos do acesso. |
+| `aplicativos/programa-empresa/recursos/icone-aplicativo.svg` | Ícone da marca em formato vetorial. |
+| `aplicativos/programa-empresa/recursos/icone-aplicativo.png` | Ícone da marca em formato raster de 512 px. |
+| `aplicativos/programa-empresa/recursos/icone-aplicativo.ico` | Ícone da marca em formato Windows com sete tamanhos. |
+| `aplicativos/programa-empresa/recursos/ilustracao-operacao.svg` | Ilustração vetorial da apresentação, local e sem conteúdo de conta. |
+| `aplicativos/painel-administracao/componentes/apresentacao-do-login.mjs` | Marca, apresentação, ilustração e cartões de recursos do acesso. |
+| `aplicativos/painel-administracao/recursos/icone-aplicativo.svg` | Ícone da marca em formato vetorial. |
+| `aplicativos/painel-administracao/recursos/icone-aplicativo.png` | Ícone da marca em formato raster de512px. |
+| `aplicativos/painel-administracao/recursos/icone-aplicativo.ico` | Ícone da marca em formato Windows com sete tamanhos. |
+| `aplicativos/painel-administracao/recursos/ilustracao-plataforma.svg` | Ilustração vetorial da apresentação, local e sem conteúdo de conta. |
+| `documentacao/validacao/aparencia/` | Relatório, capturas e evidências da revisão visual. |

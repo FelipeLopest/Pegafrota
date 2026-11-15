@@ -2,7 +2,8 @@
 
 import postgres from 'pg';
 
-const ENDERECO_BANCO = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const ENDERECO_BANCO =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
 
 const verificacoes = [];
 let falhas = 0;
@@ -17,8 +18,10 @@ async function principal() {
   const cliente = new postgres.Client({ connectionString: ENDERECO_BANCO });
   await cliente.connect();
 
-  const um = async (codigoSql, parametros = []) => (await cliente.query(codigoSql, parametros)).rows[0];
-  const todos = async (codigoSql, parametros = []) => (await cliente.query(codigoSql, parametros)).rows;
+  const um = async (codigoSql, parametros = []) =>
+    (await cliente.query(codigoSql, parametros)).rows[0];
+  const todos = async (codigoSql, parametros = []) =>
+    (await cliente.query(codigoSql, parametros)).rows;
 
   console.log('PegaNaFrota — verificação do seed\n');
 
@@ -36,7 +39,11 @@ async function principal() {
     from public.companies c order by c.trade_name
   `);
   for (const linha of porEmpresa) {
-    registro(`${linha.trade_name}: 3–8 usuários`, linha.users >= 3 && linha.users <= 8, `${linha.users}`);
+    registro(
+      `${linha.trade_name}: 3–8 usuários`,
+      linha.users >= 3 && linha.users <= 8,
+      `${linha.users}`,
+    );
     registro(
       `${linha.trade_name}: 15–40 veículos`,
       linha.vehicles >= 15 && linha.vehicles <= 40,
@@ -61,7 +68,9 @@ async function principal() {
   registro(
     'os quatro papéis existem em todas as empresas',
     ausentesPapeis.length === 0,
-    ausentesPapeis.map((resultadoItem) => `${resultadoItem.trade_name}/${resultadoItem.role}`).join(', '),
+    ausentesPapeis
+      .map((resultadoItem) => `${resultadoItem.trade_name}/${resultadoItem.role}`)
+      .join(', '),
   );
 
   const inativo = await um(`
@@ -168,14 +177,18 @@ async function principal() {
   registro(
     'data_integrity_selftest sem apontamentos',
     integridade.length === 0,
-    integridade.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`).join(' | '),
+    integridade
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`)
+      .join(' | '),
   );
 
   const seguranca = await todos('select * from private.security_selftest()');
   registro(
     'security_selftest sem desvios',
     seguranca.length === 0,
-    seguranca.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.object_name}`).join(' | '),
+    seguranca
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.object_name}`)
+      .join(' | '),
   );
 
   const cruzado = await um(`

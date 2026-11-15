@@ -9,14 +9,21 @@ export function mostrarProgressoCadastroEmpresa() {
     { class: 'progress-steps' },
     ETAPAS_PROVISIONAMENTO.map((textoItem) => {
       const noDetalhe = criarElemento('p', { class: 'progress-step-detail', text: 'Aguardando' });
-      const etiquetaSituacao = criarElemento('status-pill', { status: 'pending', label: 'Aguardando' });
-      const linha = criarElemento('div', { class: 'progress-step', dataset: { status: 'pending' } }, [
-        etiquetaSituacao,
-        criarElemento('div', { class: 'progress-step-body' }, [
-          criarElemento('p', { class: 'progress-step-label', text: textoItem.label }),
-          noDetalhe,
-        ]),
-      ]);
+      const etiquetaSituacao = criarElemento('status-pill', {
+        status: 'pending',
+        label: 'Aguardando',
+      });
+      const linha = criarElemento(
+        'div',
+        { class: 'progress-step', dataset: { status: 'pending' } },
+        [
+          etiquetaSituacao,
+          criarElemento('div', { class: 'progress-step-body' }, [
+            criarElemento('p', { class: 'progress-step-label', text: textoItem.label }),
+            noDetalhe,
+          ]),
+        ],
+      );
       linhas.set(textoItem.code, { row: linha, pill: etiquetaSituacao, detailNode: noDetalhe });
       return linha;
     }),

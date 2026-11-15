@@ -25,7 +25,7 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
   return tela(
     conteudoTela,
     PERMISSAO.LOCATIONS_READ,
-    () => dados.locations.list(),
+    () => dados.locations.page(),
     (locais) => {
       const cabecalho = cabecalhoPagina({
         title: 'Locais',
@@ -48,7 +48,9 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
           }),
         ],
       });
-      const estados = [...new Set(locais.map((linhaItem) => linhaItem.address_state).filter(Boolean))].sort();
+      const estados =
+        locais.paginaRemota?.facetas?.states ||
+        [...new Set(locais.map((linhaItem) => linhaItem.address_state).filter(Boolean))].sort();
       const explorador = exploradorColecao(locais, {
         key: 'locations',
         placeholder: 'Buscar local, cidade, UF ou observação',
@@ -91,15 +93,28 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
               criarElemento('tr', {}, [
                 criarElemento('td', {}, [
                   criarElemento('b', { text: linhaItem.name }),
-                  criarElemento('p', { class: 'muted', text: linhaItem.notes || '' }),
+                  criarElemento('p', {
+                    class: 'muted',
+                    text: linhaItem.notes || '',
+                  }),
                 ]),
                 criarElemento('td', {
-                  text: [linhaItem.address_city, linhaItem.address_state].filter(Boolean).join(' / ') || '—',
+                  text:
+                    [linhaItem.address_city, linhaItem.address_state].filter(Boolean).join(' / ') ||
+                    '—',
                 }),
                 criarElemento('td', {}, [
                   criarElemento('status-pill', {
-                    status: linhaItem.archived_at ? 'archived' : linhaItem.active ? 'active' : 'inactive',
-                    label: linhaItem.archived_at ? 'Arquivado' : linhaItem.active ? 'Ativo' : 'Inativo',
+                    status: linhaItem.archived_at
+                      ? 'archived'
+                      : linhaItem.active
+                        ? 'active'
+                        : 'inactive',
+                    label: linhaItem.archived_at
+                      ? 'Arquivado'
+                      : linhaItem.active
+                        ? 'Ativo'
+                        : 'Inativo',
                   }),
                 ]),
                 criarElemento('td', {}, [
@@ -107,7 +122,11 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
                     label: 'Editar',
                     variant: 'ghost',
                     permission: PERMISSAO.LOCATIONS_WRITE,
-                    onClick: () => abrirEditorLocal({ location: linhaItem, onDone: recarregar }),
+                    onClick: () =>
+                      abrirEditorLocal({
+                        location: linhaItem,
+                        onDone: recarregar,
+                      }),
                   }),
                   linhaItem.archived_at
                     ? botao({
@@ -117,10 +136,14 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
                         onClick: async () => {
                           try {
                             await dados.locations.unarchive(linhaItem.id);
-                            notificacao('Local desarquivado.', { tone: 'success' });
+                            notificacao('Local desarquivado.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       })
@@ -136,7 +159,9 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
                             });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       }),
@@ -156,10 +181,14 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
                           if (!motivo) return;
                           try {
                             await dados.locations.archive(linhaItem.id, motivo);
-                            notificacao('Local arquivado.', { tone: 'success' });
+                            notificacao('Local arquivado.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       })
@@ -170,36 +199,39 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
           ),
         pageSize: 50,
       });
-      const estatisticas = faixaResumo([
-        {
-          label: 'Ativos',
-          value: contarOnde(locais, (linhaItem) => linhaItem.active && !linhaItem.archived_at),
-          icon: 'pin',
-          tone: 'success',
-        },
-        {
-          label: 'Inativos',
-          value: contarOnde(locais, (linhaItem) => !linhaItem.active && !linhaItem.archived_at),
-          icon: 'ban',
-          tone: 'muted',
-        },
-        {
-          label: 'Arquivados',
-          value: contarOnde(locais, (linhaItem) => !!linhaItem.archived_at),
-          icon: 'archive',
-          tone: 'muted',
-        },
-        {
-          label: 'UFs cobertas',
-          value: new Set(
-            locais
-              .filter((linhaItem) => !linhaItem.archived_at && linhaItem.address_state)
-              .map((linhaItem) => linhaItem.address_state),
-          ).size,
-          icon: 'building',
-          tone: 'info',
-        },
-      ]);
+      const estatisticas = faixaResumo(
+        [
+          {
+            label: 'Ativos',
+            value: contarOnde(locais, (linhaItem) => linhaItem.active && !linhaItem.archived_at),
+            icon: 'pin',
+            tone: 'success',
+          },
+          {
+            label: 'Inativos',
+            value: contarOnde(locais, (linhaItem) => !linhaItem.active && !linhaItem.archived_at),
+            icon: 'ban',
+            tone: 'muted',
+          },
+          {
+            label: 'Arquivados',
+            value: contarOnde(locais, (linhaItem) => !!linhaItem.archived_at),
+            icon: 'archive',
+            tone: 'muted',
+          },
+          {
+            label: 'UFs cobertas',
+            value: new Set(
+              locais
+                .filter((linhaItem) => !linhaItem.archived_at && linhaItem.address_state)
+                .map((linhaItem) => linhaItem.address_state),
+            ).size,
+            icon: 'building',
+            tone: 'info',
+          },
+        ],
+        { colecao: locais },
+      );
       return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
     },
   );

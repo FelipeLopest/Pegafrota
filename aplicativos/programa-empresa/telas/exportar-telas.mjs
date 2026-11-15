@@ -26,4 +26,8 @@ export * from './tela-equipe.mjs';
 export * from '../formularios/formulario-integrante-equipe.mjs';
 export * from '../formularios/formulario-permissao-integrante.mjs';
 export * from './tela-meu-perfil.mjs';
-export { telaPainel as screenDashboard, telaOdometro as screenOdometer, telaRelatorios as screenReports };
+export {
+  telaPainel as screenDashboard,
+  telaOdometro as screenOdometer,
+  telaRelatorios as screenReports,
+};

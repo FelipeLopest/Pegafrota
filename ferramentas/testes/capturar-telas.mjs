@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-import { spawn as iniciarProcesso, execFileSync as executarArquivoSincrono } from 'node:child_process';
+import {
+  spawn as iniciarProcesso,
+  execFileSync as executarArquivoSincrono,
+} from 'node:child_process';
 import {
   existsSync as arquivoExiste,
   mkdirSync as criarPastaSincrona,
   writeFileSync as gravarArquivoSincrono,
   readFileSync as lerArquivoSincrono,
 } from 'node:fs';
-import { join as juntarCaminhos, dirname as obterPastaPai, resolve as resolverCaminho } from 'node:path';
+import {
+  join as juntarCaminhos,
+  dirname as obterPastaPai,
+  resolve as resolverCaminho,
+} from 'node:path';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 import { createServer as criarServidor } from 'node:http';
 import { tmpdir as pastaTemporariaSistema } from 'node:os';
@@ -19,7 +26,8 @@ const PASTA_IMAGENS_REFERENCIA = juntarCaminhos(CAPTURAS, 'design');
 const PASTA_IMAGENS_IMPLEMENTACAO = juntarCaminhos(CAPTURAS, 'implementation');
 
 const PASTA_REFERENCIAS_VISUAIS = process.env.PNF_DESIGN_ROOT || '/home/claude/handoff/extracted';
-const RECURSOS_PROTOTIPO = process.env.PNF_PROTO_RUNTIME || '/home/claude/protoruntime/node_modules';
+const RECURSOS_PROTOTIPO =
+  process.env.PNF_PROTO_RUNTIME || '/home/claude/protoruntime/node_modules';
 const SERVIDOR = process.env.PNF_DEV_URL || 'http://127.0.0.1:54321';
 
 const ignorar = (correspondenciaItem) => {
@@ -46,9 +54,19 @@ const ROTAS_PROGRAMA_EMPRESA = [
   { id: 'usuarios', proto: 'Usuários', rota: '/usuarios' },
   { id: 'auditoria', proto: 'Auditoria', rota: '/auditoria' },
   { id: 'perfil', proto: 'Perfil e aparência', rota: '/perfil' },
-  { id: 'movimentacoes', proto: null, rota: '/movimentacoes', nota: 'no protótipo vive dentro do Pátio' },
+  {
+    id: 'movimentacoes',
+    proto: null,
+    rota: '/movimentacoes',
+    nota: 'no protótipo vive dentro do Pátio',
+  },
   { id: 'odometro', proto: null, rota: '/odometro', nota: 'no protótipo vive dentro do Veículo' },
-  { id: 'veiculo-detalhe', proto: null, rota: '/veiculos/__ID__', nota: 'rota parametrizada da mesma tela' },
+  {
+    id: 'veiculo-detalhe',
+    proto: null,
+    rota: '/veiculos/__ID__',
+    nota: 'rota parametrizada da mesma tela',
+  },
 ];
 
 const ROTAS_ADMINISTRADOR = [
@@ -59,8 +77,18 @@ const ROTAS_ADMINISTRADOR = [
   { id: 'provisionamentos', proto: 'Provisionamentos', rota: '/provisionamentos', prefixo: true },
   { id: 'auditoria', proto: 'Auditoria global', rota: '/auditoria' },
   { id: 'perfil', proto: 'Perfil e aparência', rota: '/perfil' },
-  { id: 'empresa-detalhe', proto: null, rota: '/empresas/__ID__', nota: 'aberta a partir da lista' },
-  { id: 'nova-empresa', proto: null, rota: '/empresas/nova', nota: 'aberta pelo botão Nova empresa' },
+  {
+    id: 'empresa-detalhe',
+    proto: null,
+    rota: '/empresas/__ID__',
+    nota: 'aberta a partir da lista',
+  },
+  {
+    id: 'nova-empresa',
+    proto: null,
+    rota: '/empresas/nova',
+    nota: 'aberta pelo botão Nova empresa',
+  },
 ];
 
 const LARGURAS = (process.env.PNF_VISUAL_WIDTHS || '1280,1440,1920').split(',').map(Number);
@@ -140,10 +168,14 @@ const codigoSql = (buscaAtual) =>
       '-c',
       buscaAtual,
     ],
-    { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+    {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+    },
   ).trim();
 
-const administradorEmpresaIdentificador = codigoSql(`select m.user_id from public.company_memberships m
+const administradorEmpresaIdentificador =
+  codigoSql(`select m.user_id from public.company_memberships m
   join public.profiles p on p.id = m.user_id
   where m.role='company_admin' and m.active and p.active limit 1`);
 
@@ -152,7 +184,8 @@ let administradorPlataformaIdentificador = codigoSql(`select a.user_id from plat
   where a.status='active' and p.active limit 1`);
 
 if (!administradorPlataformaIdentificador) {
-  administradorPlataformaIdentificador = codigoSql(`select p.id from public.profiles p where p.active
+  administradorPlataformaIdentificador =
+    codigoSql(`select p.id from public.profiles p where p.active
     order by p.created_at limit 1`);
   codigoSql(`insert into platform.admins (user_id, status) values ('${administradorPlataformaIdentificador}'::uuid,'active')
        on conflict (user_id) do update set status='active'`);
@@ -174,7 +207,9 @@ const sessaoAdministrador = {
 };
 
 const primeiraEmpresa = codigoSql(`select id from public.companies where status='active' limit 1`);
-const primeiroVeiculo = codigoSql(`select id from public.vehicles where archived_at is null limit 1`);
+const primeiroVeiculo = codigoSql(
+  `select id from public.vehicles where archived_at is null limit 1`,
+);
 
 const TIPOS_CONTEUDO = {
   '.html': 'text/html; charset=utf-8',
@@ -200,7 +235,9 @@ const servidor = criarServidor((requisicao, resposta) => {
       return;
     }
     const restante = endereco.split('/').slice(3).join('/');
-    arquivo = restante ? juntarCaminhos(obterPastaPai(parametroItem2.proto), restante) : parametroItem2.proto;
+    arquivo = restante
+      ? juntarCaminhos(obterPastaPai(parametroItem2.proto), restante)
+      : parametroItem2.proto;
   }
   if (!arquivo || !arquivoExiste(arquivo)) {
     resposta.writeHead(404).end();
@@ -217,13 +254,17 @@ const servidor = criarServidor((requisicao, resposta) => {
     );
   }
   resposta.writeHead(200, {
-    'Content-Type': TIPOS_CONTEUDO[arquivo.slice(arquivo.lastIndexOf('.'))] || 'application/octet-stream',
+    'Content-Type':
+      TIPOS_CONTEUDO[arquivo.slice(arquivo.lastIndexOf('.'))] || 'application/octet-stream',
   });
   resposta.end(corpo);
 });
 await new Promise((resultadoItem) => servidor.listen(PORTA, '127.0.0.1', resultadoItem));
 
-const verificacao = juntarCaminhos(pastaTemporariaSistema(), `pnf-visual-routes-${process.pid}.cjs`);
+const verificacao = juntarCaminhos(
+  pastaTemporariaSistema(),
+  `pnf-visual-routes-${process.pid}.cjs`,
+);
 
 const CONFIGURACAO = {
   PORT: PORTA,
@@ -504,7 +545,10 @@ const filho = iniciarProcesso(
     env: {
       ...process.env,
       ELECTRON_DISABLE_SECURITY_WARNINGS: '1',
-      PNF_VISUAL_CFG: juntarCaminhos(pastaTemporariaSistema(), `pnf-visual-cfg-${process.pid}.json`),
+      PNF_VISUAL_CFG: juntarCaminhos(
+        pastaTemporariaSistema(),
+        `pnf-visual-cfg-${process.pid}.json`,
+      ),
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   },
@@ -542,13 +586,16 @@ filho.on('close', (codigo) => {
   for (const resultadoItem of registros) {
     const chaveItem = `${resultadoItem.produto}/${resultadoItem.rota}`;
     porRota[chaveItem] = porRota[chaveItem] || { design: 0, impl: 0 };
-    if (resultadoItem.ok) porRota[chaveItem][resultadoItem.lado === 'design' ? 'design' : 'impl'] += 1;
+    if (resultadoItem.ok)
+      porRota[chaveItem][resultadoItem.lado === 'design' ? 'design' : 'impl'] += 1;
   }
 
   console.log('visual:routes — capturas rota a rota\n');
   console.log(`  ${'rota'.padEnd(28)}${'design'.padEnd(9)}impl`);
   for (const [chaveItem, veiculoItem] of Object.entries(porRota)) {
-    console.log(`  ${chaveItem.padEnd(28)}${String(veiculoItem.design).padEnd(9)}${veiculoItem.impl}`);
+    console.log(
+      `  ${chaveItem.padEnd(28)}${String(veiculoItem.design).padEnd(9)}${veiculoItem.impl}`,
+    );
   }
 
   gravarArquivoSincrono(

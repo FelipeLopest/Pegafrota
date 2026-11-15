@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-import { spawn as iniciarProcesso, execFileSync as executarArquivoSincrono } from 'node:child_process';
+import {
+  spawn as iniciarProcesso,
+  execFileSync as executarArquivoSincrono,
+} from 'node:child_process';
 import {
   existsSync as arquivoExiste,
   writeFileSync as gravarArquivoSincrono,
   mkdirSync as criarPastaSincrona,
   rmSync as removerArquivoSincrono,
 } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
-import { join as juntarCaminhos, dirname as obterPastaPai, resolve as resolverCaminho } from 'node:path';
+import {
+  join as juntarCaminhos,
+  dirname as obterPastaPai,
+  resolve as resolverCaminho,
+} from 'node:path';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 
 const AQUI = obterPastaPai(converterEnderecoEmCaminho(import.meta.url));
@@ -105,7 +112,10 @@ app.whenReady().then(async () => {
   'utf8',
 );
 
-const argumentos = [juntarCaminhos(PASTA_COMPILADA, 'sistema', '__smoke_probe.cjs'), '--no-sandbox'];
+const argumentos = [
+  juntarCaminhos(PASTA_COMPILADA, 'sistema', '__smoke_probe.cjs'),
+  '--no-sandbox',
+];
 const comando = temXvfb ? 'xvfb-run' : caminhoElectron;
 const argumentosComando = temXvfb
   ? ['-a', '--server-args=-screen 0 1280x800x24', caminhoElectron, ...argumentos]
@@ -141,7 +151,8 @@ filho.on('close', (codigo) => {
         `o processo principal não iniciou: ${erro.split('\n').find((linhaItem) => linhaItem.trim()) || ''}`,
       );
     }
-    if (/cannot open display|Missing X server/i.test(erro)) ignorar('sem servidor gráfico disponível');
+    if (/cannot open display|Missing X server/i.test(erro))
+      ignorar('sem servidor gráfico disponível');
     falhar(`sem saída do probe (código ${codigo})\n${erro.slice(0, 600)}`);
   }
 

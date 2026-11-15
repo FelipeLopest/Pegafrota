@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 232" fill="none">
+<rect x=".5" y=".5" width="559" height="231" rx="14" fill="#191d1b" stroke="#343936"/>
+<g stroke="#28302b"><path d="M0 58h560M0 116h560M0 174h560M70 0v232M140 0v232M210 0v232M280 0v232M350 0v232M420 0v232M490 0v232"/></g>
+<path d="M151 60h54c25 0 10 56 40 56m-94 56h54c25 0 10-56 40-56m66 0h90" stroke="#fb923c" stroke-width="2" stroke-dasharray="5 6"/>
+<g fill="#232a25" stroke="#49574d"><rect x="42" y="32" width="110" height="55" rx="8"/><rect x="42" y="145" width="110" height="55" rx="8"/><rect x="401" y="70" width="116" height="91" rx="8"/></g>
+<g stroke="#b8c4bc" stroke-width="2"><rect x="57" y="45" width="21" height="27" rx="2"/><path d="M62 52h4m4 0h3m-11 6h4m4 0h3m-9 14v-7h7v7"/><rect x="57" y="158" width="21" height="27" rx="2"/><path d="M62 165h4m4 0h3m-11 6h4m4 0h3m-9 14v-7h7v7"/></g>
+<rect x="239" y="78" width="77" height="77" rx="16" fill="#f97316"/>
+<path d="m278 94 19 8v14c0 12-8 21-19 26-11-5-19-14-19-26v-14z" stroke="#24190f" stroke-width="2.5"/><path d="m269 116 6 6 12-13" stroke="#24190f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<g stroke="#b8c4bc" stroke-width="2" stroke-linecap="round"><path d="m417 89 3 3 5-6m-8 24 3 3 5-6m-8 24 3 3 5-6M436 90h62m-62 21h62m-62 21h43"/></g>
+<g font-family="Segoe UI,sans-serif" font-size="9" letter-spacing=".8" font-weight="600" fill="#bec8c1"><text x="88" y="63">EMPRESA</text><text x="88" y="176">EMPRESA</text><text x="245" y="181" fill="#fdba74">PLATAFORMA</text><text x="422" y="185">AUDITORIA</text></g>
+</svg>

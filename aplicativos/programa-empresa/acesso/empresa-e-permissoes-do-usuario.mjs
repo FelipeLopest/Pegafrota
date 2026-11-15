@@ -77,7 +77,11 @@ export class ContextoUsuario {
 
 export const contexto = new ContextoUsuario();
 
-export function aplicarPermissao(no, permissao, { hideWhenDenied: ocultarQuandoNegado = false } = {}) {
+export function aplicarPermissao(
+  no,
+  permissao,
+  { hideWhenDenied: ocultarQuandoNegado = false } = {},
+) {
   const permitido = contexto.can(permissao);
 
   if (permitido) {

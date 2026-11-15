@@ -10,6 +10,9 @@ const { contextBridge: ponteDeContexto, ipcRenderer: comunicacaoDaInterface } = 
  * segurança confere que eles continuam sincronizados com o processo principal.
  */
 const CANAIS = Object.freeze({
+  LEITOR_STATUS: 'pnf:leitor-status',
+  LEITOR_ANALISAR: 'pnf:leitor-analisar',
+  LEITOR_PARAR: 'pnf:leitor-parar',
   GET_CONFIG: 'pnf:get-config',
   GET_APP_INFO: 'pnf:get-app-info',
   SET_THEME: 'pnf:set-theme',
@@ -25,6 +28,11 @@ const CANAIS = Object.freeze({
 });
 
 const servicos = Object.freeze({
+  leitorPlacas: Object.freeze({
+    disponivel: () => comunicacaoDaInterface.invoke(CANAIS.LEITOR_STATUS),
+    analisar: (imagem) => comunicacaoDaInterface.invoke(CANAIS.LEITOR_ANALISAR, imagem),
+    parar: () => comunicacaoDaInterface.invoke(CANAIS.LEITOR_PARAR),
+  }),
   getConfig: () => comunicacaoDaInterface.invoke(CANAIS.GET_CONFIG),
 
   getAppInfo: () => comunicacaoDaInterface.invoke(CANAIS.GET_APP_INFO),

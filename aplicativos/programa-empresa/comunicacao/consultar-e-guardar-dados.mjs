@@ -51,7 +51,11 @@ export async function selecionarTodos(tabela, opcoes = {}) {
   for (let base = tamanhoPagina; ; base += tamanhoPagina * concorrencia) {
     const paginas = await Promise.all(
       Array.from({ length: concorrencia }, (_valorIgnorado, indiceItem) =>
-        selecionar(tabela, { ...opcoes, limit: tamanhoPagina, offset: base + indiceItem * tamanhoPagina }),
+        selecionar(tabela, {
+          ...opcoes,
+          limit: tamanhoPagina,
+          offset: base + indiceItem * tamanhoPagina,
+        }),
       ),
     );
     let terminou = false;
@@ -105,7 +109,12 @@ export async function comCache(chave, leitor, validadeMilissegundos = 15000) {
       if (cacheLeituras.get(chave)?.promessa === promessa) cacheLeituras.delete(chave);
       throw erro;
     });
-  cacheLeituras.set(chave, { valor: atual?.valor, expiraEm: atual?.expiraEm || 0, promessa, geracao });
+  cacheLeituras.set(chave, {
+    valor: atual?.valor,
+    expiraEm: atual?.expiraEm || 0,
+    promessa,
+    geracao,
+  });
   return promessa;
 }
 

@@ -28,7 +28,8 @@ import postgres from 'pg';
 import { randomUUID as criarIdentificadorUnico } from 'node:crypto';
 import { tratarRequisicao } from '../../functions/admin-users/gerenciar-equipe.ts';
 
-const ENDERECO_BANCO = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/pegafrota';
+const ENDERECO_BANCO =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/pegafrota';
 const ORIGEM = 'app://peganafrota';
 const PERMITIDOS = [ORIGEM];
 
@@ -37,7 +38,9 @@ let falhas = 0;
 function verificar(nome, sucesso, detalhe = '') {
   quantidade += 1;
   if (!sucesso) falhas += 1;
-  console.log(`${sucesso ? 'ok  ' : 'NOT OK'} ${quantidade} - ${nome}${detalhe ? ` (${detalhe})` : ''}`);
+  console.log(
+    `${sucesso ? 'ok  ' : 'NOT OK'} ${quantidade} - ${nome}${detalhe ? ` (${detalhe})` : ''}`,
+  );
 }
 
 // =============================================================================
@@ -55,10 +58,15 @@ function converterErroSupabase(erro) {
 /** Traduz rpc(nome, {p_x: v}) em `select public.nome(p_x => $1)`. */
 async function chamarFuncaoBanco(cliente, nome, parametros) {
   const entradas = Object.entries(parametros ?? {});
-  const argumentos = entradas.map(([chave], indiceItem) => `${chave} => $${indiceItem + 1}`).join(', ');
+  const argumentos = entradas
+    .map(([chave], indiceItem) => `${chave} => $${indiceItem + 1}`)
+    .join(', ');
   const valores = entradas.map(([, valor]) => valor);
   try {
-    const { rows: linhas } = await cliente.query(`select public.${nome}(${argumentos}) as result`, valores);
+    const { rows: linhas } = await cliente.query(
+      `select public.${nome}(${argumentos}) as result`,
+      valores,
+    );
     return { data: linhas[0].result, error: null };
   } catch (erro) {
     return { data: null, error: converterErroSupabase(erro) };
@@ -320,9 +328,10 @@ async function principal() {
   }
 
   {
-    const { rows: linhas } = await raiz.query('select active, full_name from public.profiles where id = $1', [
-      suspensoIdentificador,
-    ]);
+    const { rows: linhas } = await raiz.query(
+      'select active, full_name from public.profiles where id = $1',
+      [suspensoIdentificador],
+    );
     verificar('DB-AUD2-002 profiles.active continua false', linhas[0].active === false);
     verificar(
       'DB-AUD2-002 nome global do usuário não foi sobrescrito',
@@ -357,7 +366,9 @@ async function principal() {
       erro === null && linhas[0].active === true,
       erro?.message ?? '',
     );
-    await raiz.query('update public.profiles set active = false where id = $1', [suspensoIdentificador]);
+    await raiz.query('update public.profiles set active = false where id = $1', [
+      suspensoIdentificador,
+    ]);
   }
 
   // ===========================================================================
@@ -441,7 +452,10 @@ async function principal() {
                              raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
      values ('00000000-0000-0000-0000-000000000000', $1, 'authenticated', 'authenticated',
              $2, now(), '{"provider":"email"}'::jsonb, '{}'::jsonb, now(), now())`,
-    [inativoAlvoIdentificador, `inativo-${inativoAlvoIdentificador.slice(0, 8)}@auroraverde.example.com`],
+    [
+      inativoAlvoIdentificador,
+      `inativo-${inativoAlvoIdentificador.slice(0, 8)}@auroraverde.example.com`,
+    ],
   );
   await raiz.query(
     `insert into public.profiles (id, full_name, phone, active) values ($1,'Alvo Inativo','11922222222',true)`,
@@ -484,9 +498,10 @@ async function principal() {
       `select role, active, created_at from public.company_memberships where company_id=$1 and user_id=$2`,
       [dadosDemonstracao.company_a, inativoAlvoIdentificador],
     );
-    const antesPerfil = await raiz.query('select full_name, phone, active from public.profiles where id=$1', [
-      inativoAlvoIdentificador,
-    ]);
+    const antesPerfil = await raiz.query(
+      'select full_name, phone, active from public.profiles where id=$1',
+      [inativoAlvoIdentificador],
+    );
 
     const resposta = await tratarRequisicao(
       requisitar(
@@ -520,7 +535,8 @@ async function principal() {
     verificar('DB-AUD2-003 membership histórica NÃO é apagada', depois.rows.length === 1);
     verificar(
       'DB-AUD2-003 membership histórica mantém role e active originais',
-      depois.rows[0]?.role === antes.rows[0].role && depois.rows[0]?.active === antes.rows[0].active,
+      depois.rows[0]?.role === antes.rows[0].role &&
+        depois.rows[0]?.active === antes.rows[0].active,
       `antes ${antes.rows[0].role}/${antes.rows[0].active} depois ${depois.rows[0]?.role}/${depois.rows[0]?.active}`,
     );
     verificar(
@@ -611,7 +627,12 @@ async function principal() {
 
     const reutilizado = await tratarRequisicao(
       requisitar(
-        { action: 'change_role', userId: ativoAlvoIdentificador, role: 'viewer', idempotencyKey: chave },
+        {
+          action: 'change_role',
+          userId: ativoAlvoIdentificador,
+          role: 'viewer',
+          idempotencyKey: chave,
+        },
         { userId: dadosDemonstracao.admin_a },
       ),
       await dependenciasPara(dadosDemonstracao.admin_a),
@@ -619,7 +640,8 @@ async function principal() {
     const reutilizadoDadosEnviados = await reutilizado.json();
     verificar(
       'DB-AUD2-005 mesma chave com payload DIFERENTE gera conflito',
-      reutilizado.status === 409 && reutilizadoDadosEnviados.error.code === 'IDEMPOTENCY_KEY_REUSED',
+      reutilizado.status === 409 &&
+        reutilizadoDadosEnviados.error.code === 'IDEMPOTENCY_KEY_REUSED',
       `status ${reutilizado.status} code ${reutilizadoDadosEnviados.error?.code}`,
     );
 
@@ -656,7 +678,9 @@ async function principal() {
     verificar(
       'data_integrity_selftest continua vazio',
       linhas.length === 0,
-      linhas.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`).join(' | '),
+      linhas
+        .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`)
+        .join(' | '),
     );
   }
 

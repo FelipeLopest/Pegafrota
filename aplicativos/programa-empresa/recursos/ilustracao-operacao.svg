@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 232" fill="none">
+<rect x=".5" y=".5" width="559" height="231" rx="14" fill="#191d1b" stroke="#343936"/>
+<g stroke="#28302b"><path d="M0 58h560M0 116h560M0 174h560M70 0v232M140 0v232M210 0v232M280 0v232M350 0v232M420 0v232M490 0v232"/></g>
+<path d="M68 156h104c38 0 22-78 64-78h78c42 0 26 78 64 78h114" stroke="#3d4941" stroke-width="23" stroke-linecap="round"/>
+<path d="M68 156h104c38 0 22-78 64-78h78c42 0 26 78 64 78h114" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="6 7"/>
+<g fill="#191d1b" stroke="#fb923c" stroke-width="2"><circle cx="68" cy="156" r="11"/><circle cx="492" cy="156" r="11"/></g>
+<g fill="#fdba74"><circle cx="68" cy="156" r="3"/><circle cx="492" cy="156" r="3"/></g>
+<rect x="220" y="47" width="114" height="62" rx="9" fill="#f97316"/>
+<g stroke="#24190f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M243 62h41v26h-41zM284 71h15l10 10v7h-25"/><path d="M289 75h8l6 7h-14z"/><circle cx="253" cy="91" r="5" fill="#191d1b"/><circle cx="298" cy="91" r="5" fill="#191d1b"/></g>
+<g font-family="Segoe UI, sans-serif" font-size="10" font-weight="600" letter-spacing="1" fill="#c0c9c3"><text x="40" y="192">ENTRADA</text><text x="472" y="192">SAÍDA</text><text x="243" y="139" fill="#fdba74">SUA FROTA</text></g>
+<path d="m100 153 5 3-5 3m335-6 5 3-5 3" stroke="#fdba74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

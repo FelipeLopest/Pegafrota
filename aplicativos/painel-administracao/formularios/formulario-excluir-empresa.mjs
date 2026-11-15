@@ -24,7 +24,10 @@ export async function excluirEmpresaDefinitivamente(empresa) {
   if (!confirmado.confirmed) return;
 
   try {
-    const resultado = await servicos.companies.deletePermanently(empresa.id, confirmado.confirmedName);
+    const resultado = await servicos.companies.deletePermanently(
+      empresa.id,
+      confirmado.confirmedName,
+    );
     const falhas = Number(resultado?.authCleanup?.failed || 0);
     notificacao(
       falhas

@@ -6,7 +6,10 @@ let limpezas = 0;
 globalThis.window = {
   dispatchEvent() {},
   pnf: {
-    getConfig: async () => ({ supabaseUrl: 'http://127.0.0.1:54321', anonKey: 'chave-publica-de-teste' }),
+    getConfig: async () => ({
+      supabaseUrl: 'http://127.0.0.1:54321',
+      anonKey: 'chave-publica-de-teste',
+    }),
     getConfigStatus: async () => ({}),
     session: {
       save: async (valor) => {
@@ -73,7 +76,10 @@ testar('invalidação não permite que consulta pendente recoloque dados antigos
   invalidarCache('vehicles');
   concluirConsulta('antes-da-alteracao');
   await pendente;
-  verificar.equal(await comCache('vehicles', async () => 'depois-da-alteracao'), 'depois-da-alteracao');
+  verificar.equal(
+    await comCache('vehicles', async () => 'depois-da-alteracao'),
+    'depois-da-alteracao',
+  );
 });
 
 testar('erro 401 persistente faz uma renovação e uma repetição', async () => {
@@ -88,7 +94,10 @@ testar('erro 401 persistente faz uma renovação e uma repetição', async () =>
     chamadas += 1;
     return respostaJson({}, 401);
   };
-  await verificar.rejects(requisitar('/rest/v1/vehicles'), (erro) => erro.hint === 'UNAUTHENTICATED');
+  await verificar.rejects(
+    requisitar('/rest/v1/vehicles'),
+    (erro) => erro.hint === 'UNAUTHENTICATED',
+  );
   verificar.equal(renovacoes, 1);
   verificar.equal(chamadas, 2);
   verificar.equal(sessao.accessToken, null);
@@ -98,9 +107,12 @@ testar('repetição após renovar mantém a resposta com cabeçalhos de contagem
   await sessao.set({ access_token: 'antigo', refresh_token: 'renovavel' });
   let chamadas = 0;
   globalThis.fetch = async (endereco) => {
-    if (endereco.includes('grant_type=refresh_token')) return respostaJson({ access_token: 'novo' });
+    if (endereco.includes('grant_type=refresh_token'))
+      return respostaJson({ access_token: 'novo' });
     chamadas += 1;
-    return chamadas === 1 ? respostaJson({}, 401) : respostaJson([], 200, { 'content-range': '0-0/37' });
+    return chamadas === 1
+      ? respostaJson({}, 401)
+      : respostaJson([], 200, { 'content-range': '0-0/37' });
   };
   const resposta = await requisitar('/rest/v1/vehicles', { raw: true });
   verificar.equal(resposta.headers.get('content-range'), '0-0/37');
@@ -110,7 +122,10 @@ testar('repetição após renovar mantém a resposta com cabeçalhos de contagem
 testar('sessão sem manter conectado não é gravada nem na renovação', async () => {
   gravacoes = [];
   limpezas = 0;
-  await sessao.set({ access_token: 'temporario', refresh_token: 'renovavel' }, { persistir: false });
+  await sessao.set(
+    { access_token: 'temporario', refresh_token: 'renovavel' },
+    { persistir: false },
+  );
   globalThis.fetch = async () =>
     respostaJson({ access_token: 'temporario-renovado', refresh_token: 'renovavel' });
   verificar.equal(await tentarRenovarSessao(), true);

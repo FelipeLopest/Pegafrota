@@ -169,3 +169,52 @@ A cópia antiga `v8.mjs`, o módulo MFA vazio e o pacote de tipos sem consumidor
 - `ferramentas/compilacao/compilar-painel-vercel.mjs`: saída estática da Vercel com cabeçalhos CSP.
 - `vercel.json` e `.vercelignore`: comandos de build e exclusões do envio.
 - `PUBLICAR_E_GERAR_APLICATIVO.md`: instruções de instalação, Vercel e autorização do domínio no Supabase.
+
+## Câmeras opcionais — versão 1.1.0
+
+| Arquivo/pasta | Responsabilidade |
+|---|---|
+| `ATIVAR_CAMERAS.md` | Preparação, implantação, pareamento, calibração e limites. |
+| `aplicativos/programa-empresa/telas/tela-cameras.mjs` | Cadastro, estado do dispositivo, chave, imagens e revisão. |
+| `aplicativos/programa-empresa/dados/dados-cameras.mjs` | Contratos da fila e leitura autenticada de imagens privadas. |
+| `aplicativos/programa-empresa/comunicacao/monitorar-cameras.mjs` | Monitoramento durante a sessão, reserva de trabalhos e retorno validado. |
+| `aplicativos/programa-empresa/sistema/processar-imagem.cjs` | Subprocesso local de caminho fixo, sem shell, com limite de imagem e tempo. |
+| `servicos/leitor-placas/` | Motor OCR local, extração de placas brasileiras, dependências e testes. |
+| `dispositivos/esp32-s3/peganafrota-camera/` | Firmware, perfis explícitos de pinos, Wi-Fi, TLS, relógio e reenvio. |
+| `supabase/functions/camera-intake/` | Validação de requisições de dispositivo e upload reservado pelo banco. |
+| `supabase/functions/camera-maintenance/` | Remoção física de imagens expiradas por agendamento do servidor. |
+| `supabase/migrations/20261109000100_camera_capture_pipeline.sql` | Credenciais privadas, RLS, fila, leases, consenso e movimentação transacional. |
+| `ferramentas/administracao/agendar-limpeza-cameras.sql` | Agendamento com Vault, sem credenciais no fonte. |
+| `ferramentas/testes/cameras/` | PostgreSQL descartável, migrations reais e verificações de isolamento. |
+| `.github/workflows/verificar-camera.yml` | Compilação do firmware no Linux. |
+| `ferramentas/compilacao/gerar-leitor-placas.mjs` | Executável Windows com modelos incluídos para o instalador. |
+
+| `aplicativos/programa-empresa/formularios/formulario-camera.mjs` | Cadastro e edição: local, sentido, enquadramento, confiança e limite de fotos. |
+| `aplicativos/programa-empresa/formularios/formulario-parear-camera.mjs` | Modelo explícito, Wi-Fi e emissão única da configuração de pareamento. |
+| `aplicativos/programa-empresa/formularios/formulario-revisar-leitura.mjs` | Conferência da imagem, seleção de veículo e motivo da confirmação. |
+
+O limite padrão é de 1.000 fotos por câmera em 24 horas corridas, ajustável de 1 a 10.000 no cadastro. O firmware envia até três fotos por passagem; heartbeat não consome a cota. Consulte ATIVAR_CAMERAS.md para implantação e homologação.
+
+## Aparência e marca — versão 1.1.1
+
+- Cada app tem seu próprio estilos/estilo-login.css e componentes/apresentacao-do-login.mjs: layout de acesso, apresentação e ilustração.
+- Botões e campos são definidos em estilos/estilo-componentes.css; ajustes de páginas e faixas de resumo ficam em estilo-ajustes-visuais.css; menu e janela ficam em estilo-menu-e-janela.css. O foco de teclado é preservado.
+- recursos/icone-aplicativo.svg é a fonte vetorial da marca; .png tem 512 px e .ico reúne 16/24/32/48/64/128/256 px. O build copia recursos/ para a saída de cada app.
+- O ícone da janela fica em sistema/abrir-janela.cjs; o do instalador/executável e atalhos usa ferramentas/compilacao/gerar-instalador.mjs.
+- A aparência foi conferida com serviços simulados; os ajustes visuais não implantam alterações na Vercel ou no Supabase por conta própria.
+## Operação da frota — versão 1.2.0
+
+| Onde | Responsabilidade |
+|---|---|
+| `ATUALIZAR_PEGANAFROTA_1_2.md` | Ordem de atualização do banco, painel e aplicativo; verificação de funcionamento. |
+| `aplicativos/programa-empresa/formularios/apoio-operacoes.mjs` | Data e hora no fuso da empresa, números obrigatórios e atalhos pela ficha do veículo. |
+| `aplicativos/programa-empresa/formularios/formulario-operacao-viagem.mjs` | Início, conclusão e interrupção; passagem opcional no pátio. |
+| `aplicativos/programa-empresa/dados/paginar-colecao.mjs` | Envia pesquisa, filtros e página ao banco. |
+| `aplicativos/programa-empresa/dados/identificar-comando.mjs` | Mantém um identificador estável quando a mesma gravação é reenviada. |
+| `aplicativos/programa-empresa/dados/retomar-importacao.mjs` | Identifica o lote e guarda os números de linhas já confirmadas neste navegador. |
+| `aplicativos/programa-empresa/dados/exportar-relatorios.mjs` | Prepara CSV para Excel, com valores numéricos e proteção contra fórmulas em textos. |
+| `aplicativos/programa-empresa/componentes/linha-do-tempo-veiculo.mjs` | Mostra os eventos autorizados de um veículo em ordem. |
+| `aplicativos/painel-administracao/telas/tela-recuperar-senha.mjs` | Recebe o link de recuperação e permite definir a senha nova. |
+| `supabase/migrations/20261110*.sql` | Seis mudanças novas: reenvios, quilometragem, viagens, pátio, preventiva, consumo, consultas e importação. |
+| `ferramentas/testes/evolucao/testar-banco.cjs` | Aplica as migrations e exercita as operações num banco descartável. |
+

@@ -28,7 +28,9 @@ export const dadosVeiculos = {
           p_model: veiculoItem.model,
           p_fuel_type: veiculoItem.fuelType,
           p_model_year: veiculoItem.modelYear ? Number(veiculoItem.modelYear) : null,
-          p_initial_odometer_km: veiculoItem.initialOdometerKm ? Number(veiculoItem.initialOdometerKm) : 0,
+          p_initial_odometer_km: veiculoItem.initialOdometerKm
+            ? Number(veiculoItem.initialOdometerKm)
+            : 0,
           p_color: veiculoItem.color || null,
           p_category: veiculoItem.category || null,
           p_tank_capacity_l: veiculoItem.tankCapacityL ? Number(veiculoItem.tankCapacityL) : null,
@@ -39,25 +41,39 @@ export const dadosVeiculos = {
       'yard',
     ),
   get: async (identificador) =>
-    (await selecionar('vehicles', { columns: '*', filters: { id: `eq.${identificador}` }, limit: 1 }))[0] ??
-    null,
+    (
+      await selecionar('vehicles', {
+        columns: '*',
+        filters: { id: `eq.${identificador}` },
+        limit: 1,
+      })
+    )[0] ?? null,
   update: (identificador, correcao) =>
     executarMutacao(
-      () => executarFuncaoBanco('update_vehicle', { p_vehicle_id: identificador, p_patch: correcao }),
+      () =>
+        executarFuncaoBanco('update_vehicle', { p_vehicle_id: identificador, p_patch: correcao }),
       'vehicles',
       'dashboard',
       'yard',
     ),
   setStatus: (identificador, situacao) =>
     executarMutacao(
-      () => executarFuncaoBanco('set_vehicle_status', { p_vehicle_id: identificador, p_status: situacao }),
+      () =>
+        executarFuncaoBanco('set_vehicle_status', {
+          p_vehicle_id: identificador,
+          p_status: situacao,
+        }),
       'vehicles',
       'dashboard',
       'yard',
     ),
   archive: (identificador, motivo) =>
     executarMutacao(
-      () => executarFuncaoBanco('archive_vehicle', { p_vehicle_id: identificador, p_reason: motivo ?? null }),
+      () =>
+        executarFuncaoBanco('archive_vehicle', {
+          p_vehicle_id: identificador,
+          p_reason: motivo ?? null,
+        }),
       'vehicles',
       'dashboard',
       'yard',

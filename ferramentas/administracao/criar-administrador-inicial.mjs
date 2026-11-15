@@ -34,7 +34,9 @@ async function principal() {
   await criarOuAtualizarPerfil({ userId: usuario.id, fullName: nomeCompleto, phone: telefone });
   console.log('  Profile: ativo e sincronizado');
 
-  const jaAdministrador = await funcaoBancoPlataforma('is_platform_admin', { p_user_id: usuario.id });
+  const jaAdministrador = await funcaoBancoPlataforma('is_platform_admin', {
+    p_user_id: usuario.id,
+  });
   if (jaAdministrador === true) {
     console.log('  Plataforma: esta conta já é platform_admin ativo. Nada a alterar.');
     return;
@@ -53,7 +55,8 @@ async function principal() {
   });
 
   const verificado = await funcaoBancoPlataforma('is_platform_admin', { p_user_id: usuario.id });
-  if (verificado !== true) throw new Error('Bootstrap terminou sem confirmar o papel platform_admin.');
+  if (verificado !== true)
+    throw new Error('Bootstrap terminou sem confirmar o papel platform_admin.');
 
   console.log(`  Plataforma: bootstrap concluído (${resultado?.status ?? 'active'})`);
   console.log('Concluído. O token de bootstrap foi mantido apenas em memória.');

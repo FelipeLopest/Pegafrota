@@ -1,3 +1,5 @@
+import { contexto } from '../acesso/sessao-e-permissoes.mjs';
+import { consumirAtalho } from '../formularios/apoio-operacoes.mjs';
 import {
   el as criarElemento,
   fmt as formatar,
@@ -9,7 +11,10 @@ import {
 
 import { dados } from '../dados/dados-do-programa.mjs';
 
-import { PERMISSAO, ROTULO_STATUS_MANUTENCAO as ROTULO_SITUACAO_MANUTENCAO } from '@peganafrota/contracts';
+import {
+  PERMISSAO,
+  ROTULO_STATUS_MANUTENCAO as ROTULO_SITUACAO_MANUTENCAO,
+} from '@peganafrota/contracts';
 import {
   tela,
   indice,
@@ -24,18 +29,39 @@ import {
 import { abrirAgendamentoManutencaoV8 as abrirAgendamentoManutencao } from '../formularios/formulario-agendar-manutencao.mjs';
 import { abrirConclusaoManutencaoV8 as abrirConclusaoManutencao } from '../formularios/formulario-concluir-manutencao.mjs';
 
-export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }) {
+export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo, query: consulta }) {
   definirTitulo('Manutenções');
-  const recarregar = () => telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo });
+  const recarregar = () =>
+    telaManutencao({
+      outlet: conteudoTela,
+      setTitle: definirTitulo,
+      query: consulta,
+    });
   return tela(
     conteudoTela,
     PERMISSAO.MAINTENANCE_READ,
     async () => {
-      const [registros, veiculos] = await Promise.all([dados.maintenance.list(), dados.vehicles.list()]);
+      const [registros, veiculos] = await Promise.all([
+        dados.maintenance.page({
+          ...(consulta?.get('veiculo') && !consulta?.has('novo')
+            ? { vehicle: consulta.get('veiculo') }
+            : {}),
+          ...(consulta?.get('vencidas') === '1' ? { due: 'overdue' } : {}),
+        }),
+        dados.vehicles.list(),
+      ]);
       return { records: registros, vehicles: veiculos };
     },
     ({ records: registros, vehicles: veiculos }) => {
       const indiceVeiculo = indice(veiculos);
+      const agendar = (vehicleId = '') =>
+        abrirAgendamentoManutencao({
+          vehicles: veiculosAtivos(veiculos),
+          vehicleId,
+          historico: registros,
+          onDone: recarregar,
+        });
+      if (contexto.can(PERMISSAO.MAINTENANCE_SCHEDULE)) consumirAtalho(agendar);
       const cabecalho = cabecalhoPagina({
         title: 'Manutenções',
         subtitle:
@@ -53,8 +79,7 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
             variant: 'primary',
             icon: 'plus',
             permission: PERMISSAO.MAINTENANCE_SCHEDULE,
-            onClick: () =>
-              abrirAgendamentoManutencao({ vehicles: veiculosAtivos(veiculos), onDone: recarregar }),
+            onClick: () => agendar(),
           }),
         ],
       });
@@ -64,6 +89,14 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
         getText: (resultadoItem) =>
           `${resultadoItem.description} ${resultadoItem.supplier_name || ''} ${resultadoItem.invoice_number || ''} ${indiceVeiculo.get(resultadoItem.vehicle_id)?.plate || ''}`,
         filters: [
+          {
+            key: 'due',
+            label: 'Pendência',
+            options: [
+              ['', 'Todas'],
+              ['overdue', 'Vencidas'],
+            ],
+          },
           {
             key: 'status',
             label: 'Estado',
@@ -123,17 +156,36 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
                   criarElemento('b', { text: resultadoItem.description }),
                   criarElemento('p', {
                     class: 'muted',
-                    text: resultadoItem.maintenance_type === 'preventive' ? 'Preventiva' : 'Corretiva',
+                    text:
+                      resultadoItem.maintenance_type === 'preventive' ? 'Preventiva' : 'Corretiva',
                   }),
                 ]),
-                criarElemento('td', { text: formatar.date(resultadoItem.scheduled_for) }),
+                criarElemento('td', {}, [
+                  criarElemento('span', {
+                    text: formatar.date(resultadoItem.scheduled_for),
+                  }),
+                  resultadoItem.scheduled_odometer_km != null
+                    ? criarElemento('p', {
+                        class: 'muted',
+                        text: formatar.km(resultadoItem.scheduled_odometer_km),
+                      })
+                    : null,
+                  resultadoItem.is_overdue
+                    ? criarElemento('p', {
+                        class: 'field-error',
+                        text: 'Vencida',
+                      })
+                    : null,
+                ]),
                 criarElemento('td', {}, [
                   criarElemento('status-pill', {
                     status: resultadoItem.status,
                     label: ROTULO_SITUACAO_MANUTENCAO[resultadoItem.status],
                   }),
                 ]),
-                criarElemento('td', { text: formatar.money(resultadoItem.total_cost) }),
+                criarElemento('td', {
+                  text: formatar.money(resultadoItem.total_cost),
+                }),
                 criarElemento('td', {}, [
                   resultadoItem.status === 'scheduled'
                     ? botao({
@@ -144,15 +196,19 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
                         onClick: async () => {
                           try {
                             await dados.maintenance.start(resultadoItem.id);
-                            notificacao('Manutenção iniciada.', { tone: 'success' });
+                            notificacao('Manutenção iniciada.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       })
                     : null,
-                  resultadoItem.status === 'in_progress'
+                  ['scheduled', 'in_progress'].includes(resultadoItem.status)
                     ? botao({
                         label: 'Concluir',
                         variant: 'success',
@@ -178,10 +234,39 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
                           if (!motivo) return;
                           try {
                             await dados.maintenance.cancel(resultadoItem.id, motivo);
-                            notificacao('Manutenção cancelada.', { tone: 'success' });
+                            notificacao('Manutenção cancelada.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
+                          }
+                        },
+                      })
+                    : null,
+                  resultadoItem.plan_active &&
+                  ['scheduled', 'in_progress'].includes(resultadoItem.status)
+                    ? botao({
+                        label: 'Pausar recorrência',
+                        permission: PERMISSAO.MAINTENANCE_SCHEDULE,
+                        onClick: async () => {
+                          const motivo = await solicitarTexto({
+                            title: 'Pausar recorrência',
+                            label: 'Motivo',
+                            hint: 'O serviço atual permanece. Ao concluí-lo, uma nova revisão não será agendada.',
+                            confirmLabel: 'Pausar',
+                          });
+                          if (!motivo) return;
+                          try {
+                            await dados.maintenance.pausePlan(resultadoItem.plan_id, motivo);
+                            notificacao('Recorrência pausada.', {
+                              tone: 'success',
+                            });
+                            recarregar();
+                          } catch (erro) {
+                            notificacao(erro.message, { tone: 'danger' });
                           }
                         },
                       })
@@ -192,34 +277,36 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo }
           ),
         pageSize: 50,
       });
-      const vencido = contarOnde(
-        registros,
-        (resultadoItem) =>
-          ['scheduled', 'in_progress'].includes(resultadoItem.status) &&
-          resultadoItem.scheduled_for &&
-          new Date(resultadoItem.scheduled_for).getTime() < Date.now(),
+      const vencido = registros.paginaRemota?.resumo?.overdue || 0;
+      const estatisticas = faixaResumo(
+        [
+          {
+            label: 'Agendadas',
+            value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'scheduled'),
+            icon: 'clock',
+            tone: 'info',
+          },
+          {
+            label: 'Em execução',
+            value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'in_progress'),
+            icon: 'tool',
+            tone: 'warning',
+          },
+          {
+            label: 'Vencidas',
+            value: vencido,
+            icon: 'warning',
+            tone: vencido ? 'danger' : 'success',
+          },
+          {
+            label: 'Concluídas',
+            value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'completed'),
+            icon: 'check',
+            tone: 'success',
+          },
+        ],
+        { colecao: registros },
       );
-      const estatisticas = faixaResumo([
-        {
-          label: 'Agendadas',
-          value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'scheduled'),
-          icon: 'clock',
-          tone: 'info',
-        },
-        {
-          label: 'Em execução',
-          value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'in_progress'),
-          icon: 'tool',
-          tone: 'warning',
-        },
-        { label: 'Vencidas', value: vencido, icon: 'warning', tone: vencido ? 'danger' : 'success' },
-        {
-          label: 'Concluídas',
-          value: contarOnde(registros, (resultadoItem) => resultadoItem.status === 'completed'),
-          icon: 'check',
-          tone: 'success',
-        },
-      ]);
       return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
     },
   );

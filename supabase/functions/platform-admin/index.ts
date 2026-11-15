@@ -24,7 +24,8 @@ function cabecalhosCors(origem: string | null): Record<string, string> {
   const permitido = origem && ORIGENS_PERMITIDAS.includes(origem) ? origem : ORIGENS_PERMITIDAS[0];
   return {
     'Access-Control-Allow-Origin': permitido,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-request-id',
+    'Access-Control-Allow-Headers':
+      'authorization, x-client-info, apikey, content-type, x-request-id',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     Vary: 'Origin',
   };
@@ -91,10 +92,17 @@ interface ErroPostgres {
   code?: string;
 }
 
-function mapearErro(erro: ErroPostgres): { status: number; body: { error: Record<string, unknown> } } {
+function mapearErro(erro: ErroPostgres): {
+  status: number;
+  body: { error: Record<string, unknown> };
+} {
   const dica = erro.hint ?? undefined;
   if (!dica) {
-    console.error('erro sem hint', { message: erro.message, code: erro.code, details: erro.details });
+    console.error('erro sem hint', {
+      message: erro.message,
+      code: erro.code,
+      details: erro.details,
+    });
   }
   const situacao: number = (dica ? SITUACAO_HTTP_POR_DICA[dica] : undefined) ?? 500;
   return {
@@ -126,7 +134,11 @@ async function autenticar(requisicao: Request): Promise<{ actor: ator2 } | { err
 
   if (!token) {
     return {
-      error: respostaJson({ error: { hint: 'UNAUTHENTICATED', message: 'Token ausente.' } }, 401, origem),
+      error: respostaJson(
+        { error: { hint: 'UNAUTHENTICATED', message: 'Token ausente.' } },
+        401,
+        origem,
+      ),
     };
   }
 
@@ -138,7 +150,11 @@ async function autenticar(requisicao: Request): Promise<{ actor: ator2 } | { err
   const { data: usuarioDados, error: usuarioErro } = await publica.auth.getUser();
   if (usuarioErro || !usuarioDados?.user) {
     return {
-      error: respostaJson({ error: { hint: 'UNAUTHENTICATED', message: 'Sessão inválida.' } }, 401, origem),
+      error: respostaJson(
+        { error: { hint: 'UNAUTHENTICATED', message: 'Sessão inválida.' } },
+        401,
+        origem,
+      ),
     };
   }
 
@@ -153,17 +169,32 @@ async function autenticar(requisicao: Request): Promise<{ actor: ator2 } | { err
   }
 
   if (ehAdministrador !== true) {
-    await registrarNegacao(usuarioIdentificador, 'platform.access', 'not_platform_admin', requisicao);
+    await registrarNegacao(
+      usuarioIdentificador,
+      'platform.access',
+      'not_platform_admin',
+      requisicao,
+    );
     return {
       error: respostaJson(
-        { error: { hint: 'NOT_PLATFORM_ADMIN', message: 'Conta sem acesso ao painel da plataforma.' } },
+        {
+          error: {
+            hint: 'NOT_PLATFORM_ADMIN',
+            message: 'Conta sem acesso ao painel da plataforma.',
+          },
+        },
         403,
         origem,
       ),
     };
   }
 
-  return { actor: { userId: usuarioIdentificador, email: usuarioDados.user.email ?? null } };
+  return {
+    actor: {
+      userId: usuarioIdentificador,
+      email: usuarioDados.user.email ?? null,
+    },
+  };
 }
 
 async function registrarNegacao(
@@ -186,14 +217,19 @@ async function registrarNegacao(
       ...(extra.companyId ? { p_company_id: extra.companyId } : {}),
     });
   } catch {
-    console.error('falha ao registrar negação', { action: acao, reason: motivo });
+    console.error('falha ao registrar negação', {
+      action: acao,
+      reason: motivo,
+    });
   }
 }
 
 function gerarTokenAleatorio(bytes = 32): string {
   const trechoAcumulado = new Uint8Array(bytes);
   crypto.getRandomValues(trechoAcumulado);
-  return Array.from(trechoAcumulado, (segundoItem) => segundoItem.toString(16).padStart(2, '0')).join('');
+  return Array.from(trechoAcumulado, (segundoItem) =>
+    segundoItem.toString(16).padStart(2, '0'),
+  ).join('');
 }
 
 const LIMITE_PAGINAS_USUARIOS = 50;
@@ -207,12 +243,16 @@ async function buscarUsuarioIdentificadorPorEmail(email: string): Promise<string
       perPage: TAMANHO_PAGINA_USUARIOS,
     });
     if (erro) {
-      console.error('listUsers falhou', { page: pagina, message: erro.message });
+      console.error('listUsers falhou', {
+        page: pagina,
+        message: erro.message,
+      });
       return null;
     }
     const usuarios = dados?.users ?? [];
     const ocorrencia = usuarios.find(
-      (usuarioItem: { id: string; email?: string }) => usuarioItem.email?.toLowerCase() === termoBusca,
+      (usuarioItem: { id: string; email?: string }) =>
+        usuarioItem.email?.toLowerCase() === termoBusca,
     );
     if (ocorrencia) return ocorrencia.id;
     if (usuarios.length < TAMANHO_PAGINA_USUARIOS) return null;
@@ -232,11 +272,15 @@ async function resolverIdentidade(email: string): Promise<Identidade> {
   const usuarioIdentificador = await buscarUsuarioIdentificadorPorEmail(email);
   if (!usuarioIdentificador) return { state: 'absent', userId: null };
 
-  const { data: dados, error: erro } = await administrador.auth.admin.getUserById(usuarioIdentificador);
+  const { data: dados, error: erro } =
+    await administrador.auth.admin.getUserById(usuarioIdentificador);
   if (erro || !dados?.user) return { state: 'absent', userId: null };
 
   const confirmado = Boolean(dados.user.email_confirmed_at ?? dados.user.confirmed_at);
-  return { state: confirmado ? 'confirmed' : 'unconfirmed', userId: usuarioIdentificador };
+  return {
+    state: confirmado ? 'confirmed' : 'unconfirmed',
+    userId: usuarioIdentificador,
+  };
 }
 
 interface autenticacaoLinkResultado {
@@ -277,12 +321,20 @@ async function emitirLinkAutenticacao(argumentos: {
 
   const opcoesLink = {
     redirectTo: redirecionarPara,
-    data: { invite_token: tokenConvite, company_id: empresaIdentificador, full_name: nomeCompleto },
+    data: {
+      invite_token: tokenConvite,
+      company_id: empresaIdentificador,
+      full_name: nomeCompleto,
+    },
   };
 
   const { data: dados, error: erro } =
     tipoLink === 'invite'
-      ? await administrador.auth.admin.generateLink({ type: 'invite', email, options: opcoesLink })
+      ? await administrador.auth.admin.generateLink({
+          type: 'invite',
+          email,
+          options: opcoesLink,
+        })
       : await administrador.auth.admin.generateLink({
           type: 'recovery',
           email,
@@ -296,7 +348,11 @@ async function emitirLinkAutenticacao(argumentos: {
         identity: { state: 'confirmed', userId: identidade.userId },
       });
     }
-    return { ok: false, code: 'auth_email_conflict', error: `generateLink(${tipoLink}): ${erro.message}` };
+    return {
+      ok: false,
+      code: 'auth_email_conflict',
+      error: `generateLink(${tipoLink}): ${erro.message}`,
+    };
   }
 
   const propriedades = (dados?.properties ?? {}) as Record<string, string>;
@@ -304,13 +360,26 @@ async function emitirLinkAutenticacao(argumentos: {
   const usuarioIdentificador = dados?.user?.id ?? identidade.userId;
 
   if (!linkAcao) {
-    return { ok: false, code: 'auth_link_failed', error: 'generateLink não devolveu action_link' };
+    return {
+      ok: false,
+      code: 'auth_link_failed',
+      error: 'generateLink não devolveu action_link',
+    };
   }
   if (!usuarioIdentificador) {
-    return { ok: false, code: 'auth_link_failed', error: 'generateLink não devolveu o id do usuário' };
+    return {
+      ok: false,
+      code: 'auth_link_failed',
+      error: 'generateLink não devolveu o id do usuário',
+    };
   }
 
-  return { ok: true, userId: usuarioIdentificador, actionLink: linkAcao, linkType: tipoLink };
+  return {
+    ok: true,
+    userId: usuarioIdentificador,
+    actionLink: linkAcao,
+    linkType: tipoLink,
+  };
 }
 
 async function entregarConvite(
@@ -339,7 +408,10 @@ async function entregarConvite(
   }
 
   if (!ENDERECO_SMTP) {
-    return { ok: false, error: 'SMTP_RELAY_URL não configurada; o convite não pode ser entregue.' };
+    return {
+      ok: false,
+      error: 'SMTP_RELAY_URL não configurada; o convite não pode ser entregue.',
+    };
   }
 
   try {
@@ -349,7 +421,12 @@ async function entregarConvite(
         'Content-Type': 'application/json',
         ...(TOKEN_SMTP ? { Authorization: `Bearer ${TOKEN_SMTP}` } : {}),
       },
-      body: JSON.stringify({ from: REMETENTE_CONVITE, to: email, subject: assunto, text: corpo }),
+      body: JSON.stringify({
+        from: REMETENTE_CONVITE,
+        to: email,
+        subject: assunto,
+        text: corpo,
+      }),
     });
     if (!resposta.ok) {
       return {
@@ -359,14 +436,19 @@ async function entregarConvite(
     }
     return { ok: true };
   } catch (erro) {
-    return { ok: false, error: `falha de rede ao enviar convite: ${(erro as Error).message}` };
+    return {
+      ok: false,
+      error: `falha de rede ao enviar convite: ${(erro as Error).message}`,
+    };
   }
 }
 
 type Manipulador = (ator: ator2, dadosEnvio: any, requisicao: Request) => Promise<unknown>;
 
 async function chamarPlataforma(funcao: string, argumentos: Record<string, unknown>) {
-  const { data: dados, error: erro } = await administrador.schema('platform').rpc(funcao, argumentos);
+  const { data: dados, error: erro } = await administrador
+    .schema('platform')
+    .rpc(funcao, argumentos);
   if (erro) throw erro;
   return dados;
 }
@@ -377,7 +459,8 @@ const provisionarEmpresa: Manipulador = async (ator, dadosEnvio, requisicao) => 
     firstAdmin: primeiroAdministrador,
     idempotencyKey: chaveIdempotencia,
   } = dadosEnvio;
-  const senha = typeof primeiroAdministrador?.password === 'string' ? primeiroAdministrador.password : '';
+  const senha =
+    typeof primeiroAdministrador?.password === 'string' ? primeiroAdministrador.password : '';
 
   if (senha.length < TAMANHO_MINIMO_SENHA || senha.length > TAMANHO_MAXIMO_SENHA) {
     throw {
@@ -386,7 +469,10 @@ const provisionarEmpresa: Manipulador = async (ator, dadosEnvio, requisicao) => 
     };
   }
   if (/^\s+$/.test(senha) || /^(.)\1+$/.test(senha)) {
-    throw { hint: 'INVALID_INPUT', message: 'Escolha uma senha mais segura para o primeiro administrador.' };
+    throw {
+      hint: 'INVALID_INPUT',
+      message: 'Escolha uma senha mais segura para o primeiro administrador.',
+    };
   }
 
   // A senha NUNCA entra no request_payload da operação. Ela existe apenas na
@@ -454,12 +540,13 @@ const provisionarEmpresa: Manipulador = async (ator, dadosEnvio, requisicao) => 
       };
     }
 
-    const { data: dadosAutenticacao, error: erroAutenticacao } = await administrador.auth.admin.createUser({
-      email,
-      password: senha,
-      email_confirm: true,
-      user_metadata: { full_name: primeiroAdministrador.fullName },
-    });
+    const { data: dadosAutenticacao, error: erroAutenticacao } =
+      await administrador.auth.admin.createUser({
+        email,
+        password: senha,
+        email_confirm: true,
+        user_metadata: { full_name: primeiroAdministrador.fullName },
+      });
 
     if (erroAutenticacao || !dadosAutenticacao?.user?.id) {
       await chamarPlataforma('mark_step', {
@@ -627,8 +714,14 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
     }),
 
   'company.delete': async (primeiroItem, parametroItem, requisicao) => {
-    if (typeof parametroItem?.companyId !== 'string' || typeof parametroItem?.confirmedName !== 'string') {
-      throw { hint: 'INVALID_INPUT', message: 'Empresa e confirmação são obrigatórias.' };
+    if (
+      typeof parametroItem?.companyId !== 'string' ||
+      typeof parametroItem?.confirmedName !== 'string'
+    ) {
+      throw {
+        hint: 'INVALID_INPUT',
+        message: 'Empresa e confirmação são obrigatórias.',
+      };
     }
 
     const resultado: any = await chamarPlataforma('hard_delete_company', {
@@ -646,13 +739,22 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       const usuarioIdentificador = typeof membro?.userId === 'string' ? membro.userId : null;
       if (!usuarioIdentificador) continue;
       if (membro?.deleteAuthUser !== true) {
-        mantidos.push({ userId: usuarioIdentificador, reason: 'Conta usada fora da empresa excluída.' });
+        mantidos.push({
+          userId: usuarioIdentificador,
+          reason: 'Conta usada fora da empresa excluída.',
+        });
         continue;
       }
 
-      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(usuarioIdentificador, false);
+      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(
+        usuarioIdentificador,
+        false,
+      );
       if (erroExclusao) {
-        falhas.push({ userId: usuarioIdentificador, message: erroExclusao.message });
+        falhas.push({
+          userId: usuarioIdentificador,
+          message: erroExclusao.message,
+        });
         await registrarEventoPlataforma(
           primeiroItem,
           requisicao,
@@ -698,9 +800,12 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       p_user_id: parametroItem.userId,
     });
 
-    const { error: erroAtualizacao } = await administrador.auth.admin.updateUserById(parametroItem.userId, {
-      password: senha,
-    });
+    const { error: erroAtualizacao } = await administrador.auth.admin.updateUserById(
+      parametroItem.userId,
+      {
+        password: senha,
+      },
+    );
     if (erroAtualizacao) {
       await registrarEventoPlataforma(
         primeiroItem,
@@ -712,7 +817,10 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
         parametroItem.companyId,
         { reason: 'auth_update_failed' },
       );
-      throw { hint: 'AUTH_UPDATE_FAILED', message: 'Não foi possível alterar a senha deste usuário.' };
+      throw {
+        hint: 'AUTH_UPDATE_FAILED',
+        message: 'Não foi possível alterar a senha deste usuário.',
+      };
     }
 
     await registrarEventoPlataforma(
@@ -726,7 +834,11 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       { role: membro?.role ?? null },
     );
 
-    return { userId: parametroItem.userId, fullName: membro?.fullName ?? null, passwordUpdated: true };
+    return {
+      userId: parametroItem.userId,
+      fullName: membro?.fullName ?? null,
+      passwordUpdated: true,
+    };
   },
 
   'member.delete': async (primeiroItem, parametroItem, requisicao) => {
@@ -738,7 +850,10 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
     });
 
     if (preparado?.deleteAuthUser === true) {
-      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(parametroItem.userId, false);
+      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(
+        parametroItem.userId,
+        false,
+      );
       if (erroExclusao) {
         await registrarEventoPlataforma(
           primeiroItem,
@@ -817,10 +932,12 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
     }),
 
   'admins.list': (primeiroItem, parametroItem) =>
-    chamarPlataforma('list_company_admins', {
+    chamarPlataforma('list_company_admins_filtered', {
       p_actor_user_id: primeiroItem.userId,
       p_company_id: parametroItem?.companyId ?? null,
       p_search: parametroItem?.search ?? null,
+      p_access: parametroItem?.access ?? null,
+      p_account: parametroItem?.account ?? null,
       p_page: parametroItem?.page ?? 1,
       p_page_size: parametroItem?.pageSize ?? 25,
     }),
@@ -852,7 +969,9 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
   'admin.replace': async (primeiroItem, parametroItem) => {
     const alvoIdentificador =
       parametroItem?.userId ??
-      (parametroItem?.email ? await buscarUsuarioIdentificadorPorEmail(String(parametroItem.email)) : null);
+      (parametroItem?.email
+        ? await buscarUsuarioIdentificadorPorEmail(String(parametroItem.email))
+        : null);
     if (!alvoIdentificador) {
       throw Object.assign(new Error('Conta de destino não encontrada.'), {
         hint: 'NOT_FOUND',
@@ -924,7 +1043,11 @@ async function tratarAceiteConvite(
 ) {
   const token = (requisicao.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '').trim();
   if (!token) {
-    return respostaJson({ error: { hint: 'UNAUTHENTICATED', message: 'Sessão ausente.' } }, 401, origem);
+    return respostaJson(
+      { error: { hint: 'UNAUTHENTICATED', message: 'Sessão ausente.' } },
+      401,
+      origem,
+    );
   }
 
   const publica = criarCliente(ENDERECO_SUPABASE, CHAVE_PUBLICA, {
@@ -934,11 +1057,19 @@ async function tratarAceiteConvite(
 
   const { data: usuarioDados, error: usuarioErro } = await publica.auth.getUser();
   if (usuarioErro || !usuarioDados?.user) {
-    return respostaJson({ error: { hint: 'UNAUTHENTICATED', message: 'Sessão inválida.' } }, 401, origem);
+    return respostaJson(
+      { error: { hint: 'UNAUTHENTICATED', message: 'Sessão inválida.' } },
+      401,
+      origem,
+    );
   }
 
   if (!dadosEnvio?.token) {
-    return respostaJson({ error: { hint: 'INVITE_INVALID', message: 'Convite ausente.' } }, 403, origem);
+    return respostaJson(
+      { error: { hint: 'INVITE_INVALID', message: 'Convite ausente.' } },
+      403,
+      origem,
+    );
   }
 
   try {
@@ -968,14 +1099,22 @@ Deno.serve({ port: PORTA_FUNCAO }, async (requisicao: Request) => {
     return new Response(null, { status: 204, headers: cabecalhosCors(origem) });
   }
   if (requisicao.method !== 'POST') {
-    return respostaJson({ error: { hint: 'METHOD_NOT_ALLOWED', message: 'Use POST.' } }, 405, origem);
+    return respostaJson(
+      { error: { hint: 'METHOD_NOT_ALLOWED', message: 'Use POST.' } },
+      405,
+      origem,
+    );
   }
 
   let corpo: { action?: string; payload?: unknown };
   try {
     corpo = await requisicao.json();
   } catch {
-    return respostaJson({ error: { hint: 'INVALID_INPUT', message: 'Corpo inválido.' } }, 422, origem);
+    return respostaJson(
+      { error: { hint: 'INVALID_INPUT', message: 'Corpo inválido.' } },
+      422,
+      origem,
+    );
   }
 
   const acao = corpo.action ?? '';
@@ -991,7 +1130,12 @@ Deno.serve({ port: PORTA_FUNCAO }, async (requisicao: Request) => {
   const manipulador = ACOES_ATENDIDAS[acao];
   if (!manipulador) {
     return respostaJson(
-      { error: { hint: 'UNKNOWN_ACTION', message: `Ação desconhecida: ${acao}` } },
+      {
+        error: {
+          hint: 'UNKNOWN_ACTION',
+          message: `Ação desconhecida: ${acao}`,
+        },
+      },
       400,
       origem,
     );

@@ -13,7 +13,12 @@ const ARQUIVO_CANAIS_COMUNICACAO = 'aplicativos/programa-empresa/sistema/canais-
 const resultados = [];
 
 function verificar(identificador, condicao, descricao, solucao) {
-  resultados.push({ id: identificador, ok: Boolean(condicao), description: descricao, remedy: solucao });
+  resultados.push({
+    id: identificador,
+    ok: Boolean(condicao),
+    description: descricao,
+    remedy: solucao,
+  });
 }
 
 if (!arquivoExiste(PRINCIPAL) || !arquivoExiste(PONTE_SEGURA)) {
@@ -44,7 +49,8 @@ verificar(
 
 verificar(
   'NO_NODE_INTEGRATION',
-  /nodeIntegration\s*:\s*false/.test(principalCodigo) && !/nodeIntegration\s*:\s*true/.test(principalCodigo),
+  /nodeIntegration\s*:\s*false/.test(principalCodigo) &&
+    !/nodeIntegration\s*:\s*true/.test(principalCodigo),
   'nodeIntegration desabilitado',
   'com Node no renderer, um XSS vira acesso ao sistema de arquivos',
 );
@@ -72,7 +78,8 @@ verificar(
 
 verificar(
   'WEB_SECURITY',
-  /webSecurity\s*:\s*true/.test(principalCodigo) && !/webSecurity\s*:\s*false/.test(principalCodigo),
+  /webSecurity\s*:\s*true/.test(principalCodigo) &&
+    !/webSecurity\s*:\s*false/.test(principalCodigo),
   'webSecurity habilitado',
   'desligar same-origin para "resolver o CORS" abre o aplicativo inteiro',
 );
@@ -114,7 +121,8 @@ verificar(
 
 verificar(
   'CSP_SCRIPT_SELF_ONLY',
-  /script-src\s+'self'/.test(principalCodigo) && !/script-src[^;]*https?:\/\//.test(principalCodigo),
+  /script-src\s+'self'/.test(principalCodigo) &&
+    !/script-src[^;]*https?:\/\//.test(principalCodigo),
   "script-src 'self' sem origem remota",
   'origem remota em script-src é exatamente o que "zero CDN" proíbe',
 );
@@ -177,7 +185,8 @@ verificar(
 
 verificar(
   'CERT_ERROR_REJECTED',
-  /certificate-error/.test(principalCodigo) && /(?:callback|funcaoRetorno)\(false\)/.test(principalCodigo),
+  /certificate-error/.test(principalCodigo) &&
+    /(?:callback|funcaoRetorno)\(false\)/.test(principalCodigo),
   'certificado inválido recusado',
   'aceitar certificado inválido anula o TLS',
 );
@@ -187,14 +196,14 @@ verificar(
   /setPermissionRequestHandler/.test(principalCodigo) &&
     /(?:callback|funcaoRetorno)\(false\)/.test(principalCodigo),
   'permissões de dispositivo negadas por padrão',
-  'câmera e afins estão fora do escopo desta entrega',
+  'captura ocorre no dispositivo de rede; o renderer não acessa mídia local',
 );
 
 verificar(
   'DEVICE_PERMISSION_DENIED',
   /setDevicePermissionHandler/.test(principalCodigo),
   'USB, serial e HID negados',
-  'fecha a porta para ESP32 e periféricos nesta entrega',
+  'nenhuma permissão de USB, serial ou HID é aberta ao renderer',
 );
 
 verificar(
@@ -212,7 +221,8 @@ function extrairCanaisIpc(fonte) {
 
 verificar(
   'IPC_CHANNELS_SYNC',
-  JSON.stringify(extrairCanaisIpc(canaisIpcFonte)) === JSON.stringify(extrairCanaisIpc(preCarregamento)),
+  JSON.stringify(extrairCanaisIpc(canaisIpcFonte)) ===
+    JSON.stringify(extrairCanaisIpc(preCarregamento)),
   'canais IPC do preload estão sincronizados com o processo principal',
   'o preload precisa repetir os nomes por causa do sandbox, mas a lista deve ser idêntica ao arquivo canônico',
 );
@@ -243,7 +253,8 @@ verificar(
 
 verificar(
   'NO_ARBITRARY_INVOKE',
-  !/invoke:\s*\(/.test(codigoPreCarregamento) && !/invoke\s*=\s*\(channel/.test(codigoPreCarregamento),
+  !/invoke:\s*\(/.test(codigoPreCarregamento) &&
+    !/invoke\s*=\s*\(channel/.test(codigoPreCarregamento),
   'nenhum invoke genérico com canal parametrizado',
   'invoke(canal) reintroduz acesso a todos os canais',
 );
@@ -312,12 +323,23 @@ verificar(
   'a chave de serviço nunca pode existir no aplicativo',
 );
 
-const FORA_DO_ESCOPO = /\b(ocr|tesseract|esp32|servo|cancela|gate-?controller)\b/i;
+const processamentoFonte = lerArquivoSincrono(
+  'aplicativos/programa-empresa/sistema/processar-imagem.cjs',
+  'utf8',
+);
 verificar(
-  'NO_OUT_OF_SCOPE_HARDWARE',
-  !FORA_DO_ESCOPO.test(principalCodigo) && !FORA_DO_ESCOPO.test(codigoPreCarregamento),
-  'sem OCR, ESP32, servo ou cancela',
-  'fora do escopo desta entrega',
+  'FIXED_IMAGE_PROCESSOR',
+  /shell: false/.test(processamentoFonte) &&
+    /leitor-placas.exe/.test(processamentoFonte) &&
+    !/execSync|exec\(/.test(processamentoFonte),
+  'processamento usa executável fixo, sem shell',
+  'o renderer não pode escolher comandos do sistema',
+);
+verificar(
+  'IMAGE_PROCESSOR_LIMIT',
+  /307200/.test(processamentoFonte) && /409600/.test(processamentoFonte),
+  'imagem limitada antes de encaminhar ao processo',
+  'evita entrada arbitrária sem limite',
 );
 
 verificar(
@@ -343,5 +365,7 @@ if (falhou.length === 0) {
   process.exit(0);
 }
 
-console.error(`verify:electron  FAIL  — ${falhou.length}/${resultados.length} invariante(s) violada(s)`);
+console.error(
+  `verify:electron  FAIL  — ${falhou.length}/${resultados.length} invariante(s) violada(s)`,
+);
 process.exit(1);

@@ -1,4 +1,6 @@
-import { el as criarElemento, campo, botao, notificacao } from '../componentes/componentes-do-programa.mjs';
+import { abrirRecuperacaoSenha } from '../formularios/formulario-senha.mjs';
+import { apresentacaoLogin } from '../componentes/apresentacao-do-login.mjs';
+import { el as criarElemento, campo, botao } from '../componentes/componentes-do-programa.mjs';
 
 import { icone } from '../componentes/icones.mjs';
 
@@ -66,47 +68,29 @@ export function renderizarLogin({ onSuccess: aoSucesso }) {
       [icone(senhaVisivel ? 'eye-off' : 'eye', { size: 'sm' })],
     );
 
-    const campoSenha = criarElemento('div', { class: 'input-affix' }, [entradaSenha, alternarSenha]);
+    const campoSenha = criarElemento('div', { class: 'input-affix' }, [
+      entradaSenha,
+      alternarSenha,
+    ]);
 
     aplicativo.replaceChildren(
       criarElemento('div', { class: 'auth-split' }, [
-        criarElemento('aside', { class: 'auth-hero' }, [
-          criarElemento('div', { class: 'auth-hero-brand' }, [
-            criarElemento('span', { class: 'brand-mark', text: 'PF' }),
-            criarElemento('span', {}, [
-              criarElemento('span', { text: 'Pega' }),
-              criarElemento('span', { class: 'auth-hero-brand-accent', text: 'NaFrota' }),
-            ]),
-          ]),
-          criarElemento('div', { class: 'auth-hero-body' }, [
-            // Título curto e tópicos, no lugar do parágrafo corrido: quem abre a
-            // tela de entrada não lê texto explicativo — varre a página.
-            criarElemento('h2', { class: 'auth-hero-title', text: 'Sua frota inteira em um só lugar' }),
-            criarElemento(
-              'ul',
-              { class: 'auth-hero-marks' },
-              [
-                ['vehicles', 'Veículos e motoristas sempre atualizados'],
-                ['movements', 'Entrada e saída do pátio com odômetro conferido'],
-                ['fuel', 'Abastecimentos com consumo calculado por veículo'],
-                ['tool', 'Manutenções avisadas antes de vencer'],
-                ['reports', 'Relatórios de custo prontos para exportar'],
-              ].map(([nomeIcone, rotulo]) =>
-                criarElemento('li', { class: 'auth-hero-mark' }, [
-                  icone(nomeIcone, { size: 'sm' }),
-                  criarElemento('span', { text: rotulo }),
-                ]),
-              ),
-            ),
-          ]),
-          // O rodapé técnico ("Desktop · janela mínima 1024×720") foi removido:
-          // é informação de especificação, não serve a quem vai entrar.
-        ]),
+        apresentacaoLogin(),
 
         criarElemento('main', { class: 'auth-form-pane' }, [
           criarElemento('div', { class: 'auth-form' }, [
-            criarElemento('h1', { class: 'auth-title', text: 'Entrar' }),
-            criarElemento('p', { class: 'auth-subtitle', text: 'Acesse com as credenciais da sua empresa.' }),
+            criarElemento('p', {
+              class: 'auth-eyebrow',
+              text: 'ACESSO DA EMPRESA',
+            }),
+            criarElemento('h1', {
+              class: 'auth-title',
+              text: 'Bem-vindo de volta.',
+            }),
+            criarElemento('p', {
+              class: 'auth-subtitle',
+              text: 'Acesse com as credenciais da sua empresa.',
+            }),
             campo({
               id: 'email',
               label: 'E-mail',
@@ -138,20 +122,26 @@ export function renderizarLogin({ onSuccess: aoSucesso }) {
                   criarElemento('span', { text: erros.form }),
                 ])
               : null,
-            botao({ label: 'Entrar', variant: 'primary', size: 'block', busy: ocupado, onClick: enviar }),
+            botao({
+              label: 'Entrar',
+              variant: 'primary',
+              size: 'block',
+              busy: ocupado,
+              onClick: enviar,
+            }),
             criarElemento(
               'button',
               {
                 class: 'auth-link',
                 type: 'button',
-                onClick: () =>
-                  notificacao('Peça ao administrador da sua empresa para redefinir seu acesso.', {
-                    tone: 'info',
-                    duration: 7000,
-                  }),
+                onClick: () => abrirRecuperacaoSenha(email),
               },
               ['Esqueci minha senha'],
             ),
+            criarElemento('p', {
+              class: 'auth-form-note',
+              text: 'Seu acesso é fornecido pelo administrador da empresa.',
+            }),
           ]),
         ]),
       ]),

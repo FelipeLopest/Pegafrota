@@ -23,7 +23,8 @@
 import postgres from 'pg';
 import { randomUUID as criarIdentificadorUnico } from 'node:crypto';
 
-const ENDERECO_BANCO = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const ENDERECO_BANCO =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
 
 const resultados = [];
 let falhas = 0;
@@ -85,10 +86,10 @@ async function principal() {
 
   const resolvido = await Promise.allSettled(
     clientes.map((cliente) =>
-      cliente.query(`select public.register_vehicle_movement($1, $2, 'manual', null, null, 0) as result`, [
-        veiculoIdentificador,
-        dadosDemonstracao.location_id,
-      ]),
+      cliente.query(
+        `select public.register_vehicle_movement($1, $2, 'manual', null, null, 0) as result`,
+        [veiculoIdentificador, dadosDemonstracao.location_id],
+      ),
     ),
   );
 
@@ -114,7 +115,8 @@ async function principal() {
   );
 
   const sequencial = movimentacoes.every(
-    (correspondenciaItem, indiceItem2) => Number(correspondenciaItem.sequence_no) === indiceItem2 + 1,
+    (correspondenciaItem, indiceItem2) =>
+      Number(correspondenciaItem.sequence_no) === indiceItem2 + 1,
   );
   verificar('sequência sem buracos e sem repetição', sequencial);
 
@@ -150,7 +152,8 @@ async function principal() {
   verificar(
     'chamadas deduplicadas simultâneas não geram erro',
     deduplicacaoConcluidos.every((textoItem) => textoItem.status === 'fulfilled'),
-    deduplicacaoConcluidos.find((textoItem) => textoItem.status === 'rejected')?.reason?.message ?? '',
+    deduplicacaoConcluidos.find((textoItem) => textoItem.status === 'rejected')?.reason?.message ??
+      '',
   );
 
   const { rows: depoisLinhas } = await administrador.query(
@@ -180,10 +183,10 @@ async function principal() {
     clientes
       .slice(0, 8)
       .map((cliente) =>
-        cliente.query(`select public.register_plate_read($1, $2, 0.97, 'demo-ocr-1.4.2') as result`, [
-          dadosDemonstracao.camera_id,
-          ocrPlaca,
-        ]),
+        cliente.query(
+          `select public.register_plate_read($1, $2, 0.97, 'demo-ocr-1.4.2') as result`,
+          [dadosDemonstracao.camera_id, ocrPlaca],
+        ),
       ),
   );
 
@@ -248,7 +251,9 @@ async function principal() {
       cliente.query(`select public.complete_trip($1, 1200) as result`, [viagemIdentificador]),
     ),
   );
-  const viagemSucesso = viagemConcluidos.filter((textoItem) => textoItem.status === 'fulfilled').length;
+  const viagemSucesso = viagemConcluidos.filter(
+    (textoItem) => textoItem.status === 'fulfilled',
+  ).length;
   verificar(
     'exatamente uma conclusão de viagem vence a corrida',
     viagemSucesso === 1,
@@ -307,7 +312,9 @@ async function principal() {
     ),
   ]);
 
-  const desativarSucesso = desativarConcluidos.filter((textoItem) => textoItem.status === 'fulfilled').length;
+  const desativarSucesso = desativarConcluidos.filter(
+    (textoItem) => textoItem.status === 'fulfilled',
+  ).length;
   const desativarErros = desativarConcluidos
     .filter((textoItem) => textoItem.status === 'rejected')
     .map((textoItem) => textoItem.reason?.code ?? textoItem.reason?.message);
@@ -368,7 +375,9 @@ async function principal() {
                now() - interval '2 hours', 1000)`,
       [tIdentificador, dadosDemonstracao.company_id, vIdentificador],
     );
-    await administrador.query(`update public.vehicles set status = 'in_use' where id = $1`, [vIdentificador]);
+    await administrador.query(`update public.vehicles set status = 'in_use' where id = $1`, [
+      vIdentificador,
+    ]);
     viagemPares.push({ vId: vIdentificador, tId: tIdentificador });
   }
 
@@ -381,10 +390,13 @@ async function principal() {
 
   const concorrenciaConcluidos = await Promise.allSettled(
     viagemPares.flatMap((parAtual, indiceItem5) => [
-      finalizadores[indiceItem5].query(`select public.complete_trip($1, 1500) as result`, [parAtual.tId]),
-      canceladores[indiceItem5].query(`select public.cancel_trip($1, 'cancelamento concorrente') as result`, [
+      finalizadores[indiceItem5].query(`select public.complete_trip($1, 1500) as result`, [
         parAtual.tId,
       ]),
+      canceladores[indiceItem5].query(
+        `select public.cancel_trip($1, 'cancelamento concorrente') as result`,
+        [parAtual.tId],
+      ),
     ]),
   );
 
@@ -408,7 +420,11 @@ async function principal() {
       where id = any($1::uuid[]) and status in ('completed', 'cancelled')`,
     [viagemPares.map((parametroItem) => parametroItem.tId)],
   );
-  verificar('toda viagem termina em estado final', viagemFinal[0].n === PARES, `${viagemFinal[0].n}`);
+  verificar(
+    'toda viagem termina em estado final',
+    viagemFinal[0].n === PARES,
+    `${viagemFinal[0].n}`,
+  );
 
   for (const cliente of [...finalizadores, ...canceladores]) await cliente.end();
 
@@ -443,7 +459,9 @@ async function principal() {
 
   const manutencaoConcluidos = await Promise.allSettled(
     manutencaoPares.flatMap((parAtual, indiceItem7) => [
-      iniciadores[indiceItem7].query(`select public.start_maintenance($1) as result`, [parAtual.mId]),
+      iniciadores[indiceItem7].query(`select public.start_maintenance($1) as result`, [
+        parAtual.mId,
+      ]),
       manutencaoCanceladores[indiceItem7].query(
         `select public.cancel_maintenance($1, 'cancelamento concorrente') as result`,
         [parAtual.mId],
@@ -466,7 +484,11 @@ async function principal() {
       where id = any($1::uuid[]) and status in ('in_progress', 'cancelled')`,
     [manutencaoPares.map((parametroItem) => parametroItem.mId)],
   );
-  verificar('toda manutenção sai de scheduled', manutencaoFinal[0].n === PARES, `${manutencaoFinal[0].n}`);
+  verificar(
+    'toda manutenção sai de scheduled',
+    manutencaoFinal[0].n === PARES,
+    `${manutencaoFinal[0].n}`,
+  );
 
   const { rows: veiculoCoerente } = await administrador.query(
     `select count(*)::int as n
@@ -494,7 +516,9 @@ async function principal() {
   verificar(
     'data_integrity_selftest continua sem apontamentos',
     integridade.length === 0,
-    integridade.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`).join(' | '),
+    integridade
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`)
+      .join(' | '),
   );
 
   // ---------------------------------------------------------------------------

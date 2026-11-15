@@ -34,11 +34,23 @@ const ENDERECO_TESTE = ENDERECO_ADMINISTRACAO.replace(/\/[^/]*$/, `/${BANCO_TEST
 
 const EMPRESAS = [
   { slug: 'auroraverde', users: ['admin', 'gestor', 'operador', 'consulta', 'desligado'] },
-  { slug: 'pedraalta', users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'] },
+  {
+    slug: 'pedraalta',
+    users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'],
+  },
   { slug: 'riosereno', users: ['admin', 'gestor', 'gestor2', 'operador', 'operador2', 'consulta'] },
   {
     slug: 'camponovo',
-    users: ['admin', 'admin2', 'gestor', 'gestor2', 'operador', 'operador2', 'operador3', 'consulta'],
+    users: [
+      'admin',
+      'admin2',
+      'gestor',
+      'gestor2',
+      'operador',
+      'operador2',
+      'operador3',
+      'consulta',
+    ],
   },
 ];
 
@@ -51,7 +63,9 @@ let falhas = 0;
 function verificar(nome, sucesso, detalhe = '') {
   quantidade += 1;
   if (!sucesso) falhas += 1;
-  console.log(`${sucesso ? 'ok  ' : 'NOT OK'} ${quantidade} - ${nome}${detalhe ? ` (${detalhe})` : ''}`);
+  console.log(
+    `${sucesso ? 'ok  ' : 'NOT OK'} ${quantidade} - ${nome}${detalhe ? ` (${detalhe})` : ''}`,
+  );
 }
 
 async function principal() {
@@ -129,7 +143,9 @@ async function principal() {
     `${perfis.length}/${ENDERECOS_EMAIL.length}`,
   );
 
-  const divergente = perfis.filter((linha) => autenticacaoIdentificadores.get(linha.email) !== linha.id);
+  const divergente = perfis.filter(
+    (linha) => autenticacaoIdentificadores.get(linha.email) !== linha.id,
+  );
   verificar(
     'profiles usam o UUID devolvido pelo Auth',
     divergente.length === 0,
@@ -191,7 +207,9 @@ async function principal() {
   verificar(
     'toda empresa ativa tem administrador efetivo',
     administradores.every((resultadoItem) => resultadoItem.n >= 1),
-    administradores.map((resultadoItem) => `${resultadoItem.trade_name}=${resultadoItem.n}`).join(', '),
+    administradores
+      .map((resultadoItem) => `${resultadoItem.trade_name}=${resultadoItem.n}`)
+      .join(', '),
   );
 
   // ---------------------------------------------------------------------------
@@ -204,11 +222,15 @@ async function principal() {
     seguranca.map((resultadoItem) => resultadoItem.finding).join(' | '),
   );
 
-  const { rows: integridade } = await banco.query('select * from private.data_integrity_selftest()');
+  const { rows: integridade } = await banco.query(
+    'select * from private.data_integrity_selftest()',
+  );
   verificar(
     'data_integrity_selftest sem apontamentos',
     integridade.length === 0,
-    integridade.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`).join(' | '),
+    integridade
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`)
+      .join(' | '),
   );
 
   // ---------------------------------------------------------------------------

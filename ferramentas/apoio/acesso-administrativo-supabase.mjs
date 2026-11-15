@@ -30,7 +30,9 @@ export async function buscarJson(endereco, opcoes = {}) {
   const corpo = await lerCorpo(resposta);
   if (!resposta.ok) {
     const detalhe = typeof corpo === 'string' ? corpo : JSON.stringify(corpo);
-    const erro = new Error(`${opcoes.method ?? 'GET'} ${endereco} -> ${resposta.status}: ${detalhe}`);
+    const erro = new Error(
+      `${opcoes.method ?? 'GET'} ${endereco} -> ${resposta.status}: ${detalhe}`,
+    );
     erro.status = resposta.status;
     erro.body = corpo;
     throw erro;
@@ -80,7 +82,9 @@ export async function garantirUsuarioAutenticacao({
 
   if (!usuario) {
     if (!senha || senha.length < 12) {
-      throw new Error('PLATFORM_ADMIN_PASSWORD precisa ter pelo menos 12 caracteres para criar a conta.');
+      throw new Error(
+        'PLATFORM_ADMIN_PASSWORD precisa ter pelo menos 12 caracteres para criar a conta.',
+      );
     }
     const corpo = await administradorAutenticacao('/admin/users', {
       method: 'POST',

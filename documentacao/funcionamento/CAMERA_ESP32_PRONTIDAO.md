@@ -1,3 +1,5 @@
+> Documento histórico anterior à integração 1.1.0. Para o estado atual e ativação, leia `ATIVAR_CAMERAS.md` na raiz.
+
 > Referência anterior à reorganização. As regras de produto podem continuar válidas, mas os caminhos e a divisão do código devem ser conferidos no `GUIA_DO_PROJETO.md` da raiz e no código atual.
 
 # O sistema está pronto para receber a câmera ESP32?

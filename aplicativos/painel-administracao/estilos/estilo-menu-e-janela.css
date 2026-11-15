@@ -76,7 +76,7 @@
 .nav-item:hover {
   color: var(--tema-comando-texto);
 }
-.nav-item[aria-current='page'] {
+.nav-item[aria-current="page"] {
   color: var(--tema-comando-texto);
   font-weight: 600;
   border-bottom-color: var(--tema-violeta);
@@ -93,8 +93,8 @@
   border: 1px solid var(--tema-ambiente-borda);
   flex: none;
 }
-.env-badge[data-env='LOCAL'],
-.env-badge[data-env='HOMOLOGAÇÃO'] {
+.env-badge[data-env="LOCAL"],
+.env-badge[data-env="HOMOLOGAÇÃO"] {
   background: var(--tema-comando-alternativa);
   color: var(--tema-comando-discreto);
   border-color: var(--tema-comando-borda);

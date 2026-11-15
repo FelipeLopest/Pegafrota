@@ -1,3 +1,5 @@
+import { contexto } from '../acesso/sessao-e-permissoes.mjs';
+import { consumirAtalho } from '../formularios/apoio-operacoes.mjs';
 import {
   el as criarElemento,
   fmt as formatar,
@@ -28,8 +30,10 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
   return tela(
     conteudoTela,
     PERMISSAO.VEHICLES_READ,
-    () => dados.vehicles.list(),
+    () => dados.vehicles.page(),
     (veiculos) => {
+      if (contexto.can(PERMISSAO.VEHICLES_WRITE))
+        consumirAtalho(() => abrirEditorVeiculo({ onDone: recarregar }));
       const cabecalho = cabecalhoPagina({
         title: 'Veículos',
         subtitle:
@@ -51,9 +55,10 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
           }),
         ],
       });
-      const marcas = [...new Set(veiculos.map((veiculoItem) => veiculoItem.brand).filter(Boolean))].sort(
-        (primeiroItem, segundoItem) => primeiroItem.localeCompare(segundoItem),
-      );
+      const marcas = [
+        ...(veiculos.paginaRemota?.facetas?.brands ||
+          new Set(veiculos.map((veiculoItem) => veiculoItem.brand).filter(Boolean))),
+      ].sort((primeiroItem, segundoItem) => primeiroItem.localeCompare(segundoItem));
       const explorador = exploradorColecao(veiculos, {
         key: 'vehicles',
         placeholder: 'Buscar placa, marca, modelo, cor ou categoria',
@@ -92,7 +97,10 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
             label: 'Combustível',
             options: [
               ['', 'Todos'],
-              ...TIPOS_COMBUSTIVEL_VEICULO.map((formulario) => [formulario.value, formulario.label]),
+              ...TIPOS_COMBUSTIVEL_VEICULO.map((formulario) => [
+                formulario.value,
+                formulario.label,
+              ]),
             ],
             get: (veiculoItem) => veiculoItem.fuel_type,
           },
@@ -116,13 +124,17 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
                   }),
                 ]),
                 criarElemento('td', {}, [
-                  criarElemento('b', { text: `${veiculoItem.brand} ${veiculoItem.model}` }),
+                  criarElemento('b', {
+                    text: `${veiculoItem.brand} ${veiculoItem.model}`,
+                  }),
                   criarElemento('p', {
                     class: 'muted',
                     text: [veiculoItem.category, veiculoItem.color].filter(Boolean).join(' · '),
                   }),
                 ]),
-                criarElemento('td', { text: formatar.km(veiculoItem.current_odometer_km) }),
+                criarElemento('td', {
+                  text: formatar.km(veiculoItem.current_odometer_km),
+                }),
                 criarElemento('td', {}, [
                   criarElemento('status-pill', {
                     status: veiculoItem.archived_at ? 'archived' : veiculoItem.status,
@@ -143,47 +155,50 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
           ),
         pageSize: 50,
       });
-      const estatisticas = faixaResumo([
-        {
-          label: 'Em cadastro',
-          value: contarOnde(veiculos, (veiculoItem) => !veiculoItem.archived_at),
-          icon: 'truck',
-          hint: 'veículos atuais',
-        },
-        {
-          label: 'Disponíveis',
-          value: contarOnde(
-            veiculos,
-            (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'available',
-          ),
-          icon: 'check',
-          tone: 'success',
-        },
-        {
-          label: 'Em operação',
-          value: contarOnde(
-            veiculos,
-            (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'in_use',
-          ),
-          icon: 'route',
-          tone: 'info',
-        },
-        {
-          label: 'Manutenção',
-          value: contarOnde(
-            veiculos,
-            (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'in_maintenance',
-          ),
-          icon: 'tool',
-          tone: 'warning',
-        },
-        {
-          label: 'Arquivados',
-          value: contarOnde(veiculos, (veiculoItem) => !!veiculoItem.archived_at),
-          icon: 'archive',
-          tone: 'muted',
-        },
-      ]);
+      const estatisticas = faixaResumo(
+        [
+          {
+            label: 'Em cadastro',
+            value: contarOnde(veiculos, (veiculoItem) => !veiculoItem.archived_at),
+            icon: 'truck',
+            hint: 'veículos atuais',
+          },
+          {
+            label: 'Disponíveis',
+            value: contarOnde(
+              veiculos,
+              (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'available',
+            ),
+            icon: 'check',
+            tone: 'success',
+          },
+          {
+            label: 'Em operação',
+            value: contarOnde(
+              veiculos,
+              (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'in_use',
+            ),
+            icon: 'route',
+            tone: 'info',
+          },
+          {
+            label: 'Manutenção',
+            value: contarOnde(
+              veiculos,
+              (veiculoItem) => !veiculoItem.archived_at && veiculoItem.status === 'in_maintenance',
+            ),
+            icon: 'tool',
+            tone: 'warning',
+          },
+          {
+            label: 'Arquivados',
+            value: contarOnde(veiculos, (veiculoItem) => !!veiculoItem.archived_at),
+            icon: 'archive',
+            tone: 'muted',
+          },
+        ],
+        { colecao: veiculos },
+      );
       return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
     },
   );

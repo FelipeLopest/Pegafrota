@@ -18,7 +18,13 @@ export function rota(padrao, manipulador, metadados = {}) {
       }) +
       '$',
   );
-  rotas.push({ pattern: padrao, rx: expressaoBusca, names: nomes, handler: manipulador, meta: metadados });
+  rotas.push({
+    pattern: padrao,
+    rx: expressaoBusca,
+    names: nomes,
+    handler: manipulador,
+    meta: metadados,
+  });
 }
 
 export function navegar(caminho) {

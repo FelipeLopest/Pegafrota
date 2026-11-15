@@ -1,3 +1,4 @@
+import { separarListaSql } from '../apoio/interpretar-lista-sql.mjs';
 import { listarArquivos } from '../apoio/arquivos.mjs';
 import {
   readFileSync as lerArquivoSincrono,
@@ -33,18 +34,7 @@ function interpretarFuncoes(fonte) {
   let correspondenciaItem;
   while ((correspondenciaItem = expressaoRegular.exec(limpo)) !== null) {
     const nome = correspondenciaItem[1];
-    const parametros = [];
-    let profundidade = 0;
-    let trechoAcumulado = '';
-    for (const caractere of correspondenciaItem[2]) {
-      if (caractere === '(') profundidade += 1;
-      if (caractere === ')') profundidade -= 1;
-      if (caractere === ',' && profundidade === 0) {
-        parametros.push(trechoAcumulado);
-        trechoAcumulado = '';
-      } else trechoAcumulado += caractere;
-    }
-    if (trechoAcumulado.trim()) parametros.push(trechoAcumulado);
+    const parametros = separarListaSql(correspondenciaItem[2]);
 
     const interpretado = parametros
       .map((parametroItem) => {
@@ -86,7 +76,8 @@ function interpretarTabelas(fonte) {
 
     for (const parametroItem of partes) {
       const itemAtual = parametroItem.trim();
-      if (/^(constraint|primary\s+key|unique|foreign\s+key|check|exclude)\b/i.test(itemAtual)) continue;
+      if (/^(constraint|primary\s+key|unique|foreign\s+key|check|exclude)\b/i.test(itemAtual))
+        continue;
       const correspondenciaColuna = /^([a-z0-9_]+)\s+/i.exec(itemAtual);
       if (correspondenciaColuna) colunas.add(correspondenciaColuna[1]);
     }
@@ -123,7 +114,8 @@ function extrairChamadasFuncaoBanco({ file: arquivo, code: codigo }) {
   const chamadas = [];
   const limpo = codigo.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  const expressaoRegular = /\b(?:rpc|executarFuncaoBanco)\(\s*['"`]([a-z0-9_]+)['"`]\s*(?:,\s*\{)?/gi;
+  const expressaoRegular =
+    /\b(?:rpc|executarFuncaoBanco)\(\s*['"`]([a-z0-9_]+)['"`]\s*(?:,\s*\{)?/gi;
   let correspondenciaItem;
   while ((correspondenciaItem = expressaoRegular.exec(limpo)) !== null) {
     const nome = correspondenciaItem[1];
@@ -204,7 +196,9 @@ function extrairRelatorios() {
     return { catalog: [], implemented: new Set(), file: arquivo };
   const codigo = lerArquivoSincrono(juntarCaminhos(RAIZ, arquivo), 'utf8');
 
-  const catalogo2 = /export const (?:REPORTS|RELATORIOS) = Object\.freeze\(\[([\s\S]*?)\]\);/.exec(codigo);
+  const catalogo2 = /export const (?:REPORTS|RELATORIOS) = Object\.freeze\(\[([\s\S]*?)\]\);/.exec(
+    codigo,
+  );
   const catalogo = catalogo2
     ? [...catalogo2[1].matchAll(/id:\s*['"`]([A-Za-z0-9_]+)['"`]/g)].map(
         (correspondenciaItem) => correspondenciaItem[1],
@@ -244,7 +238,10 @@ const selecaoTabelas = new Map(
 for (const chamar of funcaoBancoChamadas) {
   const funcao = funcoesBanco.get(chamar.name);
   if (!funcao) {
-    adicionar('rpc-ausente', `${chamar.file}:${chamar.line}  rpc('${chamar.name}') não existe em public`);
+    adicionar(
+      'rpc-ausente',
+      `${chamar.file}:${chamar.line}  rpc('${chamar.name}') não existe em public`,
+    );
     continue;
   }
   const aceito = new Set(funcao.map((parametroItem) => parametroItem.name));
@@ -270,14 +267,20 @@ for (const chamar of funcaoBancoChamadas) {
 for (const seletor of selecoes) {
   const colunas = tabelasBanco.get(seletor.table);
   if (!colunas) {
-    adicionar('tabela-ausente', `${seletor.file}:${seletor.line}  tabela public.${seletor.table} não existe`);
+    adicionar(
+      'tabela-ausente',
+      `${seletor.file}:${seletor.line}  tabela public.${seletor.table} não existe`,
+    );
     continue;
   }
   if (colunas.has('*')) continue; // view: colunas não extraídas do SQL
   for (const registro of seletor.cols) {
     if (registro === '*') continue;
     if (!colunas.has(registro)) {
-      adicionar('coluna-ausente', `${seletor.file}:${seletor.line}  ${seletor.table}.${registro} não existe`);
+      adicionar(
+        'coluna-ausente',
+        `${seletor.file}:${seletor.line}  ${seletor.table}.${registro} não existe`,
+      );
     }
   }
   if (seletor.orderColumn && !colunas.has(seletor.orderColumn)) {

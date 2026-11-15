@@ -42,7 +42,9 @@ async function principal() {
        values ($1, $2, $3, 'in_progress', 'Origem', 'Destino', now() - interval '2 hours', 1000)`,
       [tIdentificador, empresaIdentificador, vIdentificador],
     );
-    await administrador.query(`update public.vehicles set status = 'in_use' where id = $1`, [vIdentificador]);
+    await administrador.query(`update public.vehicles set status = 'in_use' where id = $1`, [
+      vIdentificador,
+    ]);
     pares.push({ vId: vIdentificador, tId: tIdentificador });
   }
 
@@ -67,14 +69,19 @@ async function principal() {
 
   console.log(`banco:      ${ENDERECO_BANCO.split('/').pop()}`);
   console.log(`pares:      ${PARES}`);
-  console.log(`sucessos:   ${resolvido.filter((textoItem) => textoItem.status === 'fulfilled').length}`);
+  console.log(
+    `sucessos:   ${resolvido.filter((textoItem) => textoItem.status === 'fulfilled').length}`,
+  );
   console.log(`deadlocks:  ${impasses}  <-- 40P01`);
   console.log(
     `outros:     ${JSON.stringify(
       codigos
         .filter((registro) => registro !== '40P01')
         .reduce(
-          (acumulador, registro) => ({ ...acumulador, [registro]: (acumulador[registro] ?? 0) + 1 }),
+          (acumulador, registro) => ({
+            ...acumulador,
+            [registro]: (acumulador[registro] ?? 0) + 1,
+          }),
           {},
         ),
     )}`,

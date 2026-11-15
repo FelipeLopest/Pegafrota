@@ -142,7 +142,10 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
             )
           : resposta.items;
         if (resposta.total === 0)
-          return estadoVazio({ title: 'Sem eventos no período', description: 'Ajuste ou limpe os filtros.' });
+          return estadoVazio({
+            title: 'Sem eventos no período',
+            description: 'Ajuste ou limpe os filtros.',
+          });
         return criarElemento('div', {}, [
           resumoAdministrador([
             { label: 'Exibidos', value: itens.length, icon: 'audit' },
@@ -193,7 +196,10 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                         criarElemento('td', { text: evento.actorName || '—' }),
                         criarElemento('td', {}, [criarElemento('code', { text: evento.action })]),
                         criarElemento('td', {}, [
-                          criarElemento('status-pill', { status: evento.result, label: evento.result }),
+                          criarElemento('status-pill', {
+                            status: evento.result,
+                            label: evento.result,
+                          }),
                         ]),
                         criarElemento('td', { text: evento.companyTradeName || '—' }),
                       ]),

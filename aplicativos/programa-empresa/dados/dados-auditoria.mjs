@@ -8,6 +8,7 @@ export const dadosAuditoria = {
       order: 'occurred_at.desc',
       limit: Math.min(Math.max(Number(tamanhoPagina) || 100, 20), 250),
       offset:
-        (Math.max(Number(pagina) || 1, 1) - 1) * Math.min(Math.max(Number(tamanhoPagina) || 100, 20), 250),
+        (Math.max(Number(pagina) || 1, 1) - 1) *
+        Math.min(Math.max(Number(tamanhoPagina) || 100, 20), 250),
     }),
 };

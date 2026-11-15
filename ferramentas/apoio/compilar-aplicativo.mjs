@@ -29,7 +29,11 @@ export function validarImportsLocais(pasta) {
   const catalogo = new Map(
     arquivos.map((arquivo) => [
       arquivo,
-      { nomes: new Set(), referencias: [], codigo: lerArquivo(arquivo, 'utf8') },
+      {
+        nomes: new Set(),
+        referencias: [],
+        codigo: lerArquivo(arquivo, 'utf8'),
+      },
     ]),
   );
   for (const [arquivo, item] of catalogo) {
@@ -100,13 +104,16 @@ export function compilarAplicativo(enderecoEntrada, programaEmpresa = false) {
     'navegacao',
     'componentes',
     'estilos',
+    'recursos',
     'comunicacao',
     'importacao',
   ];
   if (programaEmpresa) pastasProduto.push('sistema');
   for (const nome of pastasProduto)
     if (existe(juntar(pastaAplicativo, nome)))
-      copiar(juntar(pastaAplicativo, nome), juntar(pastaSaida, nome), { recursive: true });
+      copiar(juntar(pastaAplicativo, nome), juntar(pastaSaida, nome), {
+        recursive: true,
+      });
   for (const nome of [
     'index.html',
     'iniciar-aplicativo.mjs',
@@ -156,7 +163,7 @@ export function compilarAplicativo(enderecoEntrada, programaEmpresa = false) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self'",
-    `connect-src 'self' ${origem} ${origem.replace(/^http/, 'ws')}${programaEmpresa ? '' : ' https://brasilapi.com.br'}`,
+    `connect-src 'self' ${origem} ${origem.replace(/^http/, 'ws')} https://viacep.com.br${programaEmpresa ? '' : ' https://brasilapi.com.br'}`,
     "object-src 'none'",
     "frame-src 'none'",
     "frame-ancestors 'none'",

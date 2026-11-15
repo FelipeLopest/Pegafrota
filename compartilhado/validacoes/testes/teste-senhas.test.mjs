@@ -52,7 +52,10 @@ testar('confirmação divergente é apontada no campo certo', () => {
 });
 
 testar('confirmação igual passa', () => {
-  verificarCondicao.equal(validarSenha('senhabemcomprida', { confirm: 'senhabemcomprida' }).ok, true);
+  verificarCondicao.equal(
+    validarSenha('senhabemcomprida', { confirm: 'senhabemcomprida' }).ok,
+    true,
+  );
 });
 
 testar('não há exigência de maiúscula, número ou símbolo', () => {

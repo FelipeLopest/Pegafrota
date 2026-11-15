@@ -1,3 +1,4 @@
+import { telaCameras } from '../telas/tela-cameras.mjs';
 import { rota } from '../componentes/componentes-do-programa.mjs';
 
 import { tema } from '../acesso/sessao-e-permissoes.mjs';
@@ -26,6 +27,7 @@ import { telaImportacao } from '../telas/tela-importar-planilha.mjs';
 export function registrarRotas() {
   rota('/', telaInicial);
   rota('/patio', telaPatio);
+  rota('/cameras', telaCameras);
   rota('/movimentacoes', telaMovimentacoes);
   rota('/veiculos', telaVeiculos);
   rota('/veiculos/:id', telaDetalheVeiculo);

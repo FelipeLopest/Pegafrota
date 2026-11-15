@@ -77,7 +77,8 @@ export async function lerPlanilhaXlsx(memoriaTemporaria) {
 export function coluna(linha, ...nomes) {
   for (const nome of nomes) {
     const chave = normalizarCabecalho(nome);
-    if (linha[chave] !== undefined && String(linha[chave]).trim() !== '') return String(linha[chave]).trim();
+    if (linha[chave] !== undefined && String(linha[chave]).trim() !== '')
+      return String(linha[chave]).trim();
   }
   return '';
 }
@@ -104,7 +105,8 @@ export function numeroBrasileiro(valor) {
 
 function excelSerialParaDados(serial, comHora = false) {
   const quantidadeItem = Number(serial);
-  if (!Number.isFinite(quantidadeItem) || quantidadeItem < 1 || quantidadeItem > 2958465) return null;
+  if (!Number.isFinite(quantidadeItem) || quantidadeItem < 1 || quantidadeItem > 2958465)
+    return null;
   // Excel usa 1899-12-30 para reproduzir o bug histórico do ano 1900.
   const dadosRecebidos = new Date(Date.UTC(1899, 11, 30) + Math.round(quantidadeItem * 86400000));
   const outroItemComparado = dadosRecebidos.getUTCFullYear();
@@ -136,7 +138,8 @@ export function dadosHoraPlanilha(valor) {
   if (!texto) return null;
   if (/^\d+(?:[.,]\d+)?$/.test(texto)) return excelSerialParaDados(texto.replace(',', '.'), true);
 
-  const brasileiro = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(texto);
+  const brasileiro =
+    /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(texto);
   if (brasileiro) {
     const [
       ,
@@ -228,7 +231,9 @@ function emailSimplesValido(valor) {
 function resolverObrigatorio(valor, resolver, rotulo) {
   if (!String(valor || '').trim()) return { erro: `${rotulo} é obrigatório.` };
   const identificador = resolver?.(valor);
-  return identificador ? { id: identificador } : { erro: `${rotulo} "${valor}" não está cadastrado.` };
+  return identificador
+    ? { id: identificador }
+    : { erro: `${rotulo} "${valor}" não está cadastrado.` };
 }
 
 // ---------------------------------------------------------------------------
@@ -267,16 +272,20 @@ export const MODELOS = {
         fuelType: combustivelTipo,
         modelYear: numeroBrasileiro(coluna(linha, 'ano modelo', 'ano', 'ano do modelo')),
         initialOdometerKm:
-          numeroBrasileiro(coluna(linha, 'odometro inicial', 'odometro', 'km', 'quilometragem')) ?? 0,
+          numeroBrasileiro(coluna(linha, 'odometro inicial', 'odometro', 'km', 'quilometragem')) ??
+          0,
         color: coluna(linha, 'cor'),
         category: coluna(linha, 'categoria'),
-        tankCapacityL: numeroBrasileiro(coluna(linha, 'capacidade tanque l', 'capacidade tanque', 'tanque')),
+        tankCapacityL: numeroBrasileiro(
+          coluna(linha, 'capacidade tanque l', 'capacidade tanque', 'tanque'),
+        ),
         notes: coluna(linha, 'observacoes', 'observacao', 'notas'),
       };
       if (contexto.existeVeiculo?.(dados.plate))
         return { erro: `A placa ${dados.plate} já está cadastrada.` };
       const resultadoItem = contexto.validarVeiculo?.(dados);
-      if (resultadoItem && !resultadoItem.ok) return { erro: Object.values(resultadoItem.errors)[0] };
+      if (resultadoItem && !resultadoItem.ok)
+        return { erro: Object.values(resultadoItem.errors)[0] };
       if (!dados.plate || !dados.brand || !dados.model)
         return { erro: 'Placa, marca e modelo são obrigatórios.' };
       return { dados };
@@ -296,7 +305,9 @@ export const MODELOS = {
       { nome: 'Observacoes', obrigatoria: false, exemplo: 'Base Sorocaba' },
     ],
     chaveUnica: (dadosRegistro) =>
-      dadosRegistro.internalDocument ? `doc:${String(dadosRegistro.internalDocument).toLowerCase()}` : null,
+      dadosRegistro.internalDocument
+        ? `doc:${String(dadosRegistro.internalDocument).toLowerCase()}`
+        : null,
     mapear(linha, contexto) {
       const nome = coluna(linha, 'nome', 'nome completo', 'motorista');
       const documento = coluna(linha, 'documento', 'matricula', 'documento interno') || null;
@@ -311,7 +322,8 @@ export const MODELOS = {
           fullName: nome,
           internalDocument: documento,
           phone: coluna(linha, 'telefone', 'celular') || null,
-          licenseCategory: (coluna(linha, 'categoria cnh', 'categoria', 'cnh') || '').toUpperCase() || null,
+          licenseCategory:
+            (coluna(linha, 'categoria cnh', 'categoria', 'cnh') || '').toUpperCase() || null,
           licenseExpiresOn: validade,
           notes: coluna(linha, 'observacoes', 'observacao', 'notas') || null,
         },
@@ -338,7 +350,8 @@ export const MODELOS = {
       const nome = coluna(linha, 'nome', 'local', 'descricao');
       if (!nome) return { erro: 'Nome do local é obrigatório.' };
       const estadoFederacao = (coluna(linha, 'uf', 'estado') || '').toUpperCase();
-      if (estadoFederacao && !/^[A-Z]{2}$/.test(estadoFederacao)) return { erro: 'UF deve ter duas letras.' };
+      if (estadoFederacao && !/^[A-Z]{2}$/.test(estadoFederacao))
+        return { erro: 'UF deve ter duas letras.' };
       return {
         dados: {
           name: nome,
@@ -380,9 +393,12 @@ export const MODELOS = {
         coluna(linha, 'valor por litro', 'preco por litro', 'preco', 'valor litro'),
       );
       const odometro = numeroBrasileiro(coluna(linha, 'odometro', 'km', 'quilometragem'));
-      const combustivelTipo = normalizarCombustivel(coluna(linha, 'combustivel', 'produto') || 'diesel s10', {
-        paraBomba: true,
-      });
+      const combustivelTipo = normalizarCombustivel(
+        coluna(linha, 'combustivel', 'produto') || 'diesel s10',
+        {
+          paraBomba: true,
+        },
+      );
       if (!litros || litros <= 0) return { erro: 'Litros inválido.' };
       if (!preco || preco <= 0) return { erro: 'Valor por litro inválido.' };
       if (odometro == null || odometro < 0) return { erro: 'Odômetro inválido.' };
@@ -391,7 +407,9 @@ export const MODELOS = {
       const dadosLocal = dadosBruta ? dadosHoraPlanilha(dadosBruta) : null;
       if (dadosBruta && !dadosLocal) return { erro: 'Data/hora do abastecimento inválida.' };
       const motoristaTexto = coluna(linha, 'motorista', 'documento motorista');
-      const motoristaIdentificador = motoristaTexto ? contexto.resolverMotorista?.(motoristaTexto) : null;
+      const motoristaIdentificador = motoristaTexto
+        ? contexto.resolverMotorista?.(motoristaTexto)
+        : null;
       if (motoristaTexto && !motoristaIdentificador)
         return { erro: `Motorista "${motoristaTexto}" não foi encontrado.` };
       return {
@@ -404,7 +422,9 @@ export const MODELOS = {
           fueledAt: dadosLocal ? contexto.converterDataHora?.(dadosLocal) || dadosLocal : null,
           driverId: motoristaIdentificador || null,
           stationName: coluna(linha, 'posto', 'estabelecimento') || null,
-          fullTank: booleanoPlanilha(coluna(linha, 'tanque cheio', 'completou tanque', 'tanque completo')),
+          fullTank: booleanoPlanilha(
+            coluna(linha, 'tanque cheio', 'completou tanque', 'tanque completo'),
+          ),
           notes: coluna(linha, 'observacoes', 'observacao', 'notas') || null,
         },
       };
@@ -441,7 +461,9 @@ export const MODELOS = {
           maintenanceType: tipo,
           description: descricao,
           scheduledFor: contexto.converterDataHora?.(dadosLocal) || dadosLocal,
-          scheduledOdometerKm: numeroBrasileiro(coluna(linha, 'odometro previsto', 'odometro', 'km')),
+          scheduledOdometerKm: numeroBrasileiro(
+            coluna(linha, 'odometro previsto', 'odometro', 'km'),
+          ),
           supplierName: coluna(linha, 'fornecedor', 'oficina') || null,
           notes: coluna(linha, 'observacoes', 'observacao', 'notas') || null,
         },
@@ -488,8 +510,12 @@ export const MODELOS = {
         driverId: resultadoDados.id,
         originLabel: origem,
         destinationLabel: destino,
-        plannedDepartureAt: saidaLocal ? contexto.converterDataHora?.(saidaLocal) || saidaLocal : null,
-        plannedReturnAt: retornoLocal ? contexto.converterDataHora?.(retornoLocal) || retornoLocal : null,
+        plannedDepartureAt: saidaLocal
+          ? contexto.converterDataHora?.(saidaLocal) || saidaLocal
+          : null,
+        plannedReturnAt: retornoLocal
+          ? contexto.converterDataHora?.(retornoLocal) || retornoLocal
+          : null,
       };
       if (
         dados.plannedDepartureAt &&
@@ -519,8 +545,10 @@ export const MODELOS = {
       const papel = normalizarPapel(coluna(linha, 'cargo', 'papel', 'perfil'));
       if (!nomeCompleto || nomeCompleto.length < 2) return { erro: 'Nome completo é obrigatório.' };
       if (!emailSimplesValido(email)) return { erro: 'E-mail inválido.' };
-      if (contexto.existeUsuarioEmail?.(email)) return { erro: `O e-mail ${email} já pertence à equipe.` };
-      if (!papel) return { erro: 'Cargo inválido. Use Administrador, Gestor, Operador ou Visualizador.' };
+      if (contexto.existeUsuarioEmail?.(email))
+        return { erro: `O e-mail ${email} já pertence à equipe.` };
+      if (!papel)
+        return { erro: 'Cargo inválido. Use Administrador, Gestor, Operador ou Visualizador.' };
       return {
         dados: {
           fullName: nomeCompleto,
@@ -562,12 +590,15 @@ export function conferir(modeloIdentificador, linhas, contexto = {}) {
       if (chave) {
         const primeira = chaves.get(chave);
         if (primeira)
-          resultado = { erro: `Duplicado dentro da própria planilha (também aparece na linha ${primeira}).` };
+          resultado = {
+            erro: `Duplicado dentro da própria planilha (também aparece na linha ${primeira}).`,
+          };
         else chaves.set(chave, linha.__linha);
       }
     }
 
-    if (resultado.erro) invalidas.push({ linha: linha.__linha, motivo: resultado.erro, original: linha });
+    if (resultado.erro)
+      invalidas.push({ linha: linha.__linha, motivo: resultado.erro, original: linha });
     else validas.push({ linha: linha.__linha, dados: resultado.dados });
   }
 

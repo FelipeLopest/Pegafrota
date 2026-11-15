@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <title>PegaNaFrota</title>
+  <rect width="128" height="128" rx="28" fill="#F97316"/>
+  <rect x="29" y="23" width="70" height="76" rx="17" fill="#17120E"/>
+  <rect x="39" y="35" width="50" height="29" rx="7" fill="#F97316"/>
+  <path d="M64 36V63" stroke="#17120E" stroke-width="4"/>
+  <rect x="39" y="76" width="13" height="8" rx="3" fill="#F97316"/>
+  <rect x="76" y="76" width="13" height="8" rx="3" fill="#F97316"/>
+  <rect x="35" y="92" width="14" height="15" rx="5" fill="#17120E"/>
+  <rect x="79" y="92" width="14" height="15" rx="5" fill="#17120E"/>
+</svg>

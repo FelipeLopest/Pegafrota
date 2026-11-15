@@ -1,3 +1,4 @@
+import { executarMutacao } from '../comunicacao/consultar-e-guardar-dados.mjs';
 /**
  * Central de importações em massa.
  *
@@ -16,11 +17,19 @@ import {
   estadoVazio,
 } from '../componentes/componentes-do-programa.mjs';
 import { dados } from '../dados/dados-do-programa.mjs';
-import { contexto } from '../acesso/sessao-e-permissoes.mjs';
+import { contexto, sessao, rpc as executarFuncaoBanco } from '../acesso/sessao-e-permissoes.mjs';
+import { identificarImportacao } from '../dados/retomar-importacao.mjs';
+import { escaparCelulaCsv } from '../dados/exportar-relatorios.mjs';
 import { PERMISSAO } from '@peganafrota/contracts';
 import { validarVeiculo } from '@peganafrota/validation';
 import { icone } from '../componentes/icones.mjs';
-import { lerCsv, lerPlanilhaXlsx, conferir, csvModelo, MODELOS } from '@peganafrota/validation/importacao';
+import {
+  lerCsv,
+  lerPlanilhaXlsx,
+  conferir,
+  csvModelo,
+  MODELOS,
+} from '@peganafrota/validation/importacao';
 
 function tabela(cabecalhos, linhas) {
   return criarElemento('div', { class: 'table-wrap' }, [
@@ -47,10 +56,24 @@ const PERMISSAO_POR_MODELO = {
   equipe: PERMISSAO.USERS_MANAGE,
 };
 
+function importarCadastro(tipo, formulario) {
+  const { commandId, ...campos } = formulario;
+  return executarMutacao(
+    () =>
+      executarFuncaoBanco('import_catalog_record', {
+        p_kind: tipo,
+        p_payload: campos,
+        p_command_id: commandId,
+      }),
+    tipo,
+    'dashboard',
+    'yard',
+  );
+}
 const ENVIO_POR_MODELO = {
-  veiculos: (dadosRegistro) => dados.vehicles.create(dadosRegistro),
-  motoristas: (dadosRegistro) => dados.drivers.create(dadosRegistro),
-  locais: (dadosRegistro) => dados.locations.create(dadosRegistro),
+  veiculos: (dadosRegistro) => importarCadastro('vehicles', dadosRegistro),
+  motoristas: (dadosRegistro) => importarCadastro('drivers', dadosRegistro),
+  locais: (dadosRegistro) => importarCadastro('locations', dadosRegistro),
   abastecimentos: (dadosRegistro) => dados.fuelings.create(dadosRegistro),
   manutencoes: (dadosRegistro) => dados.maintenance.schedule(dadosRegistro),
   viagens: (dadosRegistro) => dados.trips.create(dadosRegistro),
@@ -115,7 +138,10 @@ function normalizarChave(valor) {
     .toLocaleLowerCase('pt-BR');
 }
 
-function empresaLocalParaIso(valor, fusoHorario = contexto.data?.company?.timezone || 'America/Sao_Paulo') {
+function empresaLocalParaIso(
+  valor,
+  fusoHorario = contexto.data?.company?.timezone || 'America/Sao_Paulo',
+) {
   if (!valor) return null;
   if (/T.*(?:Z|[+-]\d{2}:?\d{2})$/i.test(valor)) return new Date(valor).toISOString();
   const correspondencia = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(valor);
@@ -123,8 +149,15 @@ function empresaLocalParaIso(valor, fusoHorario = contexto.data?.company?.timezo
     const dadosRecebidos = new Date(valor);
     return Number.isNaN(dadosRecebidos.getTime()) ? null : dadosRecebidos.toISOString();
   }
-  const [, outroItemComparado, mesAtual, dadosRegistro, cabecalhos2, indiceManutencao, segundos = '0'] =
-    correspondencia;
+  const [
+    ,
+    outroItemComparado,
+    mesAtual,
+    dadosRegistro,
+    cabecalhos2,
+    indiceManutencao,
+    segundos = '0',
+  ] = correspondencia;
   const desejado = Date.UTC(
     +outroItemComparado,
     +mesAtual - 1,
@@ -169,7 +202,10 @@ function resolverMotoristas(motoristas) {
   const nomesAmbiguos = new Set();
   for (const correspondenciaItem of motoristas || []) {
     if (correspondenciaItem.internal_document)
-      porDocumento.set(normalizarChave(correspondenciaItem.internal_document), correspondenciaItem.id);
+      porDocumento.set(
+        normalizarChave(correspondenciaItem.internal_document),
+        correspondenciaItem.id,
+      );
     const nome = normalizarChave(correspondenciaItem.full_name);
     if (!nome) continue;
     if (porNome.has(nome)) nomesAmbiguos.add(nome);
@@ -188,7 +224,9 @@ async function prepararContextoImportacao(modeloIdentificador) {
   const precisaVeiculos = ['veiculos', 'abastecimentos', 'manutencoes', 'viagens'].includes(
     modeloIdentificador,
   );
-  const precisaMotoristas = ['motoristas', 'abastecimentos', 'viagens'].includes(modeloIdentificador);
+  const precisaMotoristas = ['motoristas', 'abastecimentos', 'viagens'].includes(
+    modeloIdentificador,
+  );
   const precisaUsuarios = modeloIdentificador === 'equipe';
 
   const [veiculos, motoristas, usuarios] = await Promise.all([
@@ -228,11 +266,13 @@ function traduzirErro(erroRecebido) {
   if (dica === 'ODOMETER_REGRESSION') return 'Odômetro menor que a última leitura do veículo.';
   if (dica === 'CHRONOLOGY_ERROR')
     return erroRecebido.message || 'Data anterior ao último evento do veículo.';
-  if (dica === 'CONFLICT_STATE') return erroRecebido.message || 'O registro conflita com o estado atual.';
+  if (dica === 'CONFLICT_STATE')
+    return erroRecebido.message || 'O registro conflita com o estado atual.';
   if (dica === 'USER_ALREADY_LINKED') return 'Este usuário já possui vínculo ativo.';
   if (dica === 'VALIDATION_ERROR') return erroRecebido.message || 'Dados inválidos.';
   if (dica === 'PERMISSION_DENIED') return 'Sem permissão para criar este registro.';
-  if (dica === 'NETWORK_ERROR') return 'Falha de rede. Tente novamente quando a conexão estabilizar.';
+  if (dica === 'NETWORK_ERROR')
+    return 'Falha de rede. Tente novamente quando a conexão estabilizar.';
   return erroRecebido?.message || 'Falha ao gravar.';
 }
 
@@ -269,7 +309,8 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     conteudoTela.replaceChildren(
       estadoVazio({
         title: 'Você não tem acesso a importações',
-        description: 'Seu cargo não possui permissão de cadastro em lote. Peça ao administrador da empresa.',
+        description:
+          'Seu cargo não possui permissão de cadastro em lote. Peça ao administrador da empresa.',
       }),
     );
     return;
@@ -288,6 +329,10 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
   let relatorio = null;
   let textoColado = '';
   let ultimoRenderizarProgresso = 0;
+  let lote = null;
+  let linhasOriginais = [];
+  let sessaoDoEnvio;
+  let sequenciaConferencia = 0;
 
   const area = criarElemento('div', { class: 'import-page' });
   conteudoTela.replaceChildren(area);
@@ -300,7 +345,9 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
           tone: 'success',
         });
     } catch (erro) {
-      notificacao(erro?.message || 'Não foi possível salvar o modelo Excel.', { tone: 'danger' });
+      notificacao(erro?.message || 'Não foi possível salvar o modelo Excel.', {
+        tone: 'danger',
+      });
     }
   }
 
@@ -314,30 +361,60 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
       .then((resultadoItem) => {
         if (resultadoItem?.saved) notificacao('Modelo CSV salvo.', { tone: 'success' });
       })
-      .catch(() => notificacao('Não foi possível salvar o modelo CSV.', { tone: 'danger' }));
+      .catch(() =>
+        notificacao('Não foi possível salvar o modelo CSV.', {
+          tone: 'danger',
+        }),
+      );
   }
 
   async function conferirLinhas(leitura, descricaoOrigem) {
+    const conferencia = ++sequenciaConferencia;
+    const modeloConferido = modeloIdentificador;
+    const sessaoConferida = sessao.geracao;
     resultado = null;
     relatorio = null;
+    lote = null;
     origem = descricaoOrigem;
     renderizar();
     if (!leitura?.linhas?.length) {
-      notificacao('A planilha está vazia ou só tem o cabeçalho.', { tone: 'warning' });
+      notificacao('A planilha está vazia ou só tem o cabeçalho.', {
+        tone: 'warning',
+      });
       return;
     }
     if (leitura.linhas.length > 10000) {
-      notificacao('O limite é de 10.000 linhas por importação. Divida a planilha.', { tone: 'warning' });
+      notificacao('O limite é de 10.000 linhas por importação. Divida a planilha.', {
+        tone: 'warning',
+      });
       return;
     }
     try {
-      const contextoImportacao = await prepararContextoImportacao(modeloIdentificador);
-      resultado = conferir(modeloIdentificador, leitura.linhas, contextoImportacao);
+      const contextoImportacao = await prepararContextoImportacao(modeloConferido);
+      const loteConferido = await identificarImportacao({
+        empresa: contexto.data?.companyId,
+        usuario: contexto.data?.userId,
+        modelo: modeloConferido,
+        linhas: leitura.linhas,
+      });
+      if (
+        conferencia !== sequenciaConferencia ||
+        modeloConferido !== modeloIdentificador ||
+        sessaoConferida !== sessao.geracao ||
+        origem !== descricaoOrigem
+      )
+        return;
+      resultado = conferir(modeloConferido, leitura.linhas, contextoImportacao);
+      linhasOriginais = leitura.linhas;
+      lote = loteConferido;
+      resultado.invalidas = resultado.invalidas.filter((item) => !lote.gravadas.has(item.linha));
       resultado.cabecalho = leitura.cabecalho;
       resultado.formato = leitura.formato;
       resultado.aba = leitura.aba || null;
     } catch (erro) {
-      notificacao(erro?.message || 'Não foi possível conferir a planilha.', { tone: 'danger' });
+      notificacao(erro?.message || 'Não foi possível conferir a planilha.', {
+        tone: 'danger',
+      });
     }
     renderizar();
   }
@@ -355,13 +432,18 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         notificacao('Use um arquivo .xlsx ou .csv.', { tone: 'warning' });
       }
     } catch (erro) {
-      notificacao(erro?.message || 'Não foi possível ler a planilha.', { tone: 'danger', duration: 8000 });
+      notificacao(erro?.message || 'Não foi possível ler a planilha.', {
+        tone: 'danger',
+        duration: 8000,
+      });
     }
   }
 
   async function conferirColado() {
     if (!textoColado.trim()) {
-      notificacao('Cole primeiro as células copiadas do Excel.', { tone: 'warning' });
+      notificacao('Cole primeiro as células copiadas do Excel.', {
+        tone: 'warning',
+      });
       return;
     }
     await conferirLinhas(lerCsv(textoColado), 'dados colados');
@@ -377,7 +459,17 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
 
   async function gravarItem(item, gravar) {
     try {
-      await gravar(item.dados);
+      if (sessao.geracao !== sessaoDoEnvio) {
+        cancelarSolicitado = true;
+        throw new Error('A sessão mudou. Retome o lote após entrar novamente.');
+      }
+      const comando = await lote.comando(item.linha);
+      if (sessao.geracao !== sessaoDoEnvio) {
+        cancelarSolicitado = true;
+        throw new Error('A sessão mudou. Retome o lote após entrar novamente.');
+      }
+      await gravar({ ...item.dados, commandId: comando });
+      lote.confirmar(item.linha);
       relatorio.sucesso += 1;
     } catch (erro) {
       relatorio.falhas.push({ linha: item.linha, motivo: traduzirErro(erro) });
@@ -416,18 +508,27 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
   }
 
   async function enviar() {
-    if (!resultado?.validas.length || enviando) return;
+    if (!resultado?.validas.length || enviando || !lote) return;
+    const pendentes = resultado.validas.filter((item) => !lote.gravadas.has(item.linha));
+    if (!pendentes.length) return;
     enviando = true;
+    sessaoDoEnvio = sessao.geracao;
     cancelarSolicitado = false;
-    relatorio = { sucesso: 0, falhas: [], processados: 0, total: resultado.validas.length, cancelado: false };
+    relatorio = {
+      sucesso: 0,
+      falhas: [],
+      processados: 0,
+      total: pendentes.length,
+      cancelado: false,
+    };
     renderizar();
     const gravar = ENVIO_POR_MODELO[modeloIdentificador];
 
     if (modeloIdentificador === 'abastecimentos') {
-      await enviarAbastecimentos(resultado.validas, gravar);
+      await enviarAbastecimentos(pendentes, gravar);
     } else {
       await executarFila(
-        resultado.validas,
+        pendentes,
         CONCORRENCIA_POR_MODELO[modeloIdentificador] || 3,
         (item) => gravarItem(item, gravar),
         () => atualizarProgresso(),
@@ -440,9 +541,13 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     atualizarProgresso(true);
 
     if (relatorio.cancelado) {
-      notificacao(`Importação interrompida após ${relatorio.processados} linha(s).`, { tone: 'warning' });
+      notificacao(`Importação interrompida após ${relatorio.processados} linha(s).`, {
+        tone: 'warning',
+      });
     } else if (relatorio.falhas.length === 0) {
-      notificacao(`${relatorio.sucesso} registro(s) importado(s).`, { tone: 'success' });
+      notificacao(`${relatorio.sucesso} registro(s) importado(s).`, {
+        tone: 'success',
+      });
     } else {
       notificacao(`${relatorio.sucesso} importado(s), ${relatorio.falhas.length} com erro.`, {
         tone: 'warning',
@@ -453,14 +558,15 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
 
   function baixarErros() {
     if (!relatorio?.falhas.length && !resultado?.invalidas.length) return;
+    const originais = new Map(linhasOriginais.map((linha) => [linha.__linha, linha]));
+    const linhaErro = (item) =>
+      [item.linha, item.motivo, JSON.stringify(originais.get(item.linha) ?? '')]
+        .map((valor) => escaparCelulaCsv(valor))
+        .join(';');
     const linhas = [
-      'Linha;Motivo',
-      ...(resultado?.invalidas || []).map(
-        (indiceItem) => `${indiceItem.linha};${String(indiceItem.motivo).replace(/;/g, ',')}`,
-      ),
-      ...(relatorio?.falhas || []).map(
-        (formulario) => `${formulario.linha};${String(formulario.motivo).replace(/;/g, ',')}`,
-      ),
+      'Linha;Motivo;Dados originais',
+      ...(resultado?.invalidas || []).map(linhaErro),
+      ...(relatorio?.falhas || []).map(linhaErro),
     ];
     window.pnf
       .exportFile({
@@ -480,6 +586,7 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         id: 'imp-tipo',
         disabled: enviando,
         onChange: (evento) => {
+          sequenciaConferencia++;
           modeloIdentificador = evento.target.value;
           resultado = null;
           relatorio = null;
@@ -510,7 +617,8 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     const entradaArquivo = criarElemento('input', {
       id: 'imp-arquivo',
       type: 'file',
-      accept: '.xlsx,.csv,.tsv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      accept:
+        '.xlsx,.csv,.tsv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       class: 'import-file-input',
       disabled: enviando,
       onChange: (evento) => lerArquivo(evento.target.files?.[0]),
@@ -534,9 +642,16 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
       children: [
         criarElemento('div', { class: 'import-model-grid' }, [
           criarElemento('div', { class: 'field import-model-field' }, [
-            criarElemento('label', { class: 'field-label', for: 'imp-tipo', text: 'Tipo de registro' }),
+            criarElemento('label', {
+              class: 'field-label',
+              for: 'imp-tipo',
+              text: 'Tipo de registro',
+            }),
             seletorDecorado,
-            criarElemento('p', { class: 'field-hint import-model-description', text: modelo.descricao }),
+            criarElemento('p', {
+              class: 'field-hint import-model-description',
+              text: modelo.descricao,
+            }),
           ]),
           criarElemento('div', { class: 'import-template-panel' }, [
             criarElemento('div', { class: 'import-template-head' }, [
@@ -545,7 +660,9 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
               ]),
               criarElemento('div', {}, [
                 criarElemento('strong', { text: 'Comece pelo modelo oficial' }),
-                criarElemento('span', { text: 'Já vem com as colunas certas para evitar retrabalho.' }),
+                criarElemento('span', {
+                  text: 'Já vem com as colunas certas para evitar retrabalho.',
+                }),
               ]),
             ]),
             criarElemento('div', { class: 'import-template-actions' }, [botaoExcel, botaoCsv]),
@@ -553,13 +670,19 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         ]),
         criarElemento('div', { class: 'import-columns-head' }, [
           criarElemento('div', {}, [
-            criarElemento('h3', { class: 'card-title', text: 'Estrutura esperada' }),
+            criarElemento('h3', {
+              class: 'card-title',
+              text: 'Estrutura esperada',
+            }),
             criarElemento('p', {
               class: 'field-hint',
               text: 'As colunas obrigatórias precisam existir; as demais podem ficar vazias.',
             }),
           ]),
-          criarElemento('span', { class: 'import-format-badge', text: `${modelo.colunas.length} colunas` }),
+          criarElemento('span', {
+            class: 'import-format-badge',
+            text: `${modelo.colunas.length} colunas`,
+          }),
         ]),
         tabela(
           ['Coluna', 'Obrigatória', 'Exemplo'],
@@ -621,7 +744,10 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
           icone('upload', { size: 'lg' }),
         ]),
         criarElemento('div', { class: 'import-drop-copy' }, [
-          criarElemento('strong', { class: 'import-drop-title', text: 'Arraste sua planilha aqui' }),
+          criarElemento('strong', {
+            class: 'import-drop-title',
+            text: 'Arraste sua planilha aqui',
+          }),
           criarElemento('p', {
             text: 'Excel (.xlsx) ou CSV. O arquivo é analisado localmente antes de qualquer cadastro.',
           }),
@@ -636,7 +762,10 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             },
             [icone('upload', { size: 'sm' }), criarElemento('span', { text: 'Escolher arquivo' })],
           ),
-          criarElemento('span', { class: 'import-file-help', text: 'até 20 MB · primeira aba do Excel' }),
+          criarElemento('span', {
+            class: 'import-file-help',
+            text: 'até 20 MB · primeira aba do Excel',
+          }),
         ]),
       ],
     );
@@ -648,10 +777,14 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         criarElemento('div', { class: 'import-divider' }, [criarElemento('span', { text: 'ou' })]),
         criarElemento('div', { class: 'import-paste-panel' }, [
           criarElemento('div', { class: 'import-paste-head' }, [
-            criarElemento('span', { class: 'import-paste-icon', 'aria-hidden': 'true' }, [icone('sheet')]),
+            criarElemento('span', { class: 'import-paste-icon', 'aria-hidden': 'true' }, [
+              icone('sheet'),
+            ]),
             criarElemento('div', {}, [
               criarElemento('strong', { text: 'Cole direto do Excel' }),
-              criarElemento('span', { text: 'Copie as células incluindo o cabeçalho e cole abaixo.' }),
+              criarElemento('span', {
+                text: 'Copie as células incluindo o cabeçalho e cole abaixo.',
+              }),
             ]),
           ]),
           colar,
@@ -677,9 +810,11 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
 
     let passo3 = null;
     if (resultado) {
+      const prontas = resultado.validas.filter((item) => !lote?.gravadas.has(item.linha));
       const resumo = criarElemento('div', { class: 'kpi-grid import-kpi-grid' }, [
         kpiSimples('Linhas lidas', resultado.total, 'neutral'),
-        kpiSimples('Prontas', resultado.validas.length, 'success'),
+        kpiSimples('Prontas', prontas.length, 'success'),
+        lote?.gravadas.size ? kpiSimples('Já gravadas', lote.gravadas.size, 'success') : null,
         kpiSimples(
           'Com problema',
           resultado.invalidas.length,
@@ -699,7 +834,10 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             criarElemento('div', { class: 'import-validation-head' }, [
               icone('warning'),
               criarElemento('div', {}, [
-                criarElemento('h3', { class: 'card-title', text: 'Linhas que precisam de correção' }),
+                criarElemento('h3', {
+                  class: 'card-title',
+                  text: 'Linhas que precisam de correção',
+                }),
                 criarElemento('p', {
                   class: 'field-hint',
                   text: 'Essas linhas não serão cadastradas até serem corrigidas.',
@@ -708,14 +846,15 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             ]),
             tabela(
               ['Linha', 'O que corrigir'],
-              resultado.invalidas
-                .slice(0, 60)
-                .map((indiceItem) =>
-                  criarElemento('tr', {}, [
-                    criarElemento('td', { class: 'mono', text: String(indiceItem.linha) }),
-                    criarElemento('td', { text: indiceItem.motivo }),
-                  ]),
-                ),
+              resultado.invalidas.slice(0, 60).map((indiceItem) =>
+                criarElemento('tr', {}, [
+                  criarElemento('td', {
+                    class: 'mono',
+                    text: String(indiceItem.linha),
+                  }),
+                  criarElemento('td', { text: indiceItem.motivo }),
+                ]),
+              ),
             ),
             resultado.invalidas.length > 60
               ? criarElemento('p', {
@@ -723,16 +862,23 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
                   text: `…e mais ${resultado.invalidas.length - 60}.`,
                 })
               : null,
-            botao({ label: 'Baixar lista de erros', icon: 'download', onClick: baixarErros }),
+            botao({
+              label: 'Baixar lista de erros',
+              icon: 'download',
+              onClick: baixarErros,
+            }),
           ])
         : null;
 
-      const previa = resultado.validas.length
+      const previa = prontas.length
         ? criarElemento('div', { class: 'import-validation-panel is-success' }, [
             criarElemento('div', { class: 'import-validation-head' }, [
               icone('check'),
               criarElemento('div', {}, [
-                criarElemento('h3', { class: 'card-title', text: 'Prévia do que será importado' }),
+                criarElemento('h3', {
+                  class: 'card-title',
+                  text: 'Prévia do que será importado',
+                }),
                 criarElemento('p', {
                   class: 'field-hint',
                   text: 'Confira uma amostra antes de confirmar o cadastro em massa.',
@@ -741,21 +887,26 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             ]),
             tabela(
               ['Linha', ...Object.keys(resultado.validas[0].dados).slice(0, 6)],
-              resultado.validas.slice(0, 12).map((veiculoItem) =>
+              prontas.slice(0, 12).map((veiculoItem) =>
                 criarElemento('tr', {}, [
-                  criarElemento('td', { class: 'mono', text: String(veiculoItem.linha) }),
+                  criarElemento('td', {
+                    class: 'mono',
+                    text: String(veiculoItem.linha),
+                  }),
                   ...Object.keys(resultado.validas[0].dados)
                     .slice(0, 6)
                     .map((chaveItem) =>
-                      criarElemento('td', { text: String(veiculoItem.dados[chaveItem] ?? '—') }),
+                      criarElemento('td', {
+                        text: String(veiculoItem.dados[chaveItem] ?? '—'),
+                      }),
                     ),
                 ]),
               ),
             ),
-            resultado.validas.length > 12
+            prontas.length > 12
               ? criarElemento('p', {
                   class: 'field-hint',
-                  text: `Mostrando 12 de ${resultado.validas.length}.`,
+                  text: `Mostrando 12 de ${prontas.length}.`,
                 })
               : null,
           ])
@@ -769,14 +920,25 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
           ? criarElemento('div', { class: 'import-progress' }, [
               criarElemento('div', { class: 'import-progress-head' }, [
                 criarElemento('strong', { text: 'Importação em andamento' }),
-                criarElemento('span', { class: 'import-progress-percent', text: `${percentual}%` }),
+                criarElemento('span', {
+                  class: 'import-progress-percent',
+                  text: `${percentual}%`,
+                }),
               ]),
               criarElemento('div', { class: 'import-progress-track' }, [
-                criarElemento('div', { class: 'import-progress-bar', style: `width:${percentual}%` }),
+                criarElemento('div', {
+                  class: 'import-progress-bar',
+                  style: `width:${percentual}%`,
+                }),
               ]),
               criarElemento('div', { class: 'import-progress-stats' }, [
-                criarElemento('span', { text: `${relatorio.processados}/${relatorio.total} processadas` }),
-                criarElemento('span', { class: 'is-success', text: `${relatorio.sucesso} gravadas` }),
+                criarElemento('span', {
+                  text: `${relatorio.processados}/${relatorio.total} processadas`,
+                }),
+                criarElemento('span', {
+                  class: 'is-success',
+                  text: `${relatorio.sucesso} gravadas`,
+                }),
                 criarElemento('span', {
                   class: relatorio.falhas.length ? 'is-danger' : '',
                   text: `${relatorio.falhas.length} falharam`,
@@ -805,11 +967,18 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
                 })
               : null,
             botao({
-              label: enviando ? 'Importando…' : `Importar ${resultado.validas.length} registro(s)`,
+              label: enviando
+                ? 'Importando…'
+                : lote?.gravadas.size
+                  ? 'Importar somente pendentes'
+                  : `Importar ${resultado.validas.length} registro(s)`,
               variant: 'primary',
               icon: 'upload',
               busy: enviando,
-              disabled: enviando || resultado.validas.length === 0,
+              disabled:
+                enviando ||
+                !lote ||
+                !resultado.validas.some((item) => !lote.gravadas.has(item.linha)),
               permission: PERMISSAO_POR_MODELO[modeloIdentificador],
               onClick: enviar,
             }),
@@ -826,7 +995,11 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         children: [
           criarElemento('div', { class: 'kpi-grid import-kpi-grid' }, [
             kpiSimples('Importados', relatorio.sucesso, 'success'),
-            kpiSimples('Falharam', relatorio.falhas.length, relatorio.falhas.length ? 'danger' : 'success'),
+            kpiSimples(
+              'Falharam',
+              relatorio.falhas.length,
+              relatorio.falhas.length ? 'danger' : 'success',
+            ),
             kpiSimples('Processados', relatorio.processados, 'neutral'),
           ]),
           relatorio.cancelado
@@ -839,16 +1012,21 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             ? criarElemento('div', {}, [
                 tabela(
                   ['Linha', 'Motivo'],
-                  relatorio.falhas
-                    .slice(0, 60)
-                    .map((formulario) =>
-                      criarElemento('tr', {}, [
-                        criarElemento('td', { class: 'mono', text: String(formulario.linha) }),
-                        criarElemento('td', { text: formulario.motivo }),
-                      ]),
-                    ),
+                  relatorio.falhas.slice(0, 60).map((formulario) =>
+                    criarElemento('tr', {}, [
+                      criarElemento('td', {
+                        class: 'mono',
+                        text: String(formulario.linha),
+                      }),
+                      criarElemento('td', { text: formulario.motivo }),
+                    ]),
+                  ),
                 ),
-                botao({ label: 'Baixar lista de erros', icon: 'download', onClick: baixarErros }),
+                botao({
+                  label: 'Baixar lista de erros',
+                  icon: 'download',
+                  onClick: baixarErros,
+                }),
                 criarElemento('p', {
                   class: 'field-hint',
                   text: 'Corrija somente as linhas com erro e importe novamente. Duplicidades são recusadas pelo sistema.',
@@ -879,6 +1057,9 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
   }
 
   renderizar();
+  return () => {
+    cancelarSolicitado = true;
+  };
 }
 
 function kpiSimples(rotulo, valor, tom = 'neutral') {

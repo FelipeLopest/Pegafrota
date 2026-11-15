@@ -1,7 +1,13 @@
 import { PERMISSAO } from '@peganafrota/contracts';
 
 export const MENU = [
-  { path: '/', pattern: '/', label: 'Visão geral', icon: 'dashboard', permission: PERMISSAO.DASHBOARD_READ },
+  {
+    path: '/',
+    pattern: '/',
+    label: 'Visão geral',
+    icon: 'dashboard',
+    permission: PERMISSAO.DASHBOARD_READ,
+  },
 
   { group: 'OPERAÇÃO', roles: ['company_admin', 'fleet_manager', 'operator'] },
   {
@@ -35,6 +41,14 @@ export const MENU = [
     icon: 'tool',
     permission: PERMISSAO.MAINTENANCE_READ,
     roles: ['company_admin', 'fleet_manager', 'operator'],
+  },
+
+  {
+    path: '/cameras',
+    pattern: '/cameras',
+    label: 'Câmeras e leituras',
+    icon: 'camera',
+    permission: PERMISSAO.CAMERAS_READ,
   },
 
   { group: 'FROTA' },

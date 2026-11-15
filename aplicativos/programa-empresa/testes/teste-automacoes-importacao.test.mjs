@@ -11,7 +11,15 @@ const raiz = resolverCaminho(import.meta.dirname, '..');
 const repositorio = resolverCaminho(raiz, '../..');
 const ler = (caminho) => lerArquivoSincrono(resolverCaminho(raiz, caminho), 'utf8');
 
-const modelos = ['veiculos', 'motoristas', 'locais', 'abastecimentos', 'manutencoes', 'viagens', 'equipe'];
+const modelos = [
+  'veiculos',
+  'motoristas',
+  'locais',
+  'abastecimentos',
+  'manutencoes',
+  'viagens',
+  'equipe',
+];
 
 testar('central aceita XLSX, CSV e colagem e possui os sete fluxos de alto volume', () => {
   const tela = ler('telas/tela-importar-planilha.mjs');
@@ -25,7 +33,10 @@ testar('central aceita XLSX, CSV e colagem e possui os sete fluxos de alto volum
 
 testar('modelos Excel oficiais estão empacotados e não são placeholders vazios', () => {
   for (const identificador of modelos) {
-    const caminho = resolverCaminho(raiz, `importacao/modelos-de-planilha/modelo-${identificador}.xlsx`);
+    const caminho = resolverCaminho(
+      raiz,
+      `importacao/modelos-de-planilha/modelo-${identificador}.xlsx`,
+    );
     verificarCondicao.ok(arquivoExiste(caminho), caminho);
     verificarCondicao.ok(
       consultarArquivoSincrono(caminho).size > 10000,
@@ -43,7 +54,10 @@ testar('telas volumosas oferecem atalho contextual para a importação correta',
 testar('operador pode abrir a central, mas cada modelo continua filtrado por permissão', () => {
   const principal2 = ler('iniciar-aplicativo.mjs');
   const tela = ler('telas/tela-importar-planilha.mjs');
-  verificarCondicao.match(principal2, /label: 'Importar planilha'[\s\S]*permission: null[\s\S]*operator/);
+  verificarCondicao.match(
+    principal2,
+    /label: 'Importar planilha'[\s\S]*permission: null[\s\S]*operator/,
+  );
   verificarCondicao.match(tela, /contexto\.can\(PERMISSAO_POR_MODELO\[correspondenciaItem\.id\]\)/);
 });
 
@@ -61,19 +75,25 @@ testar('salvar modelo XLSX usa IPC dedicado e whitelist', () => {
 
 testar('build leva o parser XLSX e os templates, sem adicionar biblioteca de planilha', () => {
   const compilacao = ler('compilar-aplicativo.mjs');
-  const pacote = JSON.parse(lerArquivoSincrono(resolverCaminho(repositorio, 'package.json'), 'utf8'));
+  const pacote = JSON.parse(
+    lerArquivoSincrono(resolverCaminho(repositorio, 'package.json'), 'utf8'),
+  );
   verificarCondicao.match(compilacao, /listarArquivos/);
   verificarCondicao.ok(
     arquivoExiste(resolverCaminho(repositorio, 'compartilhado/validacoes/ler-planilha.mjs')),
   );
   const dependencias = { ...(pacote.dependencies || {}), ...(pacote.devDependencies || {}) };
-  for (const nome of Object.keys(dependencias)) verificarCondicao.doesNotMatch(nome, /xlsx|exceljs|sheetjs/i);
+  for (const nome of Object.keys(dependencias))
+    verificarCondicao.doesNotMatch(nome, /xlsx|exceljs|sheetjs/i);
 });
 
-testar('abastecimentos preservam sequência por veículo e importação tem concorrência controlada', () => {
-  const tela = ler('telas/tela-importar-planilha.mjs');
-  verificarCondicao.match(tela, /async function enviarAbastecimentos/);
-  verificarCondicao.match(tela, /grupo\.sort/);
-  verificarCondicao.match(tela, /CONCORRENCIA_POR_MODELO/);
-  verificarCondicao.doesNotMatch(tela, /Promise\.all\(resultado\.validas\.map/);
-});
+testar(
+  'abastecimentos preservam sequência por veículo e importação tem concorrência controlada',
+  () => {
+    const tela = ler('telas/tela-importar-planilha.mjs');
+    verificarCondicao.match(tela, /async function enviarAbastecimentos/);
+    verificarCondicao.match(tela, /grupo\.sort/);
+    verificarCondicao.match(tela, /CONCORRENCIA_POR_MODELO/);
+    verificarCondicao.doesNotMatch(tela, /Promise\.all\(resultado\.validas\.map/);
+  },
+);

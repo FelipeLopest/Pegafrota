@@ -1,0 +1,1183 @@
+{
+  "data": "2026-11-10",
+  "resultados": [
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "light",
+      "largura": 390,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "inicio",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 7,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "patio",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "viagens",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "abastecimentos",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "manutencoes",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "locais",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "movimentacoes",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 0,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "relatorios",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "importar",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "empresa",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "usuarios",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "perfil",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cameras",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "inicio",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 7,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "patio",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "viagens",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "abastecimentos",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "manutencoes",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "locais",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "movimentacoes",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 0,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "relatorios",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "importar",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "empresa",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "usuarios",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "perfil",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cameras",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cadastro-veiculo",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "confirmar-saida",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 390,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "inicio",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 7,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "patio",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "viagens",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "abastecimentos",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "manutencoes",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "locais",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "movimentacoes",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 0,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "relatorios",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "importar",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "empresa",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "usuarios",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "perfil",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cameras",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "inicio",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 7,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "patio",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "veiculos11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "motoristas11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "viagens",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "abastecimentos",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "manutencoes",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "locais",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "movimentacoes",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 0,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "odometro11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "relatorios",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "importar",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "empresa",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "usuarios",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "perfil",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cameras",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "cadastro-veiculo",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "programa-empresa",
+      "tela": "confirmar-saida",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 6,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "light",
+      "largura": 390,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "inicio",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresasnova",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "administradores",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "auditoria",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "perfil",
+      "tema": "light",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "inicio",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresasnova",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "administradores",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos11111111-1111-4111-8111-111111111111",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "auditoria",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "perfil",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "confirmar-saida",
+      "tema": "light",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "login",
+      "tema": "dark",
+      "largura": 390,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "inicio",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresasnova",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "administradores",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "auditoria",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "perfil",
+      "tema": "dark",
+      "largura": 1440,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "inicio",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresasnova",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "empresas11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 4,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "administradores",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "provisionamentos11111111-1111-4111-8111-111111111111",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 2,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "auditoria",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "perfil",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 1,
+      "imagensCarregadas": true
+    },
+    {
+      "produto": "painel-administracao",
+      "tela": "confirmar-saida",
+      "tema": "dark",
+      "largura": 1024,
+      "semRolagemHorizontal": true,
+      "botoesConferidos": 3,
+      "imagensCarregadas": true
+    }
+  ],
+  "login": {
+    "validacaoCampos": true,
+    "senhaVisivel": true,
+    "recuperacao": true,
+    "autenticacaoSimulada": true,
+    "persistencia": true
+  },
+  "backend": "Simulado; nenhuma alteração em produção"
+}

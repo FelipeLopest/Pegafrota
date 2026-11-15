@@ -1,5 +1,9 @@
 import * as arquivos from 'node:fs';
-import { dirname as obterPastaPai, resolve as resolverCaminho, relative as caminhoRelativo } from 'node:path';
+import {
+  dirname as obterPastaPai,
+  resolve as resolverCaminho,
+  relative as caminhoRelativo,
+} from 'node:path';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 export * from 'node:fs';
 const raiz = resolverCaminho(obterPastaPai(converterEnderecoEmCaminho(import.meta.url)), '../..');

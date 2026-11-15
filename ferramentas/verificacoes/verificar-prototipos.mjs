@@ -1,11 +1,19 @@
 #!/usr/bin/env node
 import { readFileSync as lerArquivoSincrono } from 'node:fs';
-import { join as juntarCaminhos, relative as caminhoRelativo, sep as separadorAtual } from 'node:path';
+import {
+  join as juntarCaminhos,
+  relative as caminhoRelativo,
+  sep as separadorAtual,
+} from 'node:path';
 import { listarArquivos } from '../apoio/arquivos.mjs';
 
 const RAIZ = process.cwd();
 const PASTAS_IGNORADAS = new Set(['node_modules', '.git', 'coverage', 'artifacts']);
-const PASTAS_PRODUTO = ['aplicativos/programa-empresa', 'aplicativos/painel-administracao', 'packages'];
+const PASTAS_PRODUTO = [
+  'aplicativos/programa-empresa',
+  'aplicativos/painel-administracao',
+  'packages',
+];
 
 const ARQUIVOS_PROIBIDOS = [
   { re: /\.dc\.html$/i, what: 'protótipo .dc.html' },
@@ -14,14 +22,19 @@ const ARQUIVOS_PROIBIDOS = [
 
 const REFERENCIAS_PROIBIDAS = [
   { re: /['"][^'"]*\.dc\.html['"]/gi, what: 'referência a .dc.html' },
-  { re: /(?:from|import|src\s*=)\s*['"][^'"]*\/support\.js['"]/gi, what: 'referência a support.js' },
+  {
+    re: /(?:from|import|src\s*=)\s*['"][^'"]*\/support\.js['"]/gi,
+    what: 'referência a support.js',
+  },
 ];
 
 const achados = [];
 let escaneados = 0;
 
 for (const diretorio of PASTAS_PRODUTO) {
-  for (const arquivo of listarArquivos(juntarCaminhos(RAIZ, diretorio), { ignorar: PASTAS_IGNORADAS })) {
+  for (const arquivo of listarArquivos(juntarCaminhos(RAIZ, diretorio), {
+    ignorar: PASTAS_IGNORADAS,
+  })) {
     escaneados += 1;
     const caminhoRelativoAtual = caminhoRelativo(RAIZ, arquivo).split(separadorAtual).join('/');
 
@@ -51,5 +64,6 @@ if (achados.length === 0) {
 }
 
 console.error(`verify:prototype  FAIL — ${achados.length} achado(s)\n`);
-for (const formulario of achados) console.error(`  ${formulario.rel}:${formulario.line}  ${formulario.what}`);
+for (const formulario of achados)
+  console.error(`  ${formulario.rel}:${formulario.line}  ${formulario.what}`);
 process.exit(1);

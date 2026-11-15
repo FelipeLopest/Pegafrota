@@ -50,7 +50,10 @@ export function confirmarAcaoDestrutiva({
             consequencias.map((registro) => criarElemento('li', { text: registro })),
           )
         : null,
-      criarElemento('label', { class: 'field-label', text: `Digite ${esperadoNome} para confirmar` }),
+      criarElemento('label', {
+        class: 'field-label',
+        text: `Digite ${esperadoNome} para confirmar`,
+      }),
       entrada,
     ]);
 
@@ -87,7 +90,8 @@ export function mostrarConflito({
     CONFLICT_STALE:
       'Outro administrador alterou este registro enquanto você editava. Recarregue para ver a versão atual.',
     IDEMPOTENCY_REUSE: 'Esta submissão já foi usada com outro conteúdo. Inicie um novo cadastro.',
-    NOT_RETRYABLE: 'Esta operação exige intervenção manual e não pode ser repetida automaticamente.',
+    NOT_RETRYABLE:
+      'Esta operação exige intervenção manual e não pode ser repetida automaticamente.',
     CANNOT_BLOCK_SELF: 'Você não pode bloquear a própria conta.',
     LAST_PLATFORM_ADMIN_PROTECTED: 'A plataforma precisa manter ao menos um administrador ativo.',
     CONFLICT_ARCHIVED: 'Empresa arquivada não muda de estado. O arquivamento é definitivo.',
@@ -119,7 +123,10 @@ export function mostrarConflito({
           ),
         ])
       : null,
-    criarElemento('p', { class: 'conflict-hint' }, ['Código: ', criarElemento('code', { text: dica })]),
+    criarElemento('p', { class: 'conflict-hint' }, [
+      'Código: ',
+      criarElemento('code', { text: dica }),
+    ]),
   ]);
 
   let correspondenciaItem;
@@ -253,7 +260,10 @@ export function linhaAdministrador(
 
   return criarElemento(
     'tr',
-    { class: 'admin-row', dataset: { userId: usuarioIdentificador, companyId: empresaIdentificador } },
+    {
+      class: 'admin-row',
+      dataset: { userId: usuarioIdentificador, companyId: empresaIdentificador },
+    },
     [
       criarElemento('td', {}, [
         criarElemento('div', { class: 'admin-identity' }, [
@@ -290,7 +300,9 @@ export async function executarSuspensaoEmpresa(entrada, servicos, aoConcluir) {
 
   try {
     await servicos.admins.suspendCompanyAccess(entrada.companyId, entrada.userId);
-    notificacao(`Acesso de ${entrada.fullName} a ${entrada.companyTradeName} suspenso.`, { tone: 'success' });
+    notificacao(`Acesso de ${entrada.fullName} a ${entrada.companyTradeName} suspenso.`, {
+      tone: 'success',
+    });
     aoConcluir?.();
   } catch (erro) {
     if (erro.isConflict) {
@@ -330,7 +342,12 @@ export async function executarBloqueioConta(entrada, servicos, aoConcluir) {
   }
 }
 
-export async function executarAlteracaoSituacaoEmpresa(empresa, proximaSituacao, servicos, aoConcluir) {
+export async function executarAlteracaoSituacaoEmpresa(
+  empresa,
+  proximaSituacao,
+  servicos,
+  aoConcluir,
+) {
   if (proximaSituacao === 'suspended') {
     const motivo = await escolherMotivoSuspensao();
     if (!motivo) return;
@@ -360,7 +377,8 @@ export async function executarAlteracaoSituacaoEmpresa(empresa, proximaSituacao,
       notificacao(`${empresa.tradeName} suspensa.`, { tone: 'success' });
       aoConcluir?.();
     } catch (erro) {
-      if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+      if (erro.isConflict)
+        mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
       else notificacao(erro.message, { tone: 'danger' });
     }
     return;
@@ -391,7 +409,8 @@ export async function executarAlteracaoSituacaoEmpresa(empresa, proximaSituacao,
       notificacao(`${empresa.tradeName} arquivada.`, { tone: 'success' });
       aoConcluir?.();
     } catch (erro) {
-      if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+      if (erro.isConflict)
+        mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
       else notificacao(erro.message, { tone: 'danger' });
     }
     return;
@@ -402,7 +421,8 @@ export async function executarAlteracaoSituacaoEmpresa(empresa, proximaSituacao,
     notificacao(`${empresa.tradeName} reativada.`, { tone: 'success' });
     aoConcluir?.();
   } catch (erro) {
-    if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+    if (erro.isConflict)
+      mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
     else notificacao(erro.message, { tone: 'danger' });
   }
 }

@@ -1,11 +1,18 @@
 #!/usr/bin/env node
-import { spawn as iniciarProcesso, execFileSync as executarArquivoSincrono } from 'node:child_process';
+import {
+  spawn as iniciarProcesso,
+  execFileSync as executarArquivoSincrono,
+} from 'node:child_process';
 import {
   existsSync as arquivoExiste,
   writeFileSync as gravarArquivoSincrono,
   mkdirSync as criarPastaSincrona,
 } from 'node:fs';
-import { join as juntarCaminhos, dirname as obterPastaPai, resolve as resolverCaminho } from 'node:path';
+import {
+  join as juntarCaminhos,
+  dirname as obterPastaPai,
+  resolve as resolverCaminho,
+} from 'node:path';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 
 const AQUI = obterPastaPai(converterEnderecoEmCaminho(import.meta.url));
@@ -65,7 +72,10 @@ const codigoSql = (buscaAtual) =>
       '-c',
       buscaAtual,
     ],
-    { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+    {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+    },
   ).trim();
 
 const email = codigoSql(`select u.email from auth.users u

@@ -98,13 +98,17 @@ async function principal() {
         '-c',
         buscaAtual,
       ],
-      { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+      {
+        encoding: 'utf8',
+        env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+      },
     ).trim();
 
   const administradorIdentificador = codigoSql(`select m.user_id from public.company_memberships m
     join public.profiles p on p.id=m.user_id
     where m.role='company_admin' and m.active and p.active limit 1`);
-  const outroAdministradorEmpresaIdentificador = codigoSql(`select m.user_id from public.company_memberships m
+  const outroAdministradorEmpresaIdentificador =
+    codigoSql(`select m.user_id from public.company_memberships m
     join public.profiles p on p.id=m.user_id
     where m.role='company_admin' and m.active and p.active
       and m.company_id <> (select company_id from public.company_memberships
@@ -226,7 +230,10 @@ async function principal() {
   });
 
   await esperarFalha('viagens: odômetro final menor é recusado', 'VALIDATION_ERROR', () =>
-    executarFuncaoBanco('complete_trip', { p_trip_id: viagemIdentificador, p_end_odometer_km: 500 }),
+    executarFuncaoBanco('complete_trip', {
+      p_trip_id: viagemIdentificador,
+      p_end_odometer_km: 500,
+    }),
   );
 
   await etapa('viagens: concluir (p_end_odometer_km)', async () => {
@@ -312,7 +319,10 @@ async function principal() {
   });
 
   await etapa('movimentação: registrar (servidor decide tipo e horário)', async () => {
-    const locais = await selecionar('locations', 'select=id,name,address_city,address_state,active&limit=1');
+    const locais = await selecionar(
+      'locations',
+      'select=id,name,address_city,address_state,active&limit=1',
+    );
     if (!locais.length) throw new Error('sem locais no seed');
     const resultadoItem = await executarFuncaoBanco('register_vehicle_movement', {
       p_vehicle_id: veiculoIdentificador,
@@ -366,7 +376,9 @@ async function principal() {
   });
 
   await etapa('empresa: update_company', async () => {
-    const resultadoItem = await executarFuncaoBanco('update_company', { p_patch: { phone: '1533220000' } });
+    const resultadoItem = await executarFuncaoBanco('update_company', {
+      p_patch: { phone: '1533220000' },
+    });
     return resultadoItem.id ? 'atualizada' : 'sem id';
   });
 
@@ -390,7 +402,10 @@ async function principal() {
   });
 
   await etapa('auditoria: listar', async () => {
-    const primeiroItem = await selecionar('audit_events', 'select=*&order=occurred_at.desc&limit=10');
+    const primeiroItem = await selecionar(
+      'audit_events',
+      'select=*&order=occurred_at.desc&limit=10',
+    );
     return `${primeiroItem.length} evento(s)`;
   });
 

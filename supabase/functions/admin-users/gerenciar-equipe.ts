@@ -1,7 +1,14 @@
 export const PAPEIS_VALIDOS = ['company_admin', 'fleet_manager', 'operator', 'viewer'] as const;
 export type Papel = (typeof PAPEIS_VALIDOS)[number];
 
-export const ACOES_VALIDAS = ['list', 'create', 'invite', 'deactivate', 'reactivate', 'change_role'] as const;
+export const ACOES_VALIDAS = [
+  'list',
+  'create',
+  'invite',
+  'deactivate',
+  'reactivate',
+  'change_role',
+] as const;
 export type Acao = (typeof ACOES_VALIDAS)[number];
 
 export const PERMISSAO_OBRIGATORIA: Record<Acao, string> = {
@@ -50,7 +57,8 @@ export interface Dependencias {
   logger?: { error: (...argumentos: unknown[]) => void };
 }
 
-const EXPRESSAO_IDENTIFICADOR = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const EXPRESSAO_IDENTIFICADOR =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EXPRESSAO_EMAIL = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i;
 const TAMANHO_MINIMO_SENHA = 12;
 const TAMANHO_PAGINA_USUARIOS_AUTENTICACAO = 200;
@@ -58,7 +66,8 @@ const LIMITE_PAGINAS_USUARIOS_AUTENTICACAO = 100;
 
 export function cabecalhosCors(origem: string | null, permitido: string[]): Record<string, string> {
   const base: Record<string, string> = {
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, idempotency-key',
+    'Access-Control-Allow-Headers':
+      'authorization, x-client-info, apikey, content-type, idempotency-key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Max-Age': '600',
     Vary: 'Origin',
@@ -85,7 +94,11 @@ function falhar(
   });
 }
 
-function sucesso(dadosEnvio: unknown, situacao: number, cabecalhos: Record<string, string>): Response {
+function sucesso(
+  dadosEnvio: unknown,
+  situacao: number,
+  cabecalhos: Record<string, string>,
+): Response {
   return new Response(JSON.stringify({ data: dadosEnvio }), {
     status: situacao,
     headers: { ...cabecalhos, 'Content-Type': 'application/json' },
@@ -154,8 +167,11 @@ export function mapearErroBanco(erro: any): ErroMapeado | null {
   return null;
 }
 
-export function interpretarCorpo(bruto: CorpoRequisicao): { body: CorpoInterpretado } | { error: string } {
-  if (typeof bruto !== 'object' || bruto === null) return { error: 'Corpo deve ser um objeto JSON.' };
+export function interpretarCorpo(
+  bruto: CorpoRequisicao,
+): { body: CorpoInterpretado } | { error: string } {
+  if (typeof bruto !== 'object' || bruto === null)
+    return { error: 'Corpo deve ser um objeto JSON.' };
 
   const acao = bruto.action;
   if (typeof acao !== 'string' || !ACOES_VALIDAS.includes(acao as Acao)) {
@@ -235,7 +251,9 @@ export function interpretarContexto(
     (parametroItem): parametroItem is string => typeof parametroItem === 'string',
   );
 
-  return { caller: { companyId: empresaIdentificador, role: papel as Papel, permissions: permissoes } };
+  return {
+    caller: { companyId: empresaIdentificador, role: papel as Papel, permissions: permissoes },
+  };
 }
 
 export async function impressaoDigitalAcao(
@@ -270,14 +288,19 @@ export async function buscarUsuarioAutenticacaoPorEmail(
     });
     if (erro) throw erro;
     const usuarios = dados?.users ?? [];
-    const ocorrencia = usuarios.find((usuarioItem: any) => usuarioItem.email?.toLowerCase() === alvo);
+    const ocorrencia = usuarios.find(
+      (usuarioItem: any) => usuarioItem.email?.toLowerCase() === alvo,
+    );
     if (ocorrencia) return ocorrencia;
     if (usuarios.length < TAMANHO_PAGINA_USUARIOS_AUTENTICACAO) return null;
   }
   throw new Error('AUTH_USER_SCAN_EXHAUSTED');
 }
 
-export async function tratarRequisicao(requisitar: Request, dependencias: Dependencias): Promise<Response> {
+export async function tratarRequisicao(
+  requisitar: Request,
+  dependencias: Dependencias,
+): Promise<Response> {
   const origem = requisitar.headers.get('Origin');
   const cabecalhos = cabecalhosCors(origem, dependencias.allowedOrigins);
   const registro = dependencias.logger ?? console;
@@ -325,7 +348,10 @@ export async function tratarRequisicao(requisitar: Request, dependencias: Depend
     return falhar('INTERNAL_ERROR', 'Não foi possível concluir a operação.', 500, cabecalhos);
   }
 
-  const chamador: Chamador = { userId: usuarioDados.user.id as string, ...contextoInterpretado.caller };
+  const chamador: Chamador = {
+    userId: usuarioDados.user.id as string,
+    ...contextoInterpretado.caller,
+  };
 
   let bruto: CorpoRequisicao;
   try {
@@ -342,7 +368,12 @@ export async function tratarRequisicao(requisitar: Request, dependencias: Depend
 
   const obrigatorio = PERMISSAO_OBRIGATORIA[corpo.action];
   if (!chamador.permissions.includes(obrigatorio)) {
-    return falhar('PERMISSION_DENIED', `Sua função não possui a permissão ${obrigatorio}.`, 403, cabecalhos);
+    return falhar(
+      'PERMISSION_DENIED',
+      `Sua função não possui a permissão ${obrigatorio}.`,
+      403,
+      cabecalhos,
+    );
   }
 
   if (corpo.action === 'list') {
@@ -363,7 +394,9 @@ export async function tratarRequisicao(requisitar: Request, dependencias: Depend
     corpo.idempotencyKey ??
     (chaveCabecalho && chaveCabecalho.trim().length >= 8 ? chaveCabecalho.trim() : undefined);
 
-  const impressaoDigital = chaveIdempotencia ? await impressaoDigitalAcao(chamador.companyId, corpo) : null;
+  const impressaoDigital = chaveIdempotencia
+    ? await impressaoDigitalAcao(chamador.companyId, corpo)
+    : null;
 
   if (chaveIdempotencia) {
     const { data: anterior, error: buscarErro } = await administrador.rpc('admin_find_action', {
@@ -403,10 +436,13 @@ export async function tratarRequisicao(requisitar: Request, dependencias: Depend
               cabecalhos,
             );
           }
-          const { data: dados, error: erro } = await administrador.auth.admin.inviteUserByEmail(email, {
-            data: { full_name: corpo.fullName },
-            redirectTo: dependencias.inviteRedirectTo,
-          });
+          const { data: dados, error: erro } = await administrador.auth.admin.inviteUserByEmail(
+            email,
+            {
+              data: { full_name: corpo.fullName },
+              redirectTo: dependencias.inviteRedirectTo,
+            },
+          );
           if (erro) throw erro;
           usuarioIdentificador = dados.user.id;
           usuarioAutenticacaoCriadoIdentificador = usuarioIdentificador;
@@ -465,14 +501,17 @@ export async function tratarRequisicao(requisitar: Request, dependencias: Depend
 
       case 'deactivate':
       case 'reactivate': {
-        const { data: dados, error: erro } = await administrador.rpc('admin_set_membership_active', {
-          p_company_id: chamador.companyId,
-          p_actor_user_id: chamador.userId,
-          p_user_id: corpo.userId,
-          p_active: corpo.action === 'reactivate',
-          p_idempotency_key: chaveIdempotencia ?? null,
-          p_fingerprint: impressaoDigital,
-        });
+        const { data: dados, error: erro } = await administrador.rpc(
+          'admin_set_membership_active',
+          {
+            p_company_id: chamador.companyId,
+            p_actor_user_id: chamador.userId,
+            p_user_id: corpo.userId,
+            p_active: corpo.action === 'reactivate',
+            p_idempotency_key: chaveIdempotencia ?? null,
+            p_fingerprint: impressaoDigital,
+          },
+        );
 
         if (erro) {
           const mapeados = mapearErroBanco(erro);

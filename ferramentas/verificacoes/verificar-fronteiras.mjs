@@ -5,7 +5,11 @@ import {
   statSync as consultarArquivoSincrono,
   existsSync as arquivoExiste,
 } from 'node:fs';
-import { join as juntarCaminhos, relative as caminhoRelativo, sep as separadorAtual } from 'node:path';
+import {
+  join as juntarCaminhos,
+  relative as caminhoRelativo,
+  sep as separadorAtual,
+} from 'node:path';
 
 const RAIZ = process.cwd();
 const PASTAS_IGNORADAS = new Set(['node_modules', '.git', 'dist', 'out', 'coverage']);
@@ -22,7 +26,8 @@ function percorrer(diretorio, saida = []) {
   return saida;
 }
 
-const normalizado = (parametroItem) => caminhoRelativo(RAIZ, parametroItem).split(separadorAtual).join('/');
+const normalizado = (parametroItem) =>
+  caminhoRelativo(RAIZ, parametroItem).split(separadorAtual).join('/');
 
 const achados = [];
 const arquivos = percorrer(RAIZ);
@@ -41,7 +46,8 @@ const RECURSOS_REMOTOS = [
 
 for (const arquivo of arquivos) {
   const caminhoRelativoAtual = normalizado(arquivo);
-  if (!PASTAS_PRODUTO.some((dadosRegistro) => caminhoRelativoAtual.startsWith(`${dadosRegistro}/`))) continue;
+  if (!PASTAS_PRODUTO.some((dadosRegistro) => caminhoRelativoAtual.startsWith(`${dadosRegistro}/`)))
+    continue;
   if (!/\.(html|css|mjs|js|jsx|ts|tsx)$/.test(arquivo)) continue;
 
   const conteudo = lerArquivoSincrono(arquivo, 'utf8');
@@ -64,7 +70,8 @@ const NOMES_PROIBIDOS = [/\.dc\.html$/i, /(^|\/)support\.js$/i];
 
 for (const arquivo of arquivos) {
   const caminhoRelativoAtual = normalizado(arquivo);
-  if (!PASTAS_PRODUTO.some((dadosRegistro) => caminhoRelativoAtual.startsWith(`${dadosRegistro}/`))) continue;
+  if (!PASTAS_PRODUTO.some((dadosRegistro) => caminhoRelativoAtual.startsWith(`${dadosRegistro}/`)))
+    continue;
   for (const padrao of NOMES_PROIBIDOS) {
     if (padrao.test(caminhoRelativoAtual)) {
       achados.push({

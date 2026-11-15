@@ -76,7 +76,11 @@ export function abrirEditorMotorista({ driver: motorista, onDone: aoConcluir }) 
       label: 'Observações',
       control: criarElemento(
         'textarea',
-        { class: 'textarea', rows: '2', onInput: (evento) => (formulario.notes = evento.target.value) },
+        {
+          class: 'textarea',
+          rows: '2',
+          onInput: (evento) => (formulario.notes = evento.target.value),
+        },
         [formulario.notes],
       ),
     }),

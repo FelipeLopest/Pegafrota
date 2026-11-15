@@ -11,11 +11,17 @@ export function interpretarEnderecoConvite() {
     refreshToken: parametrosResumoCriptografico.get('refresh_token'),
     type: parametrosResumoCriptografico.get('type'),
     error:
-      parametrosResumoCriptografico.get('error_description') || parametrosResumoCriptografico.get('error'),
+      parametrosResumoCriptografico.get('error_description') ||
+      parametrosResumoCriptografico.get('error'),
   };
 }
 
-export const ETAPAS = { CHECKING: 'checking', PASSWORD: 'password', DONE: 'done', FAILED: 'failed' };
+export const ETAPAS = {
+  CHECKING: 'checking',
+  PASSWORD: 'password',
+  DONE: 'done',
+  FAILED: 'failed',
+};
 
 export const ERROS_CONVITE = {
   INVITE_INVALID: {

@@ -46,11 +46,23 @@ if (!ENDERECO_SUPABASE || (!CHAVE_PRIVILEGIADA_SERVIDOR && !SOMENTE_SIMULAR)) {
  */
 const EMPRESAS = [
   { slug: 'auroraverde', users: ['admin', 'gestor', 'operador', 'consulta', 'desligado'] },
-  { slug: 'pedraalta', users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'] },
+  {
+    slug: 'pedraalta',
+    users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'],
+  },
   { slug: 'riosereno', users: ['admin', 'gestor', 'gestor2', 'operador', 'operador2', 'consulta'] },
   {
     slug: 'camponovo',
-    users: ['admin', 'admin2', 'gestor', 'gestor2', 'operador', 'operador2', 'operador3', 'consulta'],
+    users: [
+      'admin',
+      'admin2',
+      'gestor',
+      'gestor2',
+      'operador',
+      'operador2',
+      'operador3',
+      'consulta',
+    ],
   },
 ];
 
@@ -123,7 +135,8 @@ async function principal() {
   console.log(`PegaNaFrota — provisionamento de ${esperado.length} contas de demonstração`);
   console.log(`Destino: ${ENDERECO_SUPABASE}`);
   if (SOMENTE_SIMULAR) {
-    for (const usuario of esperado) console.log(`  [dry-run] ${usuario.email}  (${usuario.fullName})`);
+    for (const usuario of esperado)
+      console.log(`  [dry-run] ${usuario.email}  (${usuario.fullName})`);
     console.log(`\n${esperado.length} contas seriam verificadas. Nenhuma alteração feita.`);
     return;
   }
@@ -167,7 +180,9 @@ async function principal() {
     inalterado += 1;
   }
 
-  console.log(`\nResumo: ${criado} criada(s), ${atualizado} atualizada(s), ${inalterado} já existente(s).`);
+  console.log(
+    `\nResumo: ${criado} criada(s), ${atualizado} atualizada(s), ${inalterado} já existente(s).`,
+  );
   console.log(
     'Lembrete: as contas ainda precisam de profile e company_membership.\n' +
       'Em ambiente local isso vem do seed.sql. Em remoto, aplique o mesmo seed\n' +

@@ -63,9 +63,15 @@ export function renderizarAceiteConviteEquipe(raiz) {
       raiz.replaceChildren(
         cartao([
           criarElemento('h1', { class: 'auth-title', text: 'Conta ativada' }),
-          criarElemento('p', { class: 'auth-subtitle', text: 'Sua senha foi definida com sucesso.' }),
+          criarElemento('p', {
+            class: 'auth-subtitle',
+            text: 'Sua senha foi definida com sucesso.',
+          }),
           criarElemento('div', { class: 'card' }, [
-            criarElemento('h2', { class: 'card-title', text: 'Agora entre no PegaNaFrota Desktop' }),
+            criarElemento('h2', {
+              class: 'card-title',
+              text: 'Agora entre no PegaNaFrota Desktop',
+            }),
             criarElemento('p', {
               text: 'Abra o aplicativo no computador da empresa e use o mesmo e-mail do convite com a senha que você acabou de criar.',
             }),

@@ -13,7 +13,12 @@ export function notificacao(mensagem, { tone: tom = 'info', duration: duracao = 
     });
     document.body.append(conteinerNotificacao);
   }
-  const ICONE_TONALIDADE = { success: 'check', danger: 'warning', warning: 'warning', info: 'info' };
+  const ICONE_TONALIDADE = {
+    success: 'check',
+    danger: 'warning',
+    warning: 'warning',
+    info: 'info',
+  };
   const no = criarElemento('div', { class: 'toast', dataset: { tone: tom } }, [
     icone(ICONE_TONALIDADE[tom] || 'info', { size: 'sm' }),
     criarElemento('span', { text: mensagem }),

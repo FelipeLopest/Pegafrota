@@ -3,7 +3,10 @@ import verificarCondicao from 'node:assert/strict';
 import arquivosSistema from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 import caminhosSistema from 'node:path';
 const raiz = caminhosSistema.resolve(import.meta.dirname, '..');
-const telas = arquivosSistema.readFileSync(caminhosSistema.join(raiz, 'telas/exportar-telas.mjs'), 'utf8');
+const telas = arquivosSistema.readFileSync(
+  caminhosSistema.join(raiz, 'telas/exportar-telas.mjs'),
+  'utf8',
+);
 const estilosCss = arquivosSistema.readFileSync(
   caminhosSistema.join(raiz, 'estilos/estilo-principal.css'),
   'utf8',

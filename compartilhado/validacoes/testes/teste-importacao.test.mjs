@@ -107,7 +107,9 @@ testar('separa linhas válidas das inválidas sem enviar nada', () => {
 });
 
 testar('uma linha ruim não derruba as boas', () => {
-  const { linhas } = lerCsv(['Nome;Categoria CNH', 'João da Silva;E', ';D', 'Maria Souza;C'].join('\n'));
+  const { linhas } = lerCsv(
+    ['Nome;Categoria CNH', 'João da Silva;E', ';D', 'Maria Souza;C'].join('\n'),
+  );
 
   const resultadoItem = conferir('motoristas', linhas);
   verificarCondicao.equal(resultadoItem.validas.length, 2);
@@ -116,9 +118,11 @@ testar('uma linha ruim não derruba as boas', () => {
 
 testar('abastecimento exige veículo já cadastrado', () => {
   const { linhas } = lerCsv(
-    ['Placa;Litros;Valor por litro;Odometro', 'ABC1D23;120,5;6,19;125430', 'ZZZ9Z99;80;6,00;90000'].join(
-      '\n',
-    ),
+    [
+      'Placa;Litros;Valor por litro;Odometro',
+      'ABC1D23;120,5;6,19;125430',
+      'ZZZ9Z99;80;6,00;90000',
+    ].join('\n'),
   );
 
   const resolverVeiculo = (placa) => (placa === 'ABC1D23' ? 'uuid-do-veiculo' : null);
@@ -155,7 +159,11 @@ testar('o modelo gerado é lido de volta sem erro', () => {
   // Ida e volta: se o próprio modelo não passar na conferência, ninguém passa.
   for (const identificador of Object.keys(MODELOS)) {
     const { linhas } = lerCsv(csvModelo(identificador));
-    verificarCondicao.equal(linhas.length, 1, `modelo ${identificador} deveria ter uma linha de exemplo`);
+    verificarCondicao.equal(
+      linhas.length,
+      1,
+      `modelo ${identificador} deveria ter uma linha de exemplo`,
+    );
   }
 });
 
@@ -203,7 +211,10 @@ testar('os sete modelos Excel oficiais são lidos e conferidos', async () => {
     const bytes = lerArquivoSincrono(
       converterEnderecoEmCaminho(new URL(`modelo-${identificador}.xlsx`, pasta)),
     );
-    const memoriaTemporaria = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const memoriaTemporaria = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    );
     const leitura = await lerPlanilhaXlsx(memoriaTemporaria);
     verificarCondicao.equal(leitura.aba, 'Dados', `${identificador}: primeira aba`);
     verificarCondicao.equal(leitura.linhas.length, 1, `${identificador}: linha de exemplo`);
@@ -228,9 +239,11 @@ testar('datas numéricas do Excel e datas brasileiras viram data/hora local', ()
 
 testar('duplicidade dentro da mesma planilha é recusada antes de gravar', () => {
   const { linhas } = lerCsv(
-    ['Placa;Marca;Modelo;Combustivel', 'ABC1D23;Volvo;FH;Diesel S10', 'ABC1D23;Volvo;FH;Diesel S10'].join(
-      '\n',
-    ),
+    [
+      'Placa;Marca;Modelo;Combustivel',
+      'ABC1D23;Volvo;FH;Diesel S10',
+      'ABC1D23;Volvo;FH;Diesel S10',
+    ].join('\n'),
   );
   const resultado = conferir('veiculos', linhas, { validarVeiculo, existeVeiculo: () => false });
   verificarCondicao.equal(resultado.validas.length, 1);
@@ -271,7 +284,8 @@ testar('viagem e manutenção de planilha resolvem referências existentes', () 
 
   const manutencao = conferir(
     'manutencoes',
-    lerCsv('Placa;Tipo;Descricao;Data agendada\nABC1D23;Preventiva;Revisão;20/08/2026 08:00').linhas,
+    lerCsv('Placa;Tipo;Descricao;Data agendada\nABC1D23;Preventiva;Revisão;20/08/2026 08:00')
+      .linhas,
     base,
   );
   verificarCondicao.equal(manutencao.invalidas.length, 0);

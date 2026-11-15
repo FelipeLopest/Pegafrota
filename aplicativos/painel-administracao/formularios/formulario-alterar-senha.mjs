@@ -80,7 +80,8 @@ export async function abrirAlteracaoSenhaMembro(empresa, membro, aoConcluir) {
       notificacao(`Senha de ${membro.fullName} alterada.`, { tone: 'success' });
       aoConcluir?.();
     } catch (erro) {
-      if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+      if (erro.isConflict)
+        mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
       else notificacao(erro.message || 'Não foi possível alterar a senha.', { tone: 'danger' });
     }
   }

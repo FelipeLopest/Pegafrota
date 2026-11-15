@@ -48,7 +48,8 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
       const contagensAtividade = contagensResultadoAtividade(dadosRegistro.recentActivity || []);
       const negados =
         contagensAtividade.find((itemComparado) => itemComparado.label === 'Negadas')?.value || 0;
-      const falhas = contagensAtividade.find((itemComparado) => itemComparado.label === 'Falhas')?.value || 0;
+      const falhas =
+        contagensAtividade.find((itemComparado) => itemComparado.label === 'Falhas')?.value || 0;
 
       return criarElemento('div', {}, [
         criarElemento('div', { class: 'page-head' }, [
@@ -71,7 +72,13 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
         ]),
 
         criarElemento('div', { class: 'admin-pulse' }, [
-          pulsoAdministrador('Empresas', String(total), `${percentualAtivos}% ativas`, 'company', 'neutral'),
+          pulsoAdministrador(
+            'Empresas',
+            String(total),
+            `${percentualAtivos}% ativas`,
+            'company',
+            'neutral',
+          ),
           pulsoAdministrador('Ativas', String(ativo), 'operando normalmente', 'check', 'success'),
           pulsoAdministrador(
             'Suspensas',
@@ -126,7 +133,10 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                         segmentoCicloVida('archived', 'Arquivadas', arquivado, total),
                       ].filter(Boolean),
                     )
-                  : criarElemento('p', { class: 'muted', text: 'Nenhuma empresa provisionada ainda.' }),
+                  : criarElemento('p', {
+                      class: 'muted',
+                      text: 'Nenhuma empresa provisionada ainda.',
+                    }),
                 criarElemento('div', { class: 'lifecycle-legend' }, [
                   legendaGrafico('Ativas', ativo, 'var(--tema-sucesso)'),
                   legendaGrafico('Suspensas', suspenso, 'var(--tema-aviso)'),
@@ -157,7 +167,10 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                     class: 'chart-badge chart-badge-warning',
                     text: `${negados + falhas} atenção`,
                   })
-                : criarElemento('span', { class: 'chart-badge chart-badge-success', text: 'Fluxo saudável' }),
+                : criarElemento('span', {
+                    class: 'chart-badge chart-badge-success',
+                    text: 'Fluxo saudável',
+                  }),
             ]),
             barrasAdministrador(contagensAtividade),
             criarElemento('p', {
@@ -198,7 +211,9 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                     falhou.map((objetoItem) =>
                       criarElemento('tr', {}, [
                         criarElemento('td', {}, [
-                          criarElemento('code', { text: String(objetoItem.operationId).slice(0, 8) }),
+                          criarElemento('code', {
+                            text: String(objetoItem.operationId).slice(0, 8),
+                          }),
                         ]),
                         criarElemento('td', {}, [
                           criarElemento('status-pill', {
@@ -207,7 +222,9 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                           }),
                         ]),
                         criarElemento('td', {}, [
-                          objetoItem.errorCode ? criarElemento('code', { text: objetoItem.errorCode }) : '—',
+                          objetoItem.errorCode
+                            ? criarElemento('code', { text: objetoItem.errorCode })
+                            : '—',
                         ]),
                         criarElemento('td', {
                           class: 'col-meta',
@@ -264,14 +281,20 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                               onClick: () => navegar(`/empresas/${registro.id}`),
                             }),
                           ]),
-                          criarElemento('td', { class: 'mono col-meta', text: formatarCnpj(registro.cnpj) }),
+                          criarElemento('td', {
+                            class: 'mono col-meta',
+                            text: formatarCnpj(registro.cnpj),
+                          }),
                           criarElemento('td', {}, [
                             criarElemento('status-pill', {
                               status: registro.status,
                               label: ROTULO_SITUACAO_EMPRESA[registro.status] || registro.status,
                             }),
                           ]),
-                          criarElemento('td', { class: 'col-meta', text: formatarDados(registro.createdAt) }),
+                          criarElemento('td', {
+                            class: 'col-meta',
+                            text: formatarDados(registro.createdAt),
+                          }),
                         ]),
                       ),
                     ),

@@ -79,7 +79,11 @@ export async function definirSenha(senha) {
   const { supabaseUrl: enderecoSupabase, anonKey: chaveAnonima } = configuracao();
   const token = sessao.accessToken;
   if (!token) {
-    throw new ErroBackend({ hint: 'UNAUTHENTICATED', message: 'Sessão de ativação ausente.', status: 401 });
+    throw new ErroBackend({
+      hint: 'UNAUTHENTICATED',
+      message: 'Sessão de ativação ausente.',
+      status: 401,
+    });
   }
   const resposta = await requisicaoServidor(`${enderecoSupabase}/auth/v1/user`, {
     method: 'PUT',

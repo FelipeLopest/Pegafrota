@@ -1,11 +1,18 @@
 #!/usr/bin/env node
-import { spawn as iniciarProcesso, execFileSync as executarArquivoSincrono } from 'node:child_process';
+import {
+  spawn as iniciarProcesso,
+  execFileSync as executarArquivoSincrono,
+} from 'node:child_process';
 import {
   existsSync as arquivoExiste,
   writeFileSync as gravarArquivoSincrono,
   mkdirSync as criarPastaSincrona,
 } from 'node:fs';
-import { join as juntarCaminhos, dirname as obterPastaPai, resolve as resolverCaminho } from 'node:path';
+import {
+  join as juntarCaminhos,
+  dirname as obterPastaPai,
+  resolve as resolverCaminho,
+} from 'node:path';
 import { tmpdir as pastaTemporariaSistema } from 'node:os';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 import { emitirToken } from '../desenvolvimento/token-local.mjs';
@@ -71,7 +78,10 @@ const codigoSql = (buscaAtual) =>
       '-c',
       buscaAtual,
     ],
-    { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+    {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+    },
   ).trim();
 
 let administradorIdentificador = codigoSql(
@@ -95,7 +105,10 @@ const sessaoAdministrador = {
 
 criarPastaSincrona(CAPTURAS, { recursive: true });
 
-const verificacao = juntarCaminhos(pastaTemporariaSistema(), `pnf-admin-e2e-probe-${process.pid}.cjs`);
+const verificacao = juntarCaminhos(
+  pastaTemporariaSistema(),
+  `pnf-admin-e2e-probe-${process.pid}.cjs`,
+);
 
 gravarArquivoSincrono(
   verificacao,

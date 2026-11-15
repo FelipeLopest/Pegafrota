@@ -2,6 +2,8 @@
 
 Sistema de frota com dois aplicativos separados: programa da empresa e painel web da administração.
 
+- [Aparência e ícone: revisão 1.1.1](documentacao/validacao/aparencia/RELATORIO_VISUAL.md)
+- [Câmeras ESP32-S3: ativação, limites e testes](ATIVAR_CAMERAS.md)
 - [Instalador Windows e publicação na Vercel](PUBLICAR_E_GERAR_APLICATIVO.md)
 - [Comece por aqui: pacote unificado](LEIA_PRIMEIRO.md)
 - [Guia da organização e dos arquivos](GUIA_DO_PROJETO.md)

@@ -13,16 +13,17 @@ import { dadosEquipe } from './dados-equipe.mjs';
 import { dadosRelatorios } from './dados-relatorios.mjs';
 import { dadosAuditoria } from './dados-auditoria.mjs';
 import { registrarUltimoAcesso } from './dados-ultimo-acesso.mjs';
+import { comPaginacao } from './paginar-colecao.mjs';
 export const dados = {
   dashboard: dadosTelaInicial,
-  vehicles: dadosVeiculos,
-  drivers: dadosMotoristas,
-  locations: dadosLocais,
-  trips: dadosViagens,
-  fuelings: dadosAbastecimentos,
-  maintenance: dadosManutencoes,
+  vehicles: comPaginacao(dadosVeiculos, 'vehicles'),
+  drivers: comPaginacao(dadosMotoristas, 'drivers'),
+  locations: comPaginacao(dadosLocais, 'locations'),
+  trips: comPaginacao(dadosViagens, 'trips'),
+  fuelings: comPaginacao(dadosAbastecimentos, 'fuelings'),
+  maintenance: comPaginacao(dadosManutencoes, 'maintenance'),
   yard: dadosPatio,
-  movements: dadosMovimentacoes,
+  movements: comPaginacao(dadosMovimentacoes, 'movements'),
   odometer: dadosOdometro,
   company: dadosEmpresa,
   users: dadosEquipe,
@@ -36,5 +37,6 @@ export const RELATORIOS = Object.freeze([
   { id: 'vehicleCosts', label: 'Custos por veículo', period: true },
   { id: 'maintenanceDue', label: 'Manutenções a vencer', period: false },
   { id: 'recentMovements', label: 'Movimentações recentes', period: true },
+  { id: 'fuelEfficiency', label: 'Consumo medido da frota', period: false },
 ]);
 export { RELATORIOS as REPORTS };
