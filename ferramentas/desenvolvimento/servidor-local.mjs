@@ -83,7 +83,9 @@ const escaparTexto = (textoItem) => String(textoItem ?? '').replace(/'/g, "''");
 const SENHA_MINIMA = Number(process.env.PNF_MIN_PASSWORD || 12);
 
 const ENDERECO_SITE = process.env.PNF_SITE_URL || 'http://127.0.0.1:5174';
-const DESTINOS_PERMITIDOS = (process.env.PNF_REDIRECT_ALLOW || 'http://127.0.0.1:5174,http://localhost:5174')
+const DESTINOS_PERMITIDOS = (
+  process.env.PNF_REDIRECT_ALLOW || 'http://127.0.0.1:5174,http://localhost:5174'
+)
   .split(',')
   .map((itemComparado) => itemComparado.trim());
 
@@ -190,7 +192,11 @@ async function tratarAutenticacao(requisicao, resposta, endereco) {
     if (!linha) return respostaJson(resposta, 404, { error: 'user_not_found' });
     const [identificadorUsuario, mensagemEmail, confirmado] = linha.split('|');
     return respostaJson(resposta, 200, {
-      user: { id: identificadorUsuario, email: mensagemEmail, email_confirmed_at: confirmado || null },
+      user: {
+        id: identificadorUsuario,
+        email: mensagemEmail,
+        email_confirmed_at: confirmado || null,
+      },
     });
   }
 
@@ -201,7 +207,10 @@ async function tratarAutenticacao(requisicao, resposta, endereco) {
       .trim()
       .toLowerCase();
     const redirecionarPara = String(
-      endereco.searchParams.get('redirect_to') ?? corpo.redirect_to ?? corpo.options?.redirectTo ?? '',
+      endereco.searchParams.get('redirect_to') ??
+        corpo.redirect_to ??
+        corpo.options?.redirectTo ??
+        '',
     );
 
     const linha = codigoSql(`select id || '|' || coalesce(email_confirmed_at::text,'')
@@ -214,7 +223,8 @@ async function tratarAutenticacao(requisicao, resposta, endereco) {
       }
       let usuarioIdentificador = existenteIdentificador;
       if (!usuarioIdentificador) {
-        usuarioIdentificador = codigoSql(`insert into auth.users (id, email, aud, role, raw_user_meta_data)
+        usuarioIdentificador =
+          codigoSql(`insert into auth.users (id, email, aud, role, raw_user_meta_data)
           values (gen_random_uuid(), '${escaparTexto(mensagemEmail)}', 'authenticated', 'authenticated',
                   '${escaparTexto(JSON.stringify(corpo.data ?? corpo.options?.data ?? {}))}'::jsonb)
           returning id`);
@@ -234,7 +244,8 @@ async function tratarAutenticacao(requisicao, resposta, endereco) {
     }
 
     if (tipo === 'recovery' || tipo === 'magiclink') {
-      if (!existenteIdentificador) return respostaJson(resposta, 404, { code: 404, msg: 'User not found' });
+      if (!existenteIdentificador)
+        return respostaJson(resposta, 404, { code: 404, msg: 'User not found' });
       return respostaJson(resposta, 200, {
         action_link: montarLinkAcao(redirecionarPara, existenteIdentificador, tipo),
         email_otp: '000000',
@@ -305,7 +316,8 @@ async function tratarAutenticacao(requisicao, resposta, endereco) {
     return respostaJson(resposta, 200, { id: subparte });
   }
 
-  if (caminho.startsWith('/admin/')) return tratarAdministrador(requisicao, resposta, endereco, caminho);
+  if (caminho.startsWith('/admin/'))
+    return tratarAdministrador(requisicao, resposta, endereco, caminho);
 
   if (caminho.startsWith('/factors')) return tratarFatores(requisicao, resposta, endereco, caminho);
 
@@ -328,7 +340,9 @@ async function tratarFuncoes(requisicao, resposta, endereco) {
     if (['host', 'connection', 'content-length', 'content-type'].includes(chaveItem)) continue;
     cabecalhos[chaveItem] = veiculoItem;
   }
-  const corpo = ['GET', 'HEAD'].includes(requisicao.method) ? undefined : await lerCorpo(requisicao);
+  const corpo = ['GET', 'HEAD'].includes(requisicao.method)
+    ? undefined
+    : await lerCorpo(requisicao);
 
   try {
     const servidorDestino = await fetch(
@@ -355,11 +369,14 @@ async function tratarRest(requisicao, resposta, endereco) {
 
   const cabecalhos = {};
   for (const [chaveItem, veiculoItem] of Object.entries(requisicao.headers)) {
-    if (['host', 'apikey', 'connection', 'content-length', 'content-type'].includes(chaveItem)) continue;
+    if (['host', 'apikey', 'connection', 'content-length', 'content-type'].includes(chaveItem))
+      continue;
     cabecalhos[chaveItem] = veiculoItem;
   }
 
-  const corpo = ['GET', 'HEAD'].includes(requisicao.method) ? undefined : await lerCorpo(requisicao);
+  const corpo = ['GET', 'HEAD'].includes(requisicao.method)
+    ? undefined
+    : await lerCorpo(requisicao);
 
   try {
     const servidorDestino = await fetch(alvo, {
@@ -379,7 +396,10 @@ async function tratarRest(requisicao, resposta, endereco) {
   }
 }
 
-import { createHmac as _assinaturaIgnorada, randomBytes as gerarBytesAleatorios } from 'node:crypto';
+import {
+  createHmac as _assinaturaIgnorada,
+  randomBytes as gerarBytesAleatorios,
+} from 'node:crypto';
 
 const ALFABETO_BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
@@ -473,7 +493,9 @@ async function tratarFatores(requisicao, resposta, endereco, caminho) {
       status: 'unverified',
       friendlyName: corpo.friendly_name ?? 'TOTP',
     });
-    const email = codigoSql(`select email from auth.users where id = '${escaparTexto(subparte)}'::uuid`);
+    const email = codigoSql(
+      `select email from auth.users where id = '${escaparTexto(subparte)}'::uuid`,
+    );
     const enderecoRecurso = `otpauth://totp/PegaNaFrota:${encodeURIComponent(email)}?secret=${segredo}&issuer=PegaNaFrota`;
     const svg =
       `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">` +
@@ -515,7 +537,8 @@ async function tratarFatores(requisicao, resposta, endereco, caminho) {
       (dadosRegistro) =>
         codigoTemporarioPorTempo(formulario.secret, agora + dadosRegistro) === String(corpo.code),
     );
-    if (!valido) return respostaJson(resposta, 400, { error: 'invalid_code', msg: 'Invalid TOTP code' });
+    if (!valido)
+      return respostaJson(resposta, 400, { error: 'invalid_code', msg: 'Invalid TOTP code' });
 
     formulario.status = 'verified';
     desafios.delete(corpo.challenge_id);
@@ -577,7 +600,9 @@ async function tratarAdministrador(requisicao, resposta, endereco, caminho) {
 
     if (
       redirecionarPara &&
-      !DESTINOS_REDIRECIONAMENTO_PERMITIDOS.some((primeiroItem) => redirecionarPara.startsWith(primeiroItem))
+      !DESTINOS_REDIRECIONAMENTO_PERMITIDOS.some((primeiroItem) =>
+        redirecionarPara.startsWith(primeiroItem),
+      )
     ) {
       return respostaJson(resposta, 400, {
         error: 'validation_failed',
@@ -592,7 +617,8 @@ async function tratarAdministrador(requisicao, resposta, endereco, caminho) {
 
     if (tipo === 'invite') {
       if (usuarioIdentificador) {
-        const confirmado = codigoSql(`select case when email_confirmed_at is null then '' else 'y' end
+        const confirmado =
+          codigoSql(`select case when email_confirmed_at is null then '' else 'y' end
                                from auth.users where id = '${escaparTexto(usuarioIdentificador)}'::uuid`);
         if (confirmado === 'y') {
           return respostaJson(resposta, 422, {
@@ -640,7 +666,8 @@ criarServidor(async (requisicao, resposta) => {
 
     if (endereco.pathname.startsWith('/auth/v1'))
       return await tratarAutenticacao(requisicao, resposta, endereco);
-    if (endereco.pathname.startsWith('/rest/v1')) return await tratarRest(requisicao, resposta, endereco);
+    if (endereco.pathname.startsWith('/rest/v1'))
+      return await tratarRest(requisicao, resposta, endereco);
     if (endereco.pathname.startsWith('/functions/v1'))
       return await tratarFuncoes(requisicao, resposta, endereco);
     if (endereco.pathname === '/')

@@ -5,10 +5,16 @@ import { compilarAplicativo } from '../apoio/compilar-aplicativo.mjs';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const programa = join(raiz, 'aplicativos/programa-empresa');
+const iconeAplicativo = join(programa, 'recursos/icone-aplicativo.ico');
 compilarAplicativo(
   new URL('../../aplicativos/programa-empresa/compilar-aplicativo.mjs', import.meta.url).href,
   true,
 );
+const leitorCompilado = join(raiz, 'servicos/leitor-placas/compilado/leitor-placas');
+if (!existsSync(join(leitorCompilado, 'leitor-placas.exe')))
+  throw new Error(
+    'Gere o leitor com npm run compilar:leitor antes do instalador, ou use Gerar instalador Windows no GitHub.',
+  );
 const manifesto = JSON.parse(readFileSync(join(programa, 'package.json'), 'utf8'));
 const versaoElectron = JSON.parse(readFileSync(join(raiz, 'package-lock.json'), 'utf8')).packages[
   'node_modules/electron'
@@ -44,10 +50,13 @@ await build({
     directories: { app: join(programa, 'dist'), output: join(raiz, 'instaladores') },
     files: ['**/*', '!**/testes/**', '!**/*.map'],
     asar: true,
+    extraResources: [{ from: leitorCompilado, to: 'leitor-placas' }],
     npmRebuild: false,
     artifactName: 'PegaNaFrota-${version}-Instalador.${ext}',
-    win: { target: 'nsis' },
+    win: { target: 'nsis', icon: iconeAplicativo },
     nsis: {
+      installerIcon: iconeAplicativo,
+      uninstallerIcon: iconeAplicativo,
       oneClick: false,
       perMachine: false,
       allowToChangeInstallationDirectory: true,

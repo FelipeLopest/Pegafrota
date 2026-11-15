@@ -32,5 +32,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.error('uso: dev-token.mjs <user-uuid> [role] [aal]');
     process.exit(1);
   }
-  process.stdout.write(emitirToken(subparte, papel || 'authenticated', nivelAutenticacao || 'aal1'));
+  process.stdout.write(
+    emitirToken(subparte, papel || 'authenticated', nivelAutenticacao || 'aal1'),
+  );
 }

@@ -74,6 +74,7 @@ export function botao({
   );
 
   if (permissao) aplicarPermissao(botao, permissao);
+  if (desabilitado || ocupado) botao.disabled = true;
   return botao;
 }
 

@@ -1,3 +1,7 @@
+> Na versão 1.1.0, o instalador inclui o leitor local de placas. O workflow prepara Python e os modelos automaticamente; para compilação manual, siga também ATIVAR_CAMERAS.md.
+>
+> Na versão 1.2.0, atualize o banco e a função do painel antes de publicar os aplicativos. Veja ATUALIZAR_PEGANAFROTA_1_2.md.
+
 # Gerar o aplicativo e publicar o painel
 
 O aplicativo da empresa é Electron para Windows. O painel da administração é um site separado. Ambos usam o backend existente no Supabase. A Vercel hospeda somente o painel; ela não executa o Electron nem substitui o Supabase.
@@ -32,7 +36,7 @@ O usuário que receber o instalador não precisará de Node.js, npm, código-fon
 npm run gerar:instalador
 ```
 
-O comando compila novamente o produto e gera `instaladores/PegaNaFrota-1.0.0-Instalador.exe` (a versão segue o package.json). Inclui somente o aplicativo da empresa e os dois campos públicos; não inclui o painel, as fontes do servidor ou `.env`. O instalador é para Windows x64 e permite escolher a pasta de instalação.
+O comando compila novamente o produto e gera `instaladores/PegaNaFrota-1.2.0-Instalador.exe` (a versão segue o package.json). Inclui o aplicativo da empresa, o leitor de placas e a configuração pública. O instalador é para Windows x64 e permite escolher a pasta de instalação.
 
 Sem certificado de assinatura de código configurado, o Windows pode mostrar um aviso de editor desconhecido. Nenhum certificado foi adicionado nesta entrega.
 

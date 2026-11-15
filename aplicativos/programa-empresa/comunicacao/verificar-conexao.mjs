@@ -60,11 +60,12 @@ export async function verificarConectividadeServidor() {
   try {
     const configuracaoLida = await carregarConfiguracao();
     if (!verificacaoSaudeEmCurso) {
-      verificacaoSaudeEmCurso = sondarSaude(configuracaoLida.supabaseUrl, configuracaoLida.anonKey).finally(
-        () => {
-          verificacaoSaudeEmCurso = null;
-        },
-      );
+      verificacaoSaudeEmCurso = sondarSaude(
+        configuracaoLida.supabaseUrl,
+        configuracaoLida.anonKey,
+      ).finally(() => {
+        verificacaoSaudeEmCurso = null;
+      });
     }
     return await verificacaoSaudeEmCurso;
   } catch {

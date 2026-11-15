@@ -31,9 +31,13 @@ export function cabecalhoPagina({
   const categoriaResolvida = sobreTitulo || metadados[1];
   return criarElemento('div', { class: 'page-head' }, [
     criarElemento('div', { class: 'page-head-main' }, [
-      criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [icone(resolvidoIcon)]),
+      criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [
+        icone(resolvidoIcon),
+      ]),
       criarElemento('div', { class: 'page-head-copy' }, [
-        categoriaResolvida ? criarElemento('p', { class: 'page-eyebrow', text: categoriaResolvida }) : null,
+        categoriaResolvida
+          ? criarElemento('p', { class: 'page-eyebrow', text: categoriaResolvida })
+          : null,
         criarElemento('h1', { class: 'page-title', text: titulo }),
         subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
       ]),
@@ -51,8 +55,12 @@ export function cartao({
   const cabecalho =
     titulo || acoes.length
       ? criarElemento('div', { class: 'card-head' }, [
-          titulo ? criarElemento('h2', { class: 'card-title', text: titulo }) : criarElemento('span', {}),
-          acoes.length ? criarElemento('div', { class: 'page-actions' }, acoes.filter(Boolean)) : null,
+          titulo
+            ? criarElemento('h2', { class: 'card-title', text: titulo })
+            : criarElemento('span', {}),
+          acoes.length
+            ? criarElemento('div', { class: 'page-actions' }, acoes.filter(Boolean))
+            : null,
         ])
       : null;
   return criarElemento('section', { class: `card${concluirPendencias ? ' card-flush' : ''}` }, [

@@ -82,7 +82,12 @@ export async function telaProvisionamentos({
     );
     await carregarComEstado(
       areaLista,
-      () => servicos.operations.list({ status: estado.status || null, page: estado.page, pageSize: 25 }),
+      () =>
+        servicos.operations.list({
+          status: estado.status || null,
+          page: estado.page,
+          pageSize: 25,
+        }),
       (resposta) => {
         const buscaAtual = normalizarTexto(estado.search);
         const itens = buscaAtual
@@ -108,7 +113,9 @@ export async function telaProvisionamentos({
             },
             {
               label: 'Em execução',
-              value: itens.filter((objetoItem) => ['running', 'pending'].includes(objetoItem.status)).length,
+              value: itens.filter((objetoItem) =>
+                ['running', 'pending'].includes(objetoItem.status),
+              ).length,
               icon: 'operation',
             },
             {
@@ -147,7 +154,11 @@ export async function telaProvisionamentos({
                               class: 'row-link',
                               onClick: () => navegar(`/provisionamentos/${objetoItem.operationId}`),
                             },
-                            [criarElemento('code', { text: String(objetoItem.operationId).slice(0, 8) })],
+                            [
+                              criarElemento('code', {
+                                text: String(objetoItem.operationId).slice(0, 8),
+                              }),
+                            ],
                           ),
                         ]),
                         criarElemento('td', { text: objetoItem.companyTradeName || '—' }),
@@ -159,7 +170,9 @@ export async function telaProvisionamentos({
                         ]),
                         criarElemento('td', { text: objetoItem.currentStep || '—' }),
                         criarElemento('td', {}, [
-                          objetoItem.errorCode ? criarElemento('code', { text: objetoItem.errorCode }) : '—',
+                          objetoItem.errorCode
+                            ? criarElemento('code', { text: objetoItem.errorCode })
+                            : '—',
                         ]),
                         criarElemento('td', {
                           class: 'col-meta',

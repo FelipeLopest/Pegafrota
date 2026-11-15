@@ -115,7 +115,9 @@ export function nomeConfirmacaoConfere(digitado, esperado) {
 export function novaChaveIdempotencia(prefixo = 'prov') {
   const bytes = new Uint8Array(16);
   (globalThis.crypto ?? {}).getRandomValues?.(bytes);
-  const hexadecimal = Array.from(bytes, (segundoItem) => segundoItem.toString(16).padStart(2, '0')).join('');
+  const hexadecimal = Array.from(bytes, (segundoItem) =>
+    segundoItem.toString(16).padStart(2, '0'),
+  ).join('');
   return `${prefixo}-${Date.now().toString(36)}-${hexadecimal}`;
 }
 

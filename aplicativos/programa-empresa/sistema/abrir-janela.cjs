@@ -13,6 +13,15 @@ const {
 const caminho = require('node:path');
 const arquivosSistema = require('node:fs');
 
+const { criarProcessador } = require('./processar-imagem.cjs');
+const pastaRecursosLeitor = aplicativo.isPackaged
+  ? process.resourcesPath
+  : caminho.resolve(__dirname, '../../../..', 'servicos/leitor-placas/compilado');
+const processadorImagem = criarProcessador({
+  pastaRecursos: pastaRecursosLeitor,
+});
+aplicativo.on('before-quit', () => processadorImagem.encerrar());
+
 const ehDesenvolvimento = process.env.PNF_DEV === '1';
 
 if (!aplicativo.requestSingleInstanceLock()) {
@@ -38,7 +47,11 @@ function carregarConfiguracao() {
     anonKey: process.env.PNF_SUPABASE_ANON_KEY || '',
   };
   if (doAmbiente.supabaseUrl && doAmbiente.anonKey) {
-    return { ...doAmbiente, __source: 'variáveis de ambiente', __searched: consultados };
+    return {
+      ...doAmbiente,
+      __source: 'variáveis de ambiente',
+      __searched: consultados,
+    };
   }
 
   const candidatosJson = [
@@ -54,7 +67,11 @@ function carregarConfiguracao() {
       if (arquivosSistema.existsSync(arquivo)) {
         const configuracao = JSON.parse(arquivosSistema.readFileSync(arquivo, 'utf8'));
         if (configuracao.supabaseUrl && configuracao.anonKey) {
-          return { ...configuracao, __source: arquivo, __searched: consultados };
+          return {
+            ...configuracao,
+            __source: arquivo,
+            __searched: consultados,
+          };
         }
       }
     } catch {}
@@ -82,7 +99,12 @@ function carregarConfiguracao() {
     } catch {}
   }
 
-  return { supabaseUrl: '', anonKey: '', __source: null, __searched: consultados };
+  return {
+    supabaseUrl: '',
+    anonKey: '',
+    __source: null,
+    __searched: consultados,
+  };
 }
 
 const configuracao = carregarConfiguracao();
@@ -97,7 +119,12 @@ function origemBackend() {
 
 function montarCsp() {
   const origem = origemBackend();
-  const conectar = ["'self'", origem, origem ? origem.replace(/^http/, 'ws') : null]
+  const conectar = [
+    "'self'",
+    'https://viacep.com.br',
+    origem,
+    origem ? origem.replace(/^http/, 'ws') : null,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -136,7 +163,9 @@ function salvarSessao(dadosEnvio) {
   }
   try {
     const trechoAcumulado = armazenamentoSeguro.encryptString(JSON.stringify(dadosEnvio));
-    arquivosSistema.writeFileSync(ARQUIVO_SESSAO(), trechoAcumulado, { mode: 0o600 });
+    arquivosSistema.writeFileSync(ARQUIVO_SESSAO(), trechoAcumulado, {
+      mode: 0o600,
+    });
     return { persisted: true };
   } catch (erro) {
     return { persisted: false, reason: 'write_failed' };
@@ -171,7 +200,8 @@ function limparSessao() {
 
 let janelaPrincipal = null;
 
-const ARQUIVO_ESTADO_JANELA = () => caminho.join(aplicativo.getPath('userData'), 'window-state.json');
+const ARQUIVO_ESTADO_JANELA = () =>
+  caminho.join(aplicativo.getPath('userData'), 'window-state.json');
 
 function lerEstadoJanela() {
   try {
@@ -207,6 +237,12 @@ function criarJanela() {
     show: false,
     backgroundColor: temaNativo.shouldUseDarkColors ? '#0A0A0A' : '#FFFFFF',
     title: 'PegaNaFrota',
+    icon: caminho.join(
+      __dirname,
+      '..',
+      'recursos',
+      process.platform === 'win32' ? 'icone-aplicativo.ico' : 'icone-aplicativo.png',
+    ),
     webPreferences: {
       preload: caminho.join(__dirname, 'ponte-segura.cjs'),
       contextIsolation: true,
@@ -305,12 +341,40 @@ function fortalecerSessao() {
     ) {
       return funcaoRetorno({ cancel: false });
     }
-    if (origem && endereco.startsWith(origem)) return funcaoRetorno({ cancel: false });
+    const origemRequisicao = new URL(endereco).origin;
+    if (origem && [origem, origem.replace(/^http/, 'ws')].includes(origemRequisicao))
+      return funcaoRetorno({ cancel: false });
+    if (
+      detalhes.method === 'GET' &&
+      /^https:\/\/viacep\.com\.br\/ws\/\d{8}\/json\/$/.test(endereco)
+    )
+      return funcaoRetorno({ cancel: false });
     return funcaoRetorno({ cancel: true });
   });
 }
 
 function registrarComunicacao() {
+  function verificarOrigem(evento) {
+    if (
+      !janelaPrincipal ||
+      evento.sender !== janelaPrincipal.webContents ||
+      evento.senderFrame !== janelaPrincipal.webContents.mainFrame
+    )
+      throw new Error('Origem de comunicação inválida.');
+  }
+  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_STATUS, (evento) => {
+    verificarOrigem(evento);
+    return processadorImagem.disponivel();
+  });
+  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_ANALISAR, (evento, imagem) => {
+    verificarOrigem(evento);
+    return processadorImagem.analisar(imagem);
+  });
+  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_PARAR, (evento) => {
+    verificarOrigem(evento);
+    processadorImagem.encerrar();
+    return true;
+  });
   comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.GET_CONFIG, () => ({
     supabaseUrl: configuracao.supabaseUrl,
     anonKey: configuracao.anonKey,
@@ -343,30 +407,40 @@ function registrarComunicacao() {
     bounds: janelaPrincipal?.getNormalBounds() ?? null,
   }));
 
-  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.EXPORT_SAVE, async (_eventoIgnorado, dadosEnvio) => {
-    const { suggestedName: sugeridoNome, content: conteudo, format: formatarValor } = dadosEnvio ?? {};
+  comunicacaoPrincipal.handle(
+    CANAIS_COMUNICACAO.EXPORT_SAVE,
+    async (_eventoIgnorado, dadosEnvio) => {
+      const {
+        suggestedName: sugeridoNome,
+        content: conteudo,
+        format: formatarValor,
+      } = dadosEnvio ?? {};
 
-    if (typeof conteudo !== 'string' || conteudo.length > 50 * 1024 * 1024) {
-      throw new Error('Conteúdo inválido para exportação.');
-    }
-    if (!['csv', 'json'].includes(formatarValor)) {
-      throw new Error('Formato não suportado.');
-    }
+      if (typeof conteudo !== 'string' || conteudo.length > 50 * 1024 * 1024) {
+        throw new Error('Conteúdo inválido para exportação.');
+      }
+      if (!['csv', 'json'].includes(formatarValor)) {
+        throw new Error('Formato não suportado.');
+      }
 
-    const seguroNome = String(sugeridoNome ?? 'relatorio')
-      .replace(/[^\w\-. ]+/g, '_')
-      .slice(0, 120);
+      const seguroNome = String(sugeridoNome ?? 'relatorio')
+        .replace(/[^\w\-. ]+/g, '_')
+        .slice(0, 120);
 
-    const { canceled: cancelado, filePath: arquivoCaminho } = await dialogo.showSaveDialog(janelaPrincipal, {
-      defaultPath: `${seguroNome}.${formatarValor}`,
-      filters: [{ name: formatarValor.toUpperCase(), extensions: [formatarValor] }],
-    });
+      const { canceled: cancelado, filePath: arquivoCaminho } = await dialogo.showSaveDialog(
+        janelaPrincipal,
+        {
+          defaultPath: `${seguroNome}.${formatarValor}`,
+          filters: [{ name: formatarValor.toUpperCase(), extensions: [formatarValor] }],
+        },
+      );
 
-    if (cancelado || !arquivoCaminho) return { saved: false };
+      if (cancelado || !arquivoCaminho) return { saved: false };
 
-    await arquivosSistema.promises.writeFile(arquivoCaminho, conteudo, 'utf8');
-    return { saved: true, filePath: arquivoCaminho };
-  });
+      await arquivosSistema.promises.writeFile(arquivoCaminho, conteudo, 'utf8');
+      return { saved: true, filePath: arquivoCaminho };
+    },
+  );
 
   comunicacaoPrincipal.handle(
     CANAIS_COMUNICACAO.IMPORT_TEMPLATE_SAVE,

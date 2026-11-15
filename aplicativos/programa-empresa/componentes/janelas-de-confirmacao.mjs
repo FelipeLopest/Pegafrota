@@ -31,7 +31,12 @@ export function modal({
         podeFechar
           ? criarElemento(
               'button',
-              { class: 'modal-close', type: 'button', 'aria-label': 'Fechar', onClick: () => fechar() },
+              {
+                class: 'modal-close',
+                type: 'button',
+                'aria-label': 'Fechar',
+                onClick: () => fechar(),
+              },
               [icone('close', { size: 'sm' })],
             )
           : null,
@@ -105,7 +110,11 @@ export function confirmarAcao({
     let correspondenciaItem;
     const rodape = criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Cancelar', onClick: () => correspondenciaItem.close(false) }),
-      botao({ label: confirmarRotulo, variant: 'danger', onClick: () => correspondenciaItem.close(true) }),
+      botao({
+        label: confirmarRotulo,
+        variant: 'danger',
+        onClick: () => correspondenciaItem.close(true),
+      }),
     ]);
     correspondenciaItem = modal({
       title: titulo,

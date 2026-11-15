@@ -23,7 +23,11 @@ export async function excluirMembroEmpresa(empresa, membro, aoConcluir) {
   if (!confirmado.confirmed) return;
 
   try {
-    const resultado = await servicos.members.delete(empresa.id, membro.userId, confirmado.confirmedName);
+    const resultado = await servicos.members.delete(
+      empresa.id,
+      membro.userId,
+      confirmado.confirmedName,
+    );
     notificacao(
       resultado.authUserDeleted
         ? `${membro.fullName} e a conta de login foram excluídos.`
@@ -32,7 +36,8 @@ export async function excluirMembroEmpresa(empresa, membro, aoConcluir) {
     );
     aoConcluir?.();
   } catch (erro) {
-    if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+    if (erro.isConflict)
+      mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
     else notificacao(erro.message || 'Não foi possível excluir o usuário.', { tone: 'danger' });
   }
 }

@@ -17,7 +17,10 @@ const codigoSql = (buscaAtual) =>
   executarArquivoSincrono(
     'psql',
     ['-h', '127.0.0.1', '-p', '5433', '-U', 'postgres', '-d', BANCO, '-t', '-A', '-c', buscaAtual],
-    { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+    {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+    },
   )
     .trim()
     .split('\n')[0]
@@ -54,7 +57,9 @@ async function principal() {
   try {
     const resultadoItem = await fetch(BASE, { signal: AbortSignal.timeout(4000) });
     if (!resultadoItem.ok) throw new Error();
-    const fnVerificacao = await fetch('http://127.0.0.1:3002/', { signal: AbortSignal.timeout(4000) });
+    const fnVerificacao = await fetch('http://127.0.0.1:3002/', {
+      signal: AbortSignal.timeout(4000),
+    });
     if (!fnVerificacao) throw new Error();
   } catch {
     console.log('test:edge:integration  NÃO EXECUTADO — pilha fora do ar');
@@ -99,7 +104,11 @@ async function principal() {
 
   {
     const resultadoItem = await chamarFuncao('dashboard.get', {}, 'nao-e-um-jwt');
-    await esperar('token inválido é recusado', resultadoItem.status === 401, `HTTP ${resultadoItem.status}`);
+    await esperar(
+      'token inválido é recusado',
+      resultadoItem.status === 401,
+      `HTTP ${resultadoItem.status}`,
+    );
   }
 
   {
@@ -178,7 +187,11 @@ async function principal() {
       'company.provision',
       {
         idempotencyKey: `edge-provision-novo-${instante}`,
-        company: { legalName: 'Edge Novo LTDA', tradeName: `Edge Novo ${instante}`, cnpj: proximoCnpj() },
+        company: {
+          legalName: 'Edge Novo LTDA',
+          tradeName: `Edge Novo ${instante}`,
+          cnpj: proximoCnpj(),
+        },
         firstAdmin: { fullName: 'Admin Novo', email: emailNovo, password: senhaNova },
       },
       tokenProprietario,
@@ -221,7 +234,11 @@ async function principal() {
       'company.provision',
       {
         idempotencyKey: `edge-provision-conf-${instante}`,
-        company: { legalName: 'Edge Conf LTDA', tradeName: `Edge Conf ${instante}`, cnpj: proximoCnpj() },
+        company: {
+          legalName: 'Edge Conf LTDA',
+          tradeName: `Edge Conf ${instante}`,
+          cnpj: proximoCnpj(),
+        },
         firstAdmin: { fullName: 'Admin Confirmado', email: emailConfirmado, password: senhaNova },
       },
       tokenProprietario,
@@ -247,7 +264,9 @@ async function principal() {
       tokenProprietario,
     );
     if (resultadoItem.status !== 409 || resultadoItem.hint !== 'cnpj_already_exists') {
-      throw new Error(`esperado 409 cnpj_already_exists, veio ${resultadoItem.status} ${resultadoItem.hint}`);
+      throw new Error(
+        `esperado 409 cnpj_already_exists, veio ${resultadoItem.status} ${resultadoItem.hint}`,
+      );
     }
     return resultadoItem.hint;
   });
@@ -258,7 +277,11 @@ async function principal() {
       'company.provision',
       {
         idempotencyKey: `edge-provision-novo-${instante}`,
-        company: { legalName: 'Edge Novo LTDA', tradeName: `Edge Novo ${instante}`, cnpj: validoCnpjs[0] },
+        company: {
+          legalName: 'Edge Novo LTDA',
+          tradeName: `Edge Novo ${instante}`,
+          cnpj: validoCnpjs[0],
+        },
         firstAdmin: { fullName: 'Admin Novo', email: emailNovo, password: senhaNova },
       },
       tokenProprietario,
@@ -288,11 +311,18 @@ async function principal() {
     partial: true,
   });
 
-  const alvoEmpresa = codigoSql(`select id::text from public.companies where status='active' limit 1`);
+  const alvoEmpresa = codigoSql(
+    `select id::text from public.companies where status='active' limit 1`,
+  );
 
   await etapa('empresa: detalhe não expõe dados operacionais', async () => {
-    const resultadoItem = await chamarFuncao('company.get', { companyId: alvoEmpresa }, tokenProprietario);
-    if (resultadoItem.status !== 200) throw new Error(`${resultadoItem.status} ${resultadoItem.hint}`);
+    const resultadoItem = await chamarFuncao(
+      'company.get',
+      { companyId: alvoEmpresa },
+      tokenProprietario,
+    );
+    if (resultadoItem.status !== 200)
+      throw new Error(`${resultadoItem.status} ${resultadoItem.hint}`);
     const chaves = Object.keys(resultadoItem.body.data);
     const vazados = chaves.filter((chaveItem) =>
       ['vehicles', 'trips', 'fuelings', 'maintenance', 'drivers', 'costs'].includes(chaveItem),
@@ -308,7 +338,9 @@ async function principal() {
     );
   }
   console.log('');
-  console.log('  runtime: Deno real; Auth: gateway de desenvolvimento (ver FINAL_REPORT §limitações)');
+  console.log(
+    '  runtime: Deno real; Auth: gateway de desenvolvimento (ver FINAL_REPORT §limitações)',
+  );
   console.log('');
 
   if (falhou.length) {

@@ -1,0 +1,41 @@
+[
+  {
+    "placaEsperada": "ABC1D23",
+    "leitura": {
+      "plate": "ABC1D23",
+      "confidence": 0.9993260332516262,
+      "ambiguous": false,
+      "alternatives": [
+        "ABC1D23"
+      ],
+      "engineVersion": "rapidocr-onnx-1.4.4"
+    },
+    "tipoImagem": "gerada para teste; n\u00e3o \u00e9 fotografia de ve\u00edculo real"
+  },
+  {
+    "placaEsperada": "DEF1234",
+    "leitura": {
+      "plate": "DEF1234",
+      "confidence": 0.9986091000693185,
+      "ambiguous": false,
+      "alternatives": [
+        "DEF1234"
+      ],
+      "engineVersion": "rapidocr-onnx-1.4.4"
+    },
+    "tipoImagem": "gerada para teste; n\u00e3o \u00e9 fotografia de ve\u00edculo real"
+  },
+  {
+    "placaEsperada": "BRA2E19",
+    "leitura": {
+      "plate": "BRA2E19",
+      "confidence": 0.9980913911546979,
+      "ambiguous": false,
+      "alternatives": [
+        "BRA2E19"
+      ],
+      "engineVersion": "rapidocr-onnx-1.4.4"
+    },
+    "tipoImagem": "gerada para teste; n\u00e3o \u00e9 fotografia de ve\u00edculo real"
+  }
+]

@@ -5,7 +5,11 @@ export function validarAjusteOdometro(dados, { lastOdometerKm: ultimoOdometerKm 
   const km = Number(dados.odometerKm);
   if (!Number.isFinite(km) || km < 0) {
     erros.odometerKm = 'Informe a nova leitura.';
-  } else if (ultimoOdometerKm != null && km < Number(ultimoOdometerKm) && dados.nature !== 'correction') {
+  } else if (
+    ultimoOdometerKm != null &&
+    km < Number(ultimoOdometerKm) &&
+    dados.nature !== 'correction'
+  ) {
     erros.odometerKm = `Leitura menor que o topo do ledger (${ultimoOdometerKm} km).`;
   }
   if (!normalizarRotulo(dados.reason)) {

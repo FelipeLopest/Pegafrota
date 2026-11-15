@@ -53,21 +53,24 @@ export async function telaDetalhesEmpresa({
             ? botao({
                 label: 'Suspender',
                 variant: 'danger',
-                onClick: () => executarAlteracaoSituacaoEmpresa(registro, 'suspended', servicos, renderizar),
+                onClick: () =>
+                  executarAlteracaoSituacaoEmpresa(registro, 'suspended', servicos, renderizar),
               })
             : null,
           registro.status === 'suspended'
             ? botao({
                 label: 'Reativar',
                 variant: 'primary',
-                onClick: () => executarAlteracaoSituacaoEmpresa(registro, 'active', servicos, renderizar),
+                onClick: () =>
+                  executarAlteracaoSituacaoEmpresa(registro, 'active', servicos, renderizar),
               })
             : null,
           registro.status !== 'archived'
             ? botao({
                 label: 'Arquivar',
                 variant: 'danger',
-                onClick: () => executarAlteracaoSituacaoEmpresa(registro, 'archived', servicos, renderizar),
+                onClick: () =>
+                  executarAlteracaoSituacaoEmpresa(registro, 'archived', servicos, renderizar),
               })
             : botao({
                 label: 'Excluir definitivamente',
@@ -101,7 +104,9 @@ export async function telaDetalhesEmpresa({
             { label: 'Administradores', value: (registro.admins || []).length, icon: 'admin' },
             {
               label: 'Cidade / UF',
-              value: [registro.address?.city, registro.address?.state].filter(Boolean).join(' / ') || '—',
+              value:
+                [registro.address?.city, registro.address?.state].filter(Boolean).join(' / ') ||
+                '—',
               icon: 'company',
             },
             { label: 'Criada em', value: formatarDados(registro.createdAt), icon: 'audit' },
@@ -138,11 +143,14 @@ export async function telaDetalhesEmpresa({
                 }),
               ]),
               detalhe('Criada em', formatarDadosHora(registro.createdAt)),
-              registro.archivedAt ? detalhe('Arquivada em', formatarDadosHora(registro.archivedAt)) : null,
+              registro.archivedAt
+                ? detalhe('Arquivada em', formatarDadosHora(registro.archivedAt))
+                : null,
               registro.suspension
                 ? detalhe(
                     'Motivo da suspensão',
-                    ROTULO_MOTIVO_SUSPENSAO[registro.suspension.reasonCode] || registro.suspension.reasonCode,
+                    ROTULO_MOTIVO_SUSPENSAO[registro.suspension.reasonCode] ||
+                      registro.suspension.reasonCode,
                   )
                 : null,
             ]),
@@ -186,13 +194,17 @@ export async function telaDetalhesEmpresa({
                           criarElemento('td', {}, [
                             criarElemento('status-pill', {
                               status: primeiroItem.companyAccessActive ? 'active' : 'suspended',
-                              label: primeiroItem.companyAccessActive ? 'Com acesso' : 'Acesso suspenso',
+                              label: primeiroItem.companyAccessActive
+                                ? 'Com acesso'
+                                : 'Acesso suspenso',
                             }),
                           ]),
                           criarElemento('td', {}, [
                             criarElemento('status-pill', {
                               status: primeiroItem.globalAccountActive ? 'active' : 'failed',
-                              label: primeiroItem.globalAccountActive ? 'Conta ativa' : 'Conta bloqueada',
+                              label: primeiroItem.globalAccountActive
+                                ? 'Conta ativa'
+                                : 'Conta bloqueada',
                             }),
                           ]),
                           criarElemento('td', {

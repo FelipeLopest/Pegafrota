@@ -71,16 +71,25 @@ export function resumoAdministrador(itens) {
     itens
       .filter(Boolean)
       .map((item) =>
-        criarElemento('section', { class: `summary-stat${item.tone ? ` tone-${item.tone}` : ''}` }, [
-          criarElemento('div', { class: 'summary-stat-icon', 'aria-hidden': 'true' }, [
-            icone(item.icon || 'info', { size: 'sm' }),
-          ]),
-          criarElemento('div', { class: 'summary-stat-copy' }, [
-            criarElemento('span', { class: 'summary-stat-label', text: item.label }),
-            criarElemento('strong', { class: 'summary-stat-value', text: String(item.value ?? 0) }),
-            item.hint ? criarElemento('span', { class: 'summary-stat-hint', text: item.hint }) : null,
-          ]),
-        ]),
+        criarElemento(
+          'section',
+          { class: `summary-stat${item.tone ? ` tone-${item.tone}` : ''}` },
+          [
+            criarElemento('div', { class: 'summary-stat-icon', 'aria-hidden': 'true' }, [
+              icone(item.icon || 'info', { size: 'sm' }),
+            ]),
+            criarElemento('div', { class: 'summary-stat-copy' }, [
+              criarElemento('span', { class: 'summary-stat-label', text: item.label }),
+              criarElemento('strong', {
+                class: 'summary-stat-value',
+                text: String(item.value ?? 0),
+              }),
+              item.hint
+                ? criarElemento('span', { class: 'summary-stat-hint', text: item.hint })
+                : null,
+            ]),
+          ],
+        ),
       ),
   );
 }
@@ -125,8 +134,10 @@ export function tabelaMembrosEmpresa(empresa, membros, aoConcluir) {
             criarElemento('td', { text: ROTULO_PAPEL_MEMBRO[membro.role] || membro.role }),
             criarElemento('td', {}, [
               criarElemento('status-pill', {
-                status: membro.companyAccessActive && membro.globalAccountActive ? 'active' : 'suspended',
-                label: membro.companyAccessActive && membro.globalAccountActive ? 'Ativo' : 'Inativo',
+                status:
+                  membro.companyAccessActive && membro.globalAccountActive ? 'active' : 'suspended',
+                label:
+                  membro.companyAccessActive && membro.globalAccountActive ? 'Ativo' : 'Inativo',
               }),
             ]),
             criarElemento('td', {
@@ -189,16 +200,26 @@ export async function carregarComEstado(
   }
 }
 
-export function barraPaginacao({ page: pagina, pageSize: tamanhoPagina, total, onPage: aoMudarPagina }) {
+export function barraPaginacao({
+  page: pagina,
+  pageSize: tamanhoPagina,
+  total,
+  onPage: aoMudarPagina,
+}) {
   const ultimo = Math.max(1, Math.ceil(total / tamanhoPagina));
   return criarElemento('div', { class: 'pagination' }, [
     criarElemento('span', {
       class: 'pagination-info',
-      text: total === 0 ? 'Nenhum resultado' : `${total} resultado(s) — página ${pagina} de ${ultimo}`,
+      text:
+        total === 0 ? 'Nenhum resultado' : `${total} resultado(s) — página ${pagina} de ${ultimo}`,
     }),
     criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Anterior', disabled: pagina <= 1, onClick: () => aoMudarPagina(pagina - 1) }),
-      botao({ label: 'Próxima', disabled: pagina >= ultimo, onClick: () => aoMudarPagina(pagina + 1) }),
+      botao({
+        label: 'Próxima',
+        disabled: pagina >= ultimo,
+        onClick: () => aoMudarPagina(pagina + 1),
+      }),
     ]),
   ]);
 }

@@ -70,13 +70,19 @@ export function montarEstrutura({ onSignOut: aoSair }) {
       const nos = secao.items.map((item) => {
         const segundoItem = criarElemento(
           'button',
-          { class: 'nav-item', type: 'button', title: item.label, onClick: () => navegar(item.path) },
+          {
+            class: 'nav-item',
+            type: 'button',
+            title: item.label,
+            onClick: () => navegar(item.path),
+          },
           [icone(item.icon), criarElemento('span', { text: item.label })],
         );
         botoes.set(item.pattern, segundoItem);
         return segundoItem;
       });
-      if (!secao.label) return criarElemento('div', { class: 'nav-section nav-section-fixed' }, nos);
+      if (!secao.label)
+        return criarElemento('div', { class: 'nav-section nav-section-fixed' }, nos);
       const detalhes = criarElemento(
         'details',
         {
@@ -102,12 +108,16 @@ export function montarEstrutura({ onSignOut: aoSair }) {
 
   const titulo = criarElemento('h1', { class: 'topbar-title', text: 'Visão geral' });
 
-  const desconectado = criarElemento('div', { class: 'offline-banner', role: 'status', hidden: true }, [
-    icone('warning', { size: 'sm' }),
-    criarElemento('span', {
-      text: 'Conexão com o servidor indisponível. O aplicativo tentará reconectar automaticamente.',
-    }),
-  ]);
+  const desconectado = criarElemento(
+    'div',
+    { class: 'offline-banner', role: 'status', hidden: true },
+    [
+      icone('warning', { size: 'sm' }),
+      criarElemento('span', {
+        text: 'Conexão com o servidor indisponível. O aplicativo tentará reconectar automaticamente.',
+      }),
+    ],
+  );
 
   const conteudoTela = criarElemento('div', { class: 'content', id: 'conteudo', tabindex: '-1' });
 
@@ -229,7 +239,9 @@ export function montarEstrutura({ onSignOut: aoSair }) {
     localStorage.setItem('pnf.desktop.sidebar-collapsed', String(menuLateralRecolhido));
     if (!no) return;
     no.dataset.sidebar = menuLateralRecolhido ? 'collapsed' : 'expanded';
-    menuLateralAlternar.title = menuLateralRecolhido ? 'Expandir menu (Ctrl+B)' : 'Recolher menu (Ctrl+B)';
+    menuLateralAlternar.title = menuLateralRecolhido
+      ? 'Expandir menu (Ctrl+B)'
+      : 'Recolher menu (Ctrl+B)';
     menuLateralAlternar.setAttribute(
       'aria-label',
       menuLateralRecolhido ? 'Expandir menu lateral' : 'Recolher menu lateral',
@@ -270,7 +282,13 @@ export function montarEstrutura({ onSignOut: aoSair }) {
           ]),
           criarElemento(
             'button',
-            { class: 'icon-btn', type: 'button', 'aria-label': 'Sair', title: 'Sair', onClick: aoSair },
+            {
+              class: 'icon-btn',
+              type: 'button',
+              'aria-label': 'Sair',
+              title: 'Sair',
+              onClick: aoSair,
+            },
             [icone('logout', { size: 'sm' })],
           ),
         ]),
@@ -297,11 +315,13 @@ export function montarEstrutura({ onSignOut: aoSair }) {
   // Revalida ao montar a interface para limpar imediatamente qualquer estado antigo.
   void verificarConectividadeServidor();
 
-  if (window.__pnfDesktopShortcutHandler) removeEventListener('keydown', window.__pnfDesktopShortcutHandler);
+  if (window.__pnfDesktopShortcutHandler)
+    removeEventListener('keydown', window.__pnfDesktopShortcutHandler);
   window.__pnfDesktopShortcutHandler = (evento2) => {
     const etiqueta = document.activeElement?.tagName?.toLowerCase();
     const digitando =
-      ['input', 'textarea', 'select'].includes(etiqueta) || document.activeElement?.isContentEditable;
+      ['input', 'textarea', 'select'].includes(etiqueta) ||
+      document.activeElement?.isContentEditable;
     if ((evento2.ctrlKey || evento2.metaKey) && evento2.key.toLowerCase() === 'k') {
       evento2.preventDefault();
       abrirBuscaNavegacao();
@@ -334,7 +354,8 @@ export function montarEstrutura({ onSignOut: aoSair }) {
     },
     setActive: (padrao) => {
       for (const [parametroItem, segundoItem] of botoes) {
-        const ativo = parametroItem === padrao || (parametroItem !== '/' && padrao.startsWith(parametroItem));
+        const ativo =
+          parametroItem === padrao || (parametroItem !== '/' && padrao.startsWith(parametroItem));
         if (ativo) {
           segundoItem.setAttribute('aria-current', 'page');
           const secao = secaoPorPattern.get(parametroItem);

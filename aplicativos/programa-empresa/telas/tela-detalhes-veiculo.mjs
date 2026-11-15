@@ -1,3 +1,4 @@
+import { montarLinhaDoTempoVeiculo } from '../componentes/linha-do-tempo-veiculo.mjs';
 import {
   el as criarElemento,
   fmt as formatar,
@@ -22,14 +23,21 @@ import {
   detalhe,
   tabela,
   cartaoResumo,
-  linhaAtividade,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirEditorVeiculo } from '../formularios/formulario-veiculo.mjs';
 
-export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitulo, params: parametros }) {
+export function telaDetalheVeiculo({
+  outlet: conteudoTela,
+  setTitle: definirTitulo,
+  params: parametros,
+}) {
   definirTitulo('Veículo');
   const recarregar = () =>
-    telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitulo, params: parametros });
+    telaDetalheVeiculo({
+      outlet: conteudoTela,
+      setTitle: definirTitulo,
+      params: parametros,
+    });
   return tela(
     conteudoTela,
     PERMISSAO.VEHICLES_READ,
@@ -104,9 +112,44 @@ export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitu
        * errado.
        */
       const ultimaMov = (movimentacoes || [])[0];
-      const dentro = ultimaMov?.movement_type === 'entry';
-      const localAtual = ultimaMov ? nomeLocal.get(ultimaMov.location_id) || 'Local não identificado' : null;
+      const estadoPresenca =
+        presenca?.presence ||
+        (ultimaMov ? (ultimaMov.movement_type === 'entry' ? 'inside' : 'outside') : 'unknown');
+      const dentro = estadoPresenca === 'inside';
+      const localAtual =
+        presenca?.locationId || ultimaMov
+          ? nomeLocal.get(presenca?.locationId || ultimaMov?.location_id) ||
+            'Local não identificado'
+          : null;
       const acoes = [
+        ...(!veiculoItem.archived_at
+          ? [
+              botao({
+                label: 'Abastecer',
+                icon: 'fuel',
+                permission: PERMISSAO.FUELINGS_WRITE,
+                onClick: () => navegar('/abastecimentos?novo=1&veiculo=' + veiculoItem.id),
+              }),
+              botao({
+                label: 'Saída / retorno',
+                icon: 'yard',
+                permission: PERMISSAO.MOVEMENTS_WRITE,
+                onClick: () => navegar('/patio?novo=1&veiculo=' + veiculoItem.id),
+              }),
+              botao({
+                label: 'Planejar viagem',
+                icon: 'route',
+                permission: PERMISSAO.TRIPS_WRITE,
+                onClick: () => navegar('/viagens?novo=1&veiculo=' + veiculoItem.id),
+              }),
+              botao({
+                label: 'Agendar manutenção',
+                icon: 'tool',
+                permission: PERMISSAO.MAINTENANCE_SCHEDULE,
+                onClick: () => navegar('/manutencoes?novo=1&veiculo=' + veiculoItem.id),
+              }),
+            ]
+          : []),
         botao({
           label: 'Editar',
           icon: 'edit',
@@ -183,8 +226,9 @@ export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitu
               detalhe('Ano', veiculoItem.model_year),
               detalhe(
                 'Combustível',
-                TIPOS_COMBUSTIVEL_VEICULO.find((formulario) => formulario.value === veiculoItem.fuel_type)
-                  ?.label || veiculoItem.fuel_type,
+                TIPOS_COMBUSTIVEL_VEICULO.find(
+                  (formulario) => formulario.value === veiculoItem.fuel_type,
+                )?.label || veiculoItem.fuel_type,
               ),
               detalhe('Cor', veiculoItem.color),
               detalhe('Categoria', veiculoItem.category),
@@ -201,30 +245,44 @@ export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitu
               criarElemento('div', {}, [
                 criarElemento('p', { class: 'detail-label', text: 'Situação' }),
                 criarElemento('status-pill', {
-                  status: ultimaMov ? (dentro ? 'entry' : 'exit') : 'neutral',
-                  label: !ultimaMov ? 'Sem movimentação' : dentro ? 'No pátio' : 'Fora',
+                  status: estadoPresenca !== 'unknown' ? (dentro ? 'entry' : 'exit') : 'neutral',
+                  label:
+                    estadoPresenca === 'unknown'
+                      ? 'Presença não conferida'
+                      : dentro
+                        ? 'No pátio'
+                        : 'Fora',
                 }),
               ]),
               detalhe('Local', localAtual || 'Nenhuma movimentação registrada'),
-              detalhe('Desde', ultimaMov ? formatar.dateTime(ultimaMov.occurred_at) : '—'),
-              detalhe('Próxima movimentação', ultimaMov ? (dentro ? 'Saída' : 'Entrada') : 'Entrada'),
+              detalhe('Desde', formatar.dateTime(presenca?.occurredAt || ultimaMov?.occurred_at)),
+              detalhe('Próxima movimentação', dentro ? 'Saída' : 'Entrada'),
             ]),
             (movimentacoes || []).length
               ? criarElemento('div', {}, [
-                  criarElemento('p', { class: 'field-label', text: 'Últimas movimentações' }),
+                  criarElemento('p', {
+                    class: 'field-label',
+                    text: 'Últimas movimentações',
+                  }),
                   tabela(
                     ['Quando', 'Tipo', 'Local', 'Origem'],
                     movimentacoes.slice(0, 6).map((movimentacao) =>
                       criarElemento('tr', {}, [
-                        criarElemento('td', { text: formatar.dateTime(movimentacao.occurred_at) }),
+                        criarElemento('td', {
+                          text: formatar.dateTime(movimentacao.occurred_at),
+                        }),
                         criarElemento('td', {}, [
                           criarElemento('status-pill', {
                             status: movimentacao.movement_type,
                             label: movimentacao.movement_type === 'entry' ? 'Entrada' : 'Saída',
                           }),
                         ]),
-                        criarElemento('td', { text: nomeLocal.get(movimentacao.location_id) || '—' }),
-                        criarElemento('td', { text: movimentacao.source === 'ocr' ? 'Câmera' : 'Manual' }),
+                        criarElemento('td', {
+                          text: nomeLocal.get(movimentacao.location_id) || '—',
+                        }),
+                        criarElemento('td', {
+                          text: movimentacao.source === 'ocr' ? 'Câmera' : 'Manual',
+                        }),
                       ]),
                     ),
                   ),
@@ -248,16 +306,19 @@ export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitu
             (odometro?.items || []).length
               ? tabela(
                   ['Quando', 'Km', 'Origem', 'Motivo'],
-                  (odometro.items || [])
-                    .slice(0, 10)
-                    .map((evento) =>
-                      criarElemento('tr', {}, [
-                        criarElemento('td', { text: formatar.dateTime(evento.occurred_at) }),
-                        criarElemento('td', { class: 'num', text: formatar.km(evento.odometer_km) }),
-                        criarElemento('td', { text: evento.source_type || '—' }),
-                        criarElemento('td', { text: evento.reason || '—' }),
-                      ]),
-                    ),
+                  (odometro.items || []).slice(0, 10).map((evento) =>
+                    criarElemento('tr', {}, [
+                      criarElemento('td', {
+                        text: formatar.dateTime(evento.occurred_at),
+                      }),
+                      criarElemento('td', {
+                        class: 'num',
+                        text: formatar.km(evento.odometer_km),
+                      }),
+                      criarElemento('td', { text: evento.source_type || '—' }),
+                      criarElemento('td', { text: evento.reason || '—' }),
+                    ]),
+                  ),
                 )
               : estadoVazio({
                   title: 'Sem leituras',
@@ -272,43 +333,7 @@ export function telaDetalheVeiculo({ outlet: conteudoTela, setTitle: definirTitu
             }),
           ],
         }),
-        cartao({
-          title: 'Atividade recente',
-          children: [
-            tabela(
-              ['Tipo', 'Quando', 'Detalhe'],
-              [
-                ...viagens
-                  .slice(0, 3)
-                  .map((itemComparado) =>
-                    linhaAtividade(
-                      'Viagem',
-                      itemComparado.actual_departure_at || itemComparado.planned_departure_at,
-                      `${itemComparado.origin_label} → ${itemComparado.destination_label}`,
-                    ),
-                  ),
-                ...manutencao
-                  .slice(0, 3)
-                  .map((itemComparado) =>
-                    linhaAtividade('Manutenção', itemComparado.scheduled_for, itemComparado.description),
-                  ),
-                ...combustivel
-                  .slice(0, 3)
-                  .map((itemComparado) =>
-                    linhaAtividade(
-                      'Abastecimento',
-                      itemComparado.fueled_at,
-                      formatar.money(itemComparado.total_amount),
-                    ),
-                  ),
-              ]
-                .sort((primeiroItem, segundoItem) =>
-                  (segundoItem.dataset.ts || '').localeCompare(primeiroItem.dataset.ts || ''),
-                )
-                .slice(0, 8),
-            ),
-          ],
-        }),
+        montarLinhaDoTempoVeiculo(veiculoItem.id),
       ]);
     },
   );

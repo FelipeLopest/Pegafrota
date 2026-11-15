@@ -160,9 +160,16 @@ export function campo({
         : null,
     ]),
     envoltorio || controle,
-    dica ? criarElemento('p', { class: 'field-hint', id: `${identificador}-hint`, text: dica }) : null,
+    dica
+      ? criarElemento('p', { class: 'field-hint', id: `${identificador}-hint`, text: dica })
+      : null,
     erro
-      ? criarElemento('p', { class: 'field-error', id: `${identificador}-error`, role: 'alert', text: erro })
+      ? criarElemento('p', {
+          class: 'field-error',
+          id: `${identificador}-error`,
+          role: 'alert',
+          text: erro,
+        })
       : null,
   ]);
 }
@@ -282,7 +289,12 @@ export function estadoErro({
     criarElemento('h3', { class: 'error-title', text: titulo || 'Não foi possível carregar' }),
     descricao ? criarElemento('p', { class: 'error-description', text: descricao }) : null,
     aoTentarNovamente
-      ? botao({ label: 'Tentar novamente', variant: 'primary', icon: 'retry', onClick: aoTentarNovamente })
+      ? botao({
+          label: 'Tentar novamente',
+          variant: 'primary',
+          icon: 'retry',
+          onClick: aoTentarNovamente,
+        })
       : null,
     requisicaoIdentificador
       ? criarElemento('p', { class: 'error-meta' }, [
@@ -291,14 +303,20 @@ export function estadoErro({
         ])
       : null,
     dica
-      ? criarElemento('p', { class: 'error-meta' }, ['Motivo: ', criarElemento('code', { text: dica })])
+      ? criarElemento('p', { class: 'error-meta' }, [
+          'Motivo: ',
+          criarElemento('code', { text: dica }),
+        ])
       : null,
   ]);
 }
 
 let conteinerNotificacao = null;
 
-export function notificacao(mensagem, { tone: tom = 'info', duration: duracao = 5000, action: acao } = {}) {
+export function notificacao(
+  mensagem,
+  { tone: tom = 'info', duration: duracao = 5000, action: acao } = {},
+) {
   if (!conteinerNotificacao) {
     conteinerNotificacao = criarElemento('div', {
       class: 'toast-host',
@@ -309,11 +327,18 @@ export function notificacao(mensagem, { tone: tom = 'info', duration: duracao = 
     document.body.append(conteinerNotificacao);
   }
 
-  const ICONE_TONALIDADE = { success: 'check', danger: 'warning', warning: 'warning', info: 'info' };
+  const ICONE_TONALIDADE = {
+    success: 'check',
+    danger: 'warning',
+    warning: 'warning',
+    info: 'info',
+  };
   const no = criarElemento('div', { class: 'toast', dataset: { tone: tom } }, [
     icone(ICONE_TONALIDADE[tom] || 'info', { size: 'sm' }),
     criarElemento('span', { class: 'toast-message', text: mensagem }),
-    acao ? criarElemento('button', { class: 'toast-action', text: acao.label, onClick: acao.onClick }) : null,
+    acao
+      ? criarElemento('button', { class: 'toast-action', text: acao.label, onClick: acao.onClick })
+      : null,
   ]);
 
   conteinerNotificacao.append(no);

@@ -3,14 +3,23 @@ import verificarCondicao from 'node:assert/strict';
 import { readFileSync as lerArquivoSincrono } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 
 const telas = lerArquivoSincrono(new URL('../telas/exportar-telas.mjs', import.meta.url), 'utf8');
-const analise = lerArquivoSincrono(new URL('../telas/exportar-telas-analise.mjs', import.meta.url), 'utf8');
+const analise = lerArquivoSincrono(
+  new URL('../telas/exportar-telas-analise.mjs', import.meta.url),
+  'utf8',
+);
 const principal = lerArquivoSincrono(new URL('../iniciar-aplicativo.mjs', import.meta.url), 'utf8');
 const interfaceVisual = lerArquivoSincrono(
   new URL('../componentes/componentes-do-programa.mjs', import.meta.url),
   'utf8',
 );
-const estilosCss = lerArquivoSincrono(new URL('../estilos/estilo-principal.css', import.meta.url), 'utf8');
-const processoPrincipal = lerArquivoSincrono(new URL('../sistema/abrir-janela.cjs', import.meta.url), 'utf8');
+const estilosCss = lerArquivoSincrono(
+  new URL('../estilos/estilo-principal.css', import.meta.url),
+  'utf8',
+);
+const processoPrincipal = lerArquivoSincrono(
+  new URL('../sistema/abrir-janela.cjs', import.meta.url),
+  'utf8',
+);
 
 testar('listas mantêm busca, filtros, paginação e ocultação de arquivados', () => {
   verificarCondicao.match(telas, /function exploradorColecao/);

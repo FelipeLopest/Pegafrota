@@ -28,7 +28,10 @@ const codigoSql = (buscaAtual) =>
       '-c',
       buscaAtual,
     ],
-    { encoding: 'utf8', env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` } },
+    {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${process.env.PATH}:/usr/lib/postgresql/16/bin` },
+    },
   ).trim();
 
 async function autenticacao(caminho, { method: metodo = 'POST', body: corpo, token } = {}) {
@@ -54,9 +57,13 @@ async function autenticacao(caminho, { method: metodo = 'POST', body: corpo, tok
 async function buscarUsuarioIdentificadorPorEmail(email) {
   const termoBusca = email.trim().toLowerCase();
   for (let pagina = 1; pagina <= 50; pagina += 1) {
-    const { data: dados } = await autenticacao(`/admin/users?page=${pagina}&per_page=200`, { method: 'GET' });
+    const { data: dados } = await autenticacao(`/admin/users?page=${pagina}&per_page=200`, {
+      method: 'GET',
+    });
     const usuarios = dados?.users ?? [];
-    const ocorrencia = usuarios.find((usuarioItem) => usuarioItem.email?.toLowerCase() === termoBusca);
+    const ocorrencia = usuarios.find(
+      (usuarioItem) => usuarioItem.email?.toLowerCase() === termoBusca,
+    );
     if (ocorrencia) return ocorrencia;
     if (usuarios.length < 200) return null;
   }
@@ -74,7 +81,12 @@ async function emitirLinkAutenticacao({ email, identity: identidade, inviteToken
   const tipo = identidade.state === 'confirmed' ? 'recovery' : 'invite';
 
   const { status: situacao, data: dados } = await autenticacao('/admin/generate_link', {
-    body: { type: tipo, email, redirect_to: redirecionarPara, data: { invite_token: tokenConvite } },
+    body: {
+      type: tipo,
+      email,
+      redirect_to: redirecionarPara,
+      data: { invite_token: tokenConvite },
+    },
   });
 
   if (situacao !== 200) {
@@ -132,7 +144,8 @@ async function principal() {
       if (link.actionLink?.includes('access_token=')) sucesso('1_novo_link_estabelece_sessao');
       else invalido('1_novo_link_estabelece_sessao', 'action_link sem access_token');
 
-      if (link.actionLink?.includes(`token=tok-${instante}-1`)) sucesso('1_novo_link_leva_token_de_negocio');
+      if (link.actionLink?.includes(`token=tok-${instante}-1`))
+        sucesso('1_novo_link_leva_token_de_negocio');
       else invalido('1_novo_link_leva_token_de_negocio', link.actionLink?.slice(0, 90));
     }
   }
@@ -179,13 +192,18 @@ async function principal() {
     const { status: situacao, data: dados } = await autenticacao('/admin/generate_link', {
       body: { type: 'invite', email: confirmadoEmail, redirect_to: CONVITE_BASE },
     });
-    if (situacao === 422) sucesso('4_invite_em_conta_confirmada_recusado', `${situacao} ${dados?.msg}`);
+    if (situacao === 422)
+      sucesso('4_invite_em_conta_confirmada_recusado', `${situacao} ${dados?.msg}`);
     else invalido('4_invite_em_conta_confirmada_recusado', `esperado 422, veio ${situacao}`);
   }
 
   {
     const { status: situacao } = await autenticacao('/admin/generate_link', {
-      body: { type: 'recovery', email: `nao-existe-${instante}@t4.test`, redirect_to: CONVITE_BASE },
+      body: {
+        type: 'recovery',
+        email: `nao-existe-${instante}@t4.test`,
+        redirect_to: CONVITE_BASE,
+      },
     });
     if (situacao === 404) sucesso('5_recovery_sem_conta_recusado', String(situacao));
     else invalido('5_recovery_sem_conta_recusado', `esperado 404, veio ${situacao}`);
@@ -215,15 +233,27 @@ async function principal() {
       { encoding: 'utf8' },
     ).trim();
 
-    const curta = await autenticacao('/user', { method: 'PUT', body: { password: 'onzecarac' }, token });
+    const curta = await autenticacao('/user', {
+      method: 'PUT',
+      body: { password: 'onzecarac' },
+      token,
+    });
     if (curta.status === 422) sucesso('7_senha_curta_recusada_pelo_auth', curta.data?.msg);
     else invalido('7_senha_curta_recusada_pelo_auth', `veio ${curta.status}`);
 
-    const onze = await autenticacao('/user', { method: 'PUT', body: { password: 'A'.repeat(11) }, token });
+    const onze = await autenticacao('/user', {
+      method: 'PUT',
+      body: { password: 'A'.repeat(11) },
+      token,
+    });
     if (onze.status === 422) sucesso('7_onze_caracteres_recusados');
     else invalido('7_onze_caracteres_recusados', `veio ${onze.status}`);
 
-    const doze = await autenticacao('/user', { method: 'PUT', body: { password: 'SenhaDeDozeC' }, token });
+    const doze = await autenticacao('/user', {
+      method: 'PUT',
+      body: { password: 'SenhaDeDozeC' },
+      token,
+    });
     if (doze.status === 200) sucesso('7_doze_caracteres_aceitos');
     else invalido('7_doze_caracteres_aceitos', `veio ${doze.status}`);
   }
@@ -237,7 +267,8 @@ async function principal() {
     }
 
     const modoRegistro = await simularEntrega({ deliveryMode: 'log', endpoint: '' });
-    if (modoRegistro.ok) sucesso('8_modo_log_nao_envia_mas_nao_mente', 'registrado como desenvolvimento');
+    if (modoRegistro.ok)
+      sucesso('8_modo_log_nao_envia_mas_nao_mente', 'registrado como desenvolvimento');
     else invalido('8_modo_log_nao_envia_mas_nao_mente', modoRegistro.error);
 
     const relayQuebrado = await simularEntrega({

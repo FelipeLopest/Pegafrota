@@ -1,9 +1,12 @@
+import { interpretarRecuperacao } from './acesso/gerenciar-conta.mjs';
+import { renderizarRecuperacaoSenha } from './telas/tela-recuperar-senha.mjs';
 import { registrarRotas } from './navegacao/enderecos-das-telas.mjs';
 import {
   registrarComponentes,
   tema,
   el as criarElemento,
   notificacao,
+  botao,
   confirmarAcao,
 } from './componentes/componentes-do-painel.mjs';
 
@@ -86,6 +89,11 @@ export async function inicializar() {
   tema.apply();
   tema.watch();
 
+  if (interpretarRecuperacao(location.href)) {
+    renderizarRecuperacaoSenha(aplicativo);
+    return;
+  }
+
   if (new URLSearchParams(location.search).get('flow') === 'team-invite') {
     renderizarAceiteConviteEquipe(aplicativo);
     return;
@@ -101,7 +109,36 @@ export async function inicializar() {
     return;
   }
 
-  ator = await usuarioAtual().catch(() => null);
+  try {
+    ator = await usuarioAtual();
+  } catch (erro) {
+    if (erro?.status === 401) {
+      sessao.clear();
+      renderizarLogin({ onSuccess: inicializar });
+    } else {
+      aplicativo.replaceChildren(
+        criarElemento('main', { class: 'auth-page' }, [
+          criarElemento('div', { class: 'auth-card' }, [
+            criarElemento('h1', {
+              class: 'auth-title',
+              text: 'Vamos retomar sua conexão',
+            }),
+            criarElemento('p', {
+              class: 'auth-subtitle',
+              text: 'Sua sessão foi preservada. Confira a conexão e tente novamente.',
+            }),
+            botao({
+              label: 'Tentar reconectar',
+              variant: 'primary',
+              onClick: inicializar,
+            }),
+          ]),
+        ]),
+      );
+      aplicativo.removeAttribute('aria-busy');
+    }
+    return;
+  }
   if (!ator) {
     sessao.clear();
     renderizarLogin({ onSuccess: inicializar });
@@ -130,7 +167,10 @@ inicializar().catch((erro) => {
     criarElemento('div', { class: 'auth-page' }, [
       criarElemento('div', { class: 'auth-card' }, [
         criarElemento('h1', { class: 'auth-title', text: 'Falha ao iniciar' }),
-        criarElemento('p', { class: 'auth-subtitle', text: erro?.message || String(erro) }),
+        criarElemento('p', {
+          class: 'auth-subtitle',
+          text: erro?.message || String(erro),
+        }),
       ]),
     ]),
   );

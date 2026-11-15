@@ -18,7 +18,12 @@ const arquivos = listarArquivos(RAIZ, { ignorar: PASTAS_IGNORADAS }).filter((for
 const problemas = [];
 
 function adicionar(arquivo, linha, regra, mensagem) {
-  problemas.push({ file: caminhoRelativo(RAIZ, arquivo), line: linha, rule: regra, message: mensagem });
+  problemas.push({
+    file: caminhoRelativo(RAIZ, arquivo),
+    line: linha,
+    rule: regra,
+    message: mensagem,
+  });
 }
 
 for (const arquivo of arquivos) {
@@ -47,7 +52,12 @@ for (const arquivo of arquivos) {
     const candidatos = [alvo, `${alvo}.mjs`, `${alvo}.js`, juntarCaminhos(alvo, 'index.mjs')];
     if (!candidatos.some(arquivoExiste)) {
       const linha = somenteCodigo.slice(0, correspondenciaItem.index).split('\n').length;
-      adicionar(arquivo, linha, 'unresolved-import', `import relativo não resolve: ${caminhoImportado}`);
+      adicionar(
+        arquivo,
+        linha,
+        'unresolved-import',
+        `import relativo não resolve: ${caminhoImportado}`,
+      );
     }
   }
 
@@ -55,7 +65,9 @@ for (const arquivo of arquivos) {
   while ((correspondenciaItem = expressaoWebsocket.exec(somenteCodigo)) !== null) {
     const pacotePasta = buscarDiretorioPacote(arquivo);
     if (!pacotePasta) continue;
-    const pacote = JSON.parse(lerArquivoSincrono(juntarCaminhos(pacotePasta, 'package.json'), 'utf8'));
+    const pacote = JSON.parse(
+      lerArquivoSincrono(juntarCaminhos(pacotePasta, 'package.json'), 'utf8'),
+    );
     const dependencias = { ...pacote.dependencies, ...pacote.devDependencies };
     // Um subcaminho (`@peganafrota/validation/importacao`) é o mesmo pacote com
     // outro ponto de entrada: o que precisa estar declarado é o pacote.
@@ -94,7 +106,8 @@ for (const arquivo of arquivos) {
 function buscarDiretorioPacote(arquivo) {
   let diretorio = obterPastaPai(arquivo);
   while (diretorio.startsWith(RAIZ)) {
-    if (arquivoExiste(juntarCaminhos(diretorio, 'package.json')) && diretorio !== RAIZ) return diretorio;
+    if (arquivoExiste(juntarCaminhos(diretorio, 'package.json')) && diretorio !== RAIZ)
+      return diretorio;
     const pai = obterPastaPai(diretorio);
     if (pai === diretorio) break;
     diretorio = pai;

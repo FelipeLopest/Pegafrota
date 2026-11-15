@@ -1,4 +1,8 @@
-import { selecionarTodos, comCache, executarMutacao } from '../comunicacao/consultar-e-guardar-dados.mjs';
+import {
+  selecionarTodos,
+  comCache,
+  executarMutacao,
+} from '../comunicacao/consultar-e-guardar-dados.mjs';
 import { rpc as executarFuncaoBanco } from '../acesso/sessao-e-permissoes.mjs';
 export const dadosLocais = {
   list: () =>
@@ -43,20 +47,28 @@ export const dadosLocais = {
     ),
   update: (identificador, correcao) =>
     executarMutacao(
-      () => executarFuncaoBanco('update_location', { p_location_id: identificador, p_patch: correcao }),
+      () =>
+        executarFuncaoBanco('update_location', { p_location_id: identificador, p_patch: correcao }),
       'locations',
       'yard',
     ),
   setActive: (identificador, ativo) =>
     executarMutacao(
-      () => executarFuncaoBanco('set_location_active', { p_location_id: identificador, p_active: ativo }),
+      () =>
+        executarFuncaoBanco('set_location_active', {
+          p_location_id: identificador,
+          p_active: ativo,
+        }),
       'locations',
       'yard',
     ),
   archive: (identificador, motivo) =>
     executarMutacao(
       () =>
-        executarFuncaoBanco('archive_location', { p_location_id: identificador, p_reason: motivo || null }),
+        executarFuncaoBanco('archive_location', {
+          p_location_id: identificador,
+          p_reason: motivo || null,
+        }),
       'locations',
       'yard',
     ),

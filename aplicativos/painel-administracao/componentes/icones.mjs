@@ -6,14 +6,16 @@ const CAMINHOS = {
     '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   company:
     '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/>',
-  admin: '<path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/>',
+  admin:
+    '<path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/>',
   operation:
     '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/>',
   audit:
     '<path d="M5 4h9l5 5v11a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M14 4v5h5M8 13h6M8 17h4"/>',
   user: '<circle cx="12" cy="8" r="3.4"/><path d="M4.5 20a7.5 7.5 0 0115 0"/>',
 
-  panel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M13 9l3 3-3 3"/>',
+  panel:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M13 9l3 3-3 3"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>',
   filter: '<path d="M4 5h16l-6.2 7.4V19l-3.6 1.6v-8.2z"/>',
@@ -33,7 +35,8 @@ const CAMINHOS = {
   warning:
     '<path d="M12 4l8.5 15H3.5z"/><path d="M12 10v4"/><circle cx="12" cy="16.6" r=".9" fill="currentColor" stroke="none"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><circle cx="12" cy="8" r=".9" fill="currentColor" stroke="none"/>',
-  inbox: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 13H8l1.5 2.5h5L16 13h4.5"/>',
+  inbox:
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 13H8l1.5 2.5h5L16 13h4.5"/>',
   theme: '<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>',
 };
 
@@ -49,7 +52,10 @@ export function montarSpriteIcones() {
   svg.style.position = 'absolute';
   const definicoes = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   definicoes.innerHTML = Object.entries(CAMINHOS)
-    .map(([nome, dadosRegistro]) => `<symbol id="ti-${nome}" viewBox="0 0 24 24">${dadosRegistro}</symbol>`)
+    .map(
+      ([nome, dadosRegistro]) =>
+        `<symbol id="ti-${nome}" viewBox="0 0 24 24">${dadosRegistro}</symbol>`,
+    )
     .join('');
   svg.append(definicoes);
   document.body.prepend(svg);
@@ -66,7 +72,10 @@ export function icone(nome, { size: tamanho = 'md', className: classeNome = '' }
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   const usar = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  usar.setAttribute('href', `#ti-${Object.prototype.hasOwnProperty.call(CAMINHOS, nome) ? nome : 'info'}`);
+  usar.setAttribute(
+    'href',
+    `#ti-${Object.prototype.hasOwnProperty.call(CAMINHOS, nome) ? nome : 'info'}`,
+  );
   svg.append(usar);
   return svg;
 }

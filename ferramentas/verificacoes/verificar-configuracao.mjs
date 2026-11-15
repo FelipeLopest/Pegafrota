@@ -24,7 +24,7 @@ function lerAmbiente(arquivo) {
   const saida = {};
   const completo = juntarCaminhos(RAIZ, arquivo);
   if (!arquivoExiste(completo)) return saida;
-  for (const linha of lerArquivoSincrono(completo, 'utf8').split('\n')) {
+  for (const linha of lerArquivoSincrono(completo, 'utf8').split(/\r?\n/)) {
     const correspondenciaItem = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(linha);
     if (correspondenciaItem)
       saida[correspondenciaItem[1]] = correspondenciaItem[2].trim().replace(/^["']|["']$/g, '');
@@ -36,7 +36,9 @@ const ambiente = { ...lerAmbiente('.env.example'), ...lerAmbiente('.env') };
 
 const correspondenciaLista = /additional_redirect_urls\s*=\s*\[([\s\S]*?)\]/.exec(configuracao);
 const listaPermitida = correspondenciaLista
-  ? [...correspondenciaLista[1].matchAll(/"([^"]+)"/g)].map((correspondenciaItem) => correspondenciaItem[1])
+  ? [...correspondenciaLista[1].matchAll(/"([^"]+)"/g)].map(
+      (correspondenciaItem) => correspondenciaItem[1],
+    )
   : [];
 
 if (listaPermitida.length === 0) {
@@ -77,7 +79,9 @@ const fonteValidacao = lerArquivoSincrono(
   juntarCaminhos(RAIZ, 'compartilhado/validacoes/validar-senha.mjs'),
   'utf8',
 );
-const compartilhadoCorrespondencia = /export const TAMANHO_MINIMO_SENHA\s*=\s*(\d+)/.exec(fonteValidacao);
+const compartilhadoCorrespondencia = /export const TAMANHO_MINIMO_SENHA\s*=\s*(\d+)/.exec(
+  fonteValidacao,
+);
 
 if (!minimoCorrespondencia)
   invalido('auth_min_password', 'minimum_password_length não declarado no config.toml');
@@ -116,7 +120,10 @@ if (/\[functions\.platform-admin\]/.test(configuracao)) {
     invalido('edge_function_verify_jwt', 'verify_jwt não está true para platform-admin');
   }
 } else {
-  invalido('edge_function_declarada', '[functions.platform-admin] ausente — a função nunca seria implantada');
+  invalido(
+    'edge_function_declarada',
+    '[functions.platform-admin] ausente — a função nunca seria implantada',
+  );
 }
 
 const fonteServicos = lerArquivoSincrono(
@@ -154,6 +161,13 @@ for (const funcao of unicoFnReferencias) {
   const secao = configuracao.slice(inicio).split(/\n(?=\[)/)[0];
   if (/verify_jwt\s*=\s*true/.test(secao)) sucesso(`verify_jwt:${funcao}`, 'verify_jwt = true');
   else invalido(`verify_jwt:${funcao}`, 'verify_jwt precisa estar true');
+}
+
+for (const [nome, jwt] of [['camera-intake',false],['camera-maintenance',true]]) {
+  const secao = configuracao.split('[functions.'+nome+']')[1]?.split(/\n(?=\[)/)[0] || '';
+  const valor = /verify_jwt\s*=\s*(true|false)/.exec(secao)?.[1];
+  if (valor !== String(jwt)) invalido('camera_config:'+nome,'Configure a barreira JWT prevista para este endpoint.');
+  else sucesso('camera_config:'+nome,'verify_jwt = '+jwt);
 }
 
 for (const registro of verificacoes)

@@ -7,13 +7,21 @@ const PASTA_RESULTADOS = juntarCaminhos(process.cwd(), 'artifacts', 'test-result
 criarPastaSincrona(PASTA_RESULTADOS, { recursive: true });
 
 const ETAPAS = [
-  { id: 'lint', cmd: 'node ferramentas/verificacoes/analisar-codigo.mjs', label: 'Lint do monorepo' },
+  {
+    id: 'lint',
+    cmd: 'node ferramentas/verificacoes/analisar-codigo.mjs',
+    label: 'Lint do monorepo',
+  },
   {
     id: 'secrets',
     cmd: 'node ferramentas/verificacoes/verificar-segredos.mjs .',
     label: 'Scanner de segredos',
   },
-  { id: 'no-cdn', cmd: 'node ferramentas/verificacoes/verificar-recursos-locais.mjs', label: 'Zero CDN' },
+  {
+    id: 'no-cdn',
+    cmd: 'node ferramentas/verificacoes/verificar-recursos-locais.mjs',
+    label: 'Zero CDN',
+  },
   {
     id: 'prototype',
     cmd: 'node ferramentas/verificacoes/verificar-prototipos.mjs',
@@ -66,7 +74,12 @@ const ETAPAS = [
     label: 'Smoke do Desktop (Electron real)',
     skipCode: 2,
   },
-  { id: 'db', cmd: 'bash ferramentas/testes/banco-local/testar-banco.sh', label: 'pgTAP', skipCode: 2 },
+  {
+    id: 'db',
+    cmd: 'bash ferramentas/testes/banco-local/testar-banco.sh',
+    label: 'pgTAP',
+    skipCode: 2,
+  },
   {
     id: 'integration',
     cmd: 'node ferramentas/testes/testar-integracao.mjs',
@@ -147,7 +160,8 @@ for (const etapa of ETAPAS) {
       console.log(`         ${linhaItem}`);
   }
   if (situacao === 'N/E') {
-    const motivo = saidaTexto.split('\n').find((linhaItem) => linhaItem.includes('NÃO EXECUTADO')) || '';
+    const motivo =
+      saidaTexto.split('\n').find((linhaItem) => linhaItem.includes('NÃO EXECUTADO')) || '';
     console.log(`         ${motivo.trim() || 'ambiente não permite executar'}`);
   }
 }
@@ -203,7 +217,10 @@ for (const usuarioItem of ETAPAS_INDISPONIVEIS) {
 
 const resumo = {
   generatedAt: new Date().toISOString(),
-  executed: resultados.map((resultadoItem) => ({ id: resultadoItem.id, status: resultadoItem.status })),
+  executed: resultados.map((resultadoItem) => ({
+    id: resultadoItem.id,
+    status: resultadoItem.status,
+  })),
   notExecutable: ETAPAS_INDISPONIVEIS.map((usuarioItem2) => ({
     id: usuarioItem2.id,
     reason: usuarioItem2.why,

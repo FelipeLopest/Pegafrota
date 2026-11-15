@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = Object.freeze({
+  LEITOR_STATUS: 'pnf:leitor-status',
+  LEITOR_ANALISAR: 'pnf:leitor-analisar',
+  LEITOR_PARAR: 'pnf:leitor-parar',
   GET_CONFIG: 'pnf:get-config',
   GET_APP_INFO: 'pnf:get-app-info',
   SET_THEME: 'pnf:set-theme',

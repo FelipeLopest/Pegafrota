@@ -77,7 +77,10 @@ export function abrirTransferenciaAdministradorPlataforma(ator) {
     if (!confirmado.confirmed) return;
     try {
       await servicos.admins.replacePlatformAdmin(formulario.email, formulario.reason);
-      notificacao('Administração transferida. Entre com a nova conta.', { tone: 'success', duration: 7000 });
+      notificacao('Administração transferida. Entre com a nova conta.', {
+        tone: 'success',
+        duration: 7000,
+      });
       sessao.clear();
       setTimeout(() => location.reload(), 600);
     } catch (erro) {

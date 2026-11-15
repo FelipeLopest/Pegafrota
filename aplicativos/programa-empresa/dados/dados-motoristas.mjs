@@ -18,8 +18,13 @@ export const dadosMotoristas = {
       30000,
     ),
   get: async (identificador) =>
-    (await selecionar('drivers', { columns: '*', filters: { id: `eq.${identificador}` }, limit: 1 }))[0] ??
-    null,
+    (
+      await selecionar('drivers', {
+        columns: '*',
+        filters: { id: `eq.${identificador}` },
+        limit: 1,
+      })
+    )[0] ?? null,
   create: (dadosRegistro) =>
     executarMutacao(
       () =>
@@ -53,13 +58,18 @@ export const dadosMotoristas = {
     ),
   setActive: (identificador, ativo) =>
     executarMutacao(
-      () => executarFuncaoBanco('set_driver_active', { p_driver_id: identificador, p_active: ativo }),
+      () =>
+        executarFuncaoBanco('set_driver_active', { p_driver_id: identificador, p_active: ativo }),
       'drivers',
       'dashboard',
     ),
   archive: (identificador, motivo) =>
     executarMutacao(
-      () => executarFuncaoBanco('archive_driver', { p_driver_id: identificador, p_reason: motivo ?? null }),
+      () =>
+        executarFuncaoBanco('archive_driver', {
+          p_driver_id: identificador,
+          p_reason: motivo ?? null,
+        }),
       'drivers',
       'dashboard',
     ),

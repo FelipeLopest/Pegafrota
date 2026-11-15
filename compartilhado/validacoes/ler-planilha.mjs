@@ -150,7 +150,9 @@ async function lerXmlZip(arquivoZip, nome) {
 }
 
 function primeiraAba(pastaTrabalhoXml, relacoesXml) {
-  const aba = /<(?:[A-Za-z0-9_]+:)?sheet\b[^>]*\br:id="([^"]+)"[^>]*>/i.exec(pastaTrabalhoXml || '');
+  const aba = /<(?:[A-Za-z0-9_]+:)?sheet\b[^>]*\br:id="([^"]+)"[^>]*>/i.exec(
+    pastaTrabalhoXml || '',
+  );
   const relIdentificador = aba?.[1];
   if (!relIdentificador) return 'xl/worksheets/sheet1.xml';
   const relacoes = String(relacoesXml || '');
@@ -168,7 +170,8 @@ function primeiraAba(pastaTrabalhoXml, relacoesXml) {
 
 function nomePrimeiraAba(pastaTrabalhoXml) {
   return decodificarXml(
-    /<(?:[A-Za-z0-9_]+:)?sheet\b[^>]*\bname="([^"]+)"/i.exec(pastaTrabalhoXml || '')?.[1] || 'Planilha1',
+    /<(?:[A-Za-z0-9_]+:)?sheet\b[^>]*\bname="([^"]+)"/i.exec(pastaTrabalhoXml || '')?.[1] ||
+      'Planilha1',
   );
 }
 
@@ -184,7 +187,9 @@ function lerStringsCompartilhadas(documentoXml) {
 
 function valorCelula(xmlCelula, tipo, compartilhadas) {
   if (tipo === 'inlineStr') return textoTags(xmlCelula, 't');
-  const bruto = /<(?:[A-Za-z0-9_]+:)?v\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z0-9_]+:)?v>/i.exec(xmlCelula)?.[1];
+  const bruto = /<(?:[A-Za-z0-9_]+:)?v\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z0-9_]+:)?v>/i.exec(
+    xmlCelula,
+  )?.[1];
   if (bruto == null) return '';
   const valor = decodificarXml(bruto);
   if (tipo === 's') return compartilhadas[Number(valor)] ?? '';
@@ -226,7 +231,8 @@ function matrizDaAba(abaXml, compartilhadas) {
  */
 export async function lerXlsx(memoriaTemporaria) {
   if (!(memoriaTemporaria instanceof ArrayBuffer)) throw erroPlanilha('Arquivo XLSX inválido.');
-  if (memoriaTemporaria.byteLength === 0) return { cabecalho: [], linhas: [], aba: null, formato: 'xlsx' };
+  if (memoriaTemporaria.byteLength === 0)
+    return { cabecalho: [], linhas: [], aba: null, formato: 'xlsx' };
   if (memoriaTemporaria.byteLength > MAXIMO_ARQUIVO_BYTES)
     throw erroPlanilha('O arquivo XLSX excede 20 MB. Divida a importação em arquivos menores.');
 

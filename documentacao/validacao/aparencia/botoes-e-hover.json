@@ -1,0 +1,88 @@
+[
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "primary",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "secondary",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "danger",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "success",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "ghost",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "variante": "automation",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "largura": 1024,
+    "rolagemHorizontalGlobal": false
+  },
+  {
+    "aplicativo": "programa-empresa",
+    "largura": 390,
+    "rolagemHorizontalGlobal": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "variante": "primary",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "variante": "secondary",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "variante": "danger",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "variante": "success",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "variante": "ghost",
+    "brilho": false,
+    "deslocamento": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "largura": 1024,
+    "rolagemHorizontalGlobal": false
+  },
+  {
+    "aplicativo": "painel-administracao",
+    "largura": 390,
+    "rolagemHorizontalGlobal": false
+  }
+]

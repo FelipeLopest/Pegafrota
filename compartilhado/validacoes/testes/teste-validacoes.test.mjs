@@ -132,14 +132,17 @@ testar('validarEtapa1Empresa passa com dados corretos', () => {
   verificarCondicao.equal(resultadoItem.ok, true);
 });
 
-testar('validarEtapaPrimeiroAdministrador valida os dados pessoais; a senha é validada separadamente', () => {
-  const resultadoItem = validarEtapaPrimeiroAdministrador({
-    fullName: 'Ana Ribeiro',
-    email: 'ana@empresa.test',
-  });
-  verificarCondicao.equal(resultadoItem.ok, true);
-  verificarCondicao.equal('password' in resultadoItem.errors, false);
-});
+testar(
+  'validarEtapaPrimeiroAdministrador valida os dados pessoais; a senha é validada separadamente',
+  () => {
+    const resultadoItem = validarEtapaPrimeiroAdministrador({
+      fullName: 'Ana Ribeiro',
+      email: 'ana@empresa.test',
+    });
+    verificarCondicao.equal(resultadoItem.ok, true);
+    verificarCondicao.equal('password' in resultadoItem.errors, false);
+  },
+);
 
 testar('validarMovimentacao exige apenas veículo e local', () => {
   verificarCondicao.equal(validarMovimentacao({}).ok, false);
@@ -221,7 +224,10 @@ testar('validarConclusaoViagem exige km final >= km inicial', () => {
 });
 
 testar('validarAjusteOdometro exige justificativa', () => {
-  const resultadoItem = validarAjusteOdometro({ odometerKm: 5000, reason: '   ' }, { lastOdometerKm: 4000 });
+  const resultadoItem = validarAjusteOdometro(
+    { odometerKm: 5000, reason: '   ' },
+    { lastOdometerKm: 4000 },
+  );
   verificarCondicao.equal(resultadoItem.ok, false);
   verificarCondicao.ok(resultadoItem.errors.reason);
 });

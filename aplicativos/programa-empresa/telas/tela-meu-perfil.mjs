@@ -1,3 +1,5 @@
+import { abrirTrocaSenha } from '../formularios/formulario-senha.mjs';
+import { PAGINA_VERSOES } from '../acesso/gerenciar-conta.mjs';
 import {
   el as criarElemento,
   botao,
@@ -40,7 +42,11 @@ export function telaPerfil({ outlet: conteudoTela, setTitle: definirTitulo, them
         subtitle: 'Sua conta e como o seu cargo se traduz no dia a dia.',
       }),
       faixaResumo([
-        { label: 'Empresa', value: contexto.companyName || '—', icon: 'building' },
+        {
+          label: 'Empresa',
+          value: contexto.companyName || '—',
+          icon: 'building',
+        },
         { label: 'Cargo', value: papel, icon: 'shield', tone: 'info' },
         { label: 'Sessão', value: 'Ativa', icon: 'check', tone: 'success' },
       ]),
@@ -59,9 +65,38 @@ export function telaPerfil({ outlet: conteudoTela, setTitle: definirTitulo, them
         ],
       }),
       cartao({
+        title: 'Segurança',
+        children: [
+          criarElemento('p', {
+            class: 'muted',
+            text: 'Defina sua senha pessoal. Ela vale em todos os seus acessos à plataforma.',
+          }),
+          botao({ label: 'Alterar minha senha', onClick: abrirTrocaSenha }),
+        ],
+      }),
+      cartao({
+        title: 'Aplicativo',
+        children: [
+          criarElemento('p', {
+            class: 'muted',
+            text: 'As versões publicadas incluem o instalador e as notas de atualização.',
+          }),
+          criarElemento('a', {
+            class: 'btn btn-secondary',
+            href: PAGINA_VERSOES,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            text: 'Consultar versões do aplicativo',
+          }),
+        ],
+      }),
+      cartao({
         title: 'Aparência',
         children: [
-          criarElemento('p', { class: 'muted', text: 'Escolha o tema usado neste computador.' }),
+          criarElemento('p', {
+            class: 'muted',
+            text: 'Escolha o tema usado neste computador.',
+          }),
           criarElemento(
             'div',
             { class: 'modal-actions' },

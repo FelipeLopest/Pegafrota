@@ -9,7 +9,14 @@ import {
 import { dados } from '../dados/dados-do-programa.mjs';
 
 export function abrirConviteUsuario(aoConcluir) {
-  const formulario = { email: '', fullName: '', phone: '', role: 'viewer', mode: 'invite', password: '' };
+  const formulario = {
+    email: '',
+    fullName: '',
+    phone: '',
+    role: 'viewer',
+    mode: 'invite',
+    password: '',
+  };
   let correspondenciaItem;
   const conteinerCorpo = criarElemento('div', {});
   const rodapeConteiner = criarElemento('div', { class: 'modal-actions' });
@@ -20,7 +27,9 @@ export function abrirConviteUsuario(aoConcluir) {
       return;
     }
     if (formulario.mode === 'create' && formulario.password.length < 12) {
-      notificacao('A senha temporária precisa ter pelo menos 12 caracteres.', { tone: 'warning' });
+      notificacao('A senha temporária precisa ter pelo menos 12 caracteres.', {
+        tone: 'warning',
+      });
       return;
     }
     try {
@@ -28,16 +37,16 @@ export function abrirConviteUsuario(aoConcluir) {
       if (formulario.mode === 'create') resultado = await dados.users.create(formulario);
       else resultado = await dados.users.invite(formulario);
       correspondenciaItem.close();
-      if (formulario.mode === 'create') {
-        notificacao('Acesso criado. A pessoa já pode entrar com a senha temporária.', {
-          tone: 'success',
-          duration: 7000,
-        });
-      } else if (resultado?.authUserExisted) {
-        notificacao('Acesso vinculado. Esta pessoa já possuía uma conta e continua usando a senha atual.', {
-          tone: 'success',
-          duration: 8000,
-        });
+      if (resultado?.authUserExisted) {
+        notificacao(
+          'Acesso vinculado. Esta pessoa já possuía uma conta e continua usando a senha atual. Ela pode recuperar a senha pela tela de entrada.',
+          { tone: 'success', duration: 9000 },
+        );
+      } else if (formulario.mode === 'create') {
+        notificacao(
+          'Acesso criado. A pessoa pode entrar com a senha inicial e alterá-la em Meu perfil → Alterar minha senha.',
+          { tone: 'success', duration: 9000 },
+        );
       } else if (resultado?.inviteSent) {
         notificacao(
           'Convite enviado. A pessoa define a senha pelo link e depois entra no PegaNaFrota Desktop.',
@@ -109,7 +118,11 @@ export function abrirConviteUsuario(aoConcluir) {
             ['operator', 'Operador'],
             ['viewer', 'Visualizador'],
           ].map(([valor, rotulo]) =>
-            criarElemento('option', { value: valor, text: rotulo, selected: valor === formulario.role }),
+            criarElemento('option', {
+              value: valor,
+              text: rotulo,
+              selected: valor === formulario.role,
+            }),
           ),
         ),
       }),
@@ -145,7 +158,7 @@ export function abrirConviteUsuario(aoConcluir) {
             id: 'iu-password',
             label: 'Senha temporária',
             required: true,
-            hint: 'Mínimo de 12 caracteres. Entregue a senha por um canal seguro e peça a troca no primeiro contato.',
+            hint: 'Mínimo de 12 caracteres. Entregue a senha por um canal seguro e peça a troca em Meu perfil → Alterar minha senha.',
             control: criarElemento('input', {
               class: 'input',
               type: 'password',

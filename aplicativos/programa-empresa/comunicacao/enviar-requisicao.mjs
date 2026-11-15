@@ -38,7 +38,8 @@ export async function requisitar(
   };
   if (autenticacao) {
     const token = sessao.accessToken;
-    if (!token) throw new ErroBackend({ hint: 'UNAUTHENTICATED', status: 401, message: 'Sessão expirada.' });
+    if (!token)
+      throw new ErroBackend({ hint: 'UNAUTHENTICATED', status: 401, message: 'Sessão expirada.' });
     cabecalhos2.Authorization = `Bearer ${token}`;
   }
 
@@ -50,7 +51,11 @@ export async function requisitar(
       body: corpo === undefined ? undefined : JSON.stringify(corpo),
     });
   } catch {
-    throw new ErroBackend({ hint: 'NETWORK_ERROR', status: 0, message: 'Sem conexão com o servidor.' });
+    throw new ErroBackend({
+      hint: 'NETWORK_ERROR',
+      status: 0,
+      message: 'Sem conexão com o servidor.',
+    });
   }
 
   if (resposta.status === 401 && autenticacao) {
@@ -96,7 +101,9 @@ export async function requisitar(
     });
   }
 
-  return respostaBruta ? { data: dados, headers: resposta.headers, status: resposta.status } : dados;
+  return respostaBruta
+    ? { data: dados, headers: resposta.headers, status: resposta.status }
+    : dados;
 }
 
 export function executarFuncaoBanco(nome, argumentos = {}) {

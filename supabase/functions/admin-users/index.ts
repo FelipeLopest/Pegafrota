@@ -4,7 +4,8 @@ import { tratarRequisicao } from './gerenciar-equipe.ts';
 const ENDERECO_SUPABASE = Deno.env.get('SUPABASE_URL')!;
 const CHAVE_PUBLICA = Deno.env.get('SUPABASE_ANON_KEY')!;
 const CHAVE_PRIVILEGIADA_SERVIDOR = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const ENDERECO_BASE_CONVITE = Deno.env.get('TEAM_INVITE_BASE_URL') ?? Deno.env.get('INVITE_BASE_URL') ?? '';
+const ENDERECO_BASE_CONVITE =
+  Deno.env.get('TEAM_INVITE_BASE_URL') ?? Deno.env.get('INVITE_BASE_URL') ?? '';
 const DESTINO_CONVITE_EQUIPE = ENDERECO_BASE_CONVITE
   ? `${ENDERECO_BASE_CONVITE.replace(/\/$/, '')}/?flow=team-invite`
   : '';

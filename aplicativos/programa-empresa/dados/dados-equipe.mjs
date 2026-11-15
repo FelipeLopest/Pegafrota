@@ -5,7 +5,8 @@ import {
 } from '../comunicacao/consultar-e-guardar-dados.mjs';
 
 export const dadosEquipe = {
-  list: () => comCache('users', () => chamarFuncaoDoServidor('admin-users', { action: 'list' }), 10000),
+  list: () =>
+    comCache('users', () => chamarFuncaoDoServidor('admin-users', { action: 'list' }), 10000),
   invite: (dadosEnvio) =>
     executarMutacao(
       () => chamarFuncaoDoServidor('admin-users', { action: 'invite', ...dadosEnvio }),
@@ -20,13 +21,21 @@ export const dadosEquipe = {
     ),
   deactivate: (usuarioIdentificador) =>
     executarMutacao(
-      () => chamarFuncaoDoServidor('admin-users', { action: 'deactivate', userId: usuarioIdentificador }),
+      () =>
+        chamarFuncaoDoServidor('admin-users', {
+          action: 'deactivate',
+          userId: usuarioIdentificador,
+        }),
       'users',
       'company:members',
     ),
   reactivate: (usuarioIdentificador) =>
     executarMutacao(
-      () => chamarFuncaoDoServidor('admin-users', { action: 'reactivate', userId: usuarioIdentificador }),
+      () =>
+        chamarFuncaoDoServidor('admin-users', {
+          action: 'reactivate',
+          userId: usuarioIdentificador,
+        }),
       'users',
       'company:members',
     ),

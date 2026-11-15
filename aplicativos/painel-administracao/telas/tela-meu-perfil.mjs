@@ -1,3 +1,5 @@
+import { abrirTrocaSenha } from '../formularios/formulario-senha.mjs';
+import { PAGINA_VERSOES } from '../acesso/gerenciar-conta.mjs';
 import { el as criarElemento, botao, notificacao } from '../componentes/componentes-do-painel.mjs';
 
 import { cabecalhoPagina, secao, detalhe } from '../componentes/listas-resumos-e-detalhes.mjs';
@@ -27,7 +29,21 @@ export async function telaPerfil({
           text: 'Este perfil é global e não pertence a nenhuma empresa cliente.',
         }),
       ]),
+      secao('Aplicativo Windows', [
+        criarElemento('p', {
+          class: 'muted',
+          text: 'Consulte as versões publicadas e as notas de atualização do aplicativo das empresas.',
+        }),
+        criarElemento('a', {
+          class: 'btn btn-secondary',
+          href: PAGINA_VERSOES,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          text: 'Consultar versões do aplicativo',
+        }),
+      ]),
       secao('Segurança', [
+        botao({ label: 'Alterar minha senha', onClick: abrirTrocaSenha }),
         criarElemento('p', {
           class: 'muted',
           text: 'O acesso usa e-mail e senha. Ações críticas exigem confirmação explícita e são auditadas no servidor.',

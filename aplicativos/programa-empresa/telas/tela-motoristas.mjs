@@ -28,7 +28,7 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
   return tela(
     conteudoTela,
     PERMISSAO.DRIVERS_READ,
-    () => dados.drivers.list(),
+    () => dados.drivers.page(),
     (motoristas) => {
       const cabecalho = cabecalhoPagina({
         title: 'Motoristas',
@@ -52,7 +52,9 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
         ],
       });
       const categorias = [
-        ...new Set(motoristas.map((dadosRegistro) => dadosRegistro.license_category).filter(Boolean)),
+        ...new Set(
+          motoristas.map((dadosRegistro) => dadosRegistro.license_category).filter(Boolean),
+        ),
       ].sort();
       const explorador = exploradorColecao(motoristas, {
         key: 'drivers',
@@ -96,7 +98,8 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
               if (!veiculoItem) return true;
               if (!dadosRegistro.license_expires_on) return veiculoItem === 'unknown';
               const delta =
-                (new Date(`${dadosRegistro.license_expires_on}T23:59:59`).getTime() - Date.now()) / 86400000;
+                (new Date(`${dadosRegistro.license_expires_on}T23:59:59`).getTime() - Date.now()) /
+                86400000;
               return veiculoItem === 'expired'
                 ? delta < 0
                 : veiculoItem === '30d'
@@ -109,7 +112,13 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
           {
             key: 'category',
             label: 'Categoria CNH',
-            options: [['', 'Todas'], ...categorias.map((registro) => [registro, registro])],
+            options: [
+              ['', 'Todas'],
+              ...(motoristas.paginaRemota?.facetas?.categories || categorias).map((registro) => [
+                registro,
+                registro,
+              ]),
+            ],
             get: (dadosRegistro) => dadosRegistro.license_category,
           },
         ],
@@ -144,7 +153,11 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
                     label: 'Editar',
                     variant: 'ghost',
                     permission: PERMISSAO.DRIVERS_WRITE,
-                    onClick: () => abrirEditorMotorista({ driver: dadosRegistro, onDone: recarregar }),
+                    onClick: () =>
+                      abrirEditorMotorista({
+                        driver: dadosRegistro,
+                        onDone: recarregar,
+                      }),
                   }),
                   dadosRegistro.archived_at
                     ? botao({
@@ -165,7 +178,9 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
                             await dados.drivers.setActive(dadosRegistro.id, !dadosRegistro.active);
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       }),
@@ -185,10 +200,14 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
                           if (!motivo) return;
                           try {
                             await dados.drivers.archive(dadosRegistro.id, motivo);
-                            notificacao('Motorista arquivado.', { tone: 'success' });
+                            notificacao('Motorista arquivado.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       })
@@ -202,41 +221,45 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
       const expiraEmBreve = contarOnde(motoristas, (dadosRegistro) => {
         if (!dadosRegistro.license_expires_on || dadosRegistro.archived_at) return false;
         const dias =
-          (new Date(`${dadosRegistro.license_expires_on}T23:59:59`).getTime() - Date.now()) / 86400000;
+          (new Date(`${dadosRegistro.license_expires_on}T23:59:59`).getTime() - Date.now()) /
+          86400000;
         return dias >= 0 && dias <= 30;
       });
-      const estatisticas = faixaResumo([
-        {
-          label: 'Ativos',
-          value: contarOnde(
-            motoristas,
-            (dadosRegistro) => dadosRegistro.active && !dadosRegistro.archived_at,
-          ),
-          icon: 'check',
-          tone: 'success',
-        },
-        {
-          label: 'Inativos',
-          value: contarOnde(
-            motoristas,
-            (dadosRegistro) => !dadosRegistro.active && !dadosRegistro.archived_at,
-          ),
-          icon: 'ban',
-          tone: 'muted',
-        },
-        {
-          label: 'CNH até 30 dias',
-          value: expiraEmBreve,
-          icon: 'warning',
-          tone: expiraEmBreve ? 'warning' : 'success',
-        },
-        {
-          label: 'Arquivados',
-          value: contarOnde(motoristas, (dadosRegistro) => !!dadosRegistro.archived_at),
-          icon: 'archive',
-          tone: 'muted',
-        },
-      ]);
+      const estatisticas = faixaResumo(
+        [
+          {
+            label: 'Ativos',
+            value: contarOnde(
+              motoristas,
+              (dadosRegistro) => dadosRegistro.active && !dadosRegistro.archived_at,
+            ),
+            icon: 'check',
+            tone: 'success',
+          },
+          {
+            label: 'Inativos',
+            value: contarOnde(
+              motoristas,
+              (dadosRegistro) => !dadosRegistro.active && !dadosRegistro.archived_at,
+            ),
+            icon: 'ban',
+            tone: 'muted',
+          },
+          {
+            label: 'CNH até 30 dias',
+            value: expiraEmBreve,
+            icon: 'warning',
+            tone: expiraEmBreve ? 'warning' : 'success',
+          },
+          {
+            label: 'Arquivados',
+            value: contarOnde(motoristas, (dadosRegistro) => !!dadosRegistro.archived_at),
+            icon: 'archive',
+            tone: 'muted',
+          },
+        ],
+        { colecao: motoristas },
+      );
       return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
     },
   );

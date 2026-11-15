@@ -40,10 +40,12 @@ export async function sondarSaude(enderecoBase, chaveAnonima) {
     return resposta.ok;
   } catch {
     const agora = Date.now();
-    if (!ultimaFalhaConfirmadaEm || agora - ultimaFalhaConfirmadaEm > 15000) falhasSaudeConsecutivas = 0;
+    if (!ultimaFalhaConfirmadaEm || agora - ultimaFalhaConfirmadaEm > 15000)
+      falhasSaudeConsecutivas = 0;
     ultimaFalhaConfirmadaEm = agora;
     falhasSaudeConsecutivas += 1;
-    if (falhasSaudeConsecutivas >= 2 && servidorDisponivel !== false) emitirConectividadeServidor(false);
+    if (falhasSaudeConsecutivas >= 2 && servidorDisponivel !== false)
+      emitirConectividadeServidor(false);
     return false;
   } finally {
     clearTimeout(temporizador);

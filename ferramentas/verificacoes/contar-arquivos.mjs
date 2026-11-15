@@ -58,12 +58,18 @@ const contagens = {
   capturasComparacao: quantidade('artifacts/screenshots/design-comparison', /\.png$/),
 
   telasDesktop: (() => {
-    const formulario = juntarCaminhos(RAIZ, 'aplicativos/programa-empresa/navegacao/enderecos-das-telas.mjs');
+    const formulario = juntarCaminhos(
+      RAIZ,
+      'aplicativos/programa-empresa/navegacao/enderecos-das-telas.mjs',
+    );
     if (!arquivoExiste(formulario)) return 0;
     return (lerArquivoSincrono(formulario, 'utf8').match(/^\s*rota\(/gm) || []).length;
   })(),
   telasAdmin: (() => {
-    const formulario = juntarCaminhos(RAIZ, 'aplicativos/painel-administracao/iniciar-aplicativo.mjs');
+    const formulario = juntarCaminhos(
+      RAIZ,
+      'aplicativos/painel-administracao/iniciar-aplicativo.mjs',
+    );
     if (!arquivoExiste(formulario)) return 0;
     return (lerArquivoSincrono(formulario, 'utf8').match(/^\s*rota\(/gm) || []).length;
   })(),
@@ -85,7 +91,10 @@ if (arquivoExiste(visual)) {
   ).length;
 }
 
-gravarArquivoSincrono(juntarCaminhos(PASTA_RESULTADOS, 'counts.json'), JSON.stringify(contagens, null, 2));
+gravarArquivoSincrono(
+  juntarCaminhos(PASTA_RESULTADOS, 'counts.json'),
+  JSON.stringify(contagens, null, 2),
+);
 
 const rotulo = (chaveItem) => chaveItem.replace(/([A-Z])/g, ' $1').toLowerCase();
 console.log('Contagens geradas do repositório\n');

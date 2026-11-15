@@ -1,3 +1,4 @@
+import { criarAssistenteCep, FUSOS_HORARIOS } from '../dados/consultar-cep.mjs';
 import {
   el as criarElemento,
   campo,
@@ -24,6 +25,18 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
     notes: local?.notes || '',
   };
   let correspondenciaItem;
+  const avisoCep = criarElemento('p', { class: 'muted', role: 'status' });
+  const idsEndereco = {
+    addressStreet: 'st',
+    addressDistrict: 'dist',
+    addressCity: 'city',
+    addressState: 'state',
+  };
+  const cep = criarAssistenteCep({
+    estado: formulario,
+    localizar: (chave) => corpo.querySelector('#loc-' + idsEndereco[chave]),
+    avisar: (mensagem) => (avisoCep.textContent = mensagem),
+  });
   const corpo = criarElemento('div', {}, [
     campo({
       id: 'loc-n',
@@ -42,7 +55,10 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
         control: criarElemento('input', {
           class: 'input',
           value: formulario.addressStreet,
-          onInput: (evento) => (formulario.addressStreet = evento.target.value),
+          onInput: (evento) => {
+            formulario.addressStreet = evento.target.value;
+            cep.editar('addressStreet');
+          },
         }),
       }),
       campo({
@@ -61,7 +77,10 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
       control: criarElemento('input', {
         class: 'input',
         value: formulario.addressDistrict,
-        onInput: (evento) => (formulario.addressDistrict = evento.target.value),
+        onInput: (evento) => {
+          formulario.addressDistrict = evento.target.value;
+          cep.editar('addressDistrict');
+        },
       }),
     }),
     criarElemento('div', { class: 'form-row' }, [
@@ -71,7 +90,10 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
         control: criarElemento('input', {
           class: 'input',
           value: formulario.addressCity,
-          onInput: (evento) => (formulario.addressCity = evento.target.value),
+          onInput: (evento) => {
+            formulario.addressCity = evento.target.value;
+            cep.editar('addressCity');
+          },
         }),
       }),
       campo({
@@ -81,7 +103,10 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
           class: 'input',
           maxlength: '2',
           value: formulario.addressState,
-          onInput: (evento) => (formulario.addressState = evento.target.value.toUpperCase()),
+          onInput: (evento) => {
+            formulario.addressState = evento.target.value.toUpperCase();
+            cep.editar('addressState');
+          },
         }),
       }),
     ]),
@@ -91,25 +116,52 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
       control: criarElemento('input', {
         class: 'input',
         value: formulario.addressPostalCode,
-        onInput: (evento) => (formulario.addressPostalCode = evento.target.value.replace(/\D/g, '')),
+        onInput: (evento) =>
+          (formulario.addressPostalCode = evento.target.value.replace(/\D/g, '')),
       }),
     }),
+    criarElemento('div', { class: 'toolbar' }, [
+      botao({
+        label: 'Consultar CEP',
+        icon: 'search',
+        onClick: () => cep.consultar(),
+      }),
+      avisoCep,
+    ]),
     campo({
       id: 'loc-tz',
       label: 'Fuso horário',
       hint: 'Usado para datas locais deste ponto. Ex.: America/Sao_Paulo.',
-      control: criarElemento('input', {
-        class: 'input',
-        value: formulario.timezone,
-        onInput: (evento) => (formulario.timezone = evento.target.value),
-      }),
+      control: criarElemento(
+        'select',
+        {
+          class: 'select',
+          onChange: (evento) => (formulario.timezone = evento.target.value),
+        },
+        [
+          ...FUSOS_HORARIOS,
+          ...(!FUSOS_HORARIOS.some(([id]) => id === formulario.timezone)
+            ? [[formulario.timezone, formulario.timezone]]
+            : []),
+        ].map(([id, rotulo]) =>
+          criarElemento('option', {
+            value: id,
+            text: rotulo,
+            selected: formulario.timezone === id,
+          }),
+        ),
+      ),
     }),
     campo({
       id: 'loc-notes',
       label: 'Observações',
       control: criarElemento(
         'textarea',
-        { class: 'textarea', rows: '2', onInput: (evento) => (formulario.notes = evento.target.value) },
+        {
+          class: 'textarea',
+          rows: '2',
+          onInput: (evento) => (formulario.notes = evento.target.value),
+        },
         [formulario.notes],
       ),
     }),

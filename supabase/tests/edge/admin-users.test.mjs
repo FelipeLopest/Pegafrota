@@ -98,7 +98,10 @@ function criarAdministradorCliente({
         listUsers: async ({ page: pagina, perPage: porPagina }) => {
           historicoOperacoes.push({ listUsers: { page: pagina, perPage: porPagina } });
           const inicio = (pagina - 1) * porPagina;
-          return { data: { users: usuariosAutenticacao.slice(inicio, inicio + porPagina) }, error: null };
+          return {
+            data: { users: usuariosAutenticacao.slice(inicio, inicio + porPagina) },
+            error: null,
+          };
         },
         createUser: async (dadosEnvio) => {
           historicoOperacoes.push({ createUser: dadosEnvio.email });
@@ -126,7 +129,11 @@ const CONTEXTO_ADMINISTRADOR = {
   permissions: ['users.manage', 'users.read'],
 };
 
-const CONTEXTO_GESTOR = { ...CONTEXTO_ADMINISTRADOR, role: 'fleet_manager', permissions: ['users.read'] };
+const CONTEXTO_GESTOR = {
+  ...CONTEXTO_ADMINISTRADOR,
+  role: 'fleet_manager',
+  permissions: ['users.read'],
+};
 const CONTEXTO_VISUALIZADOR = { ...CONTEXTO_ADMINISTRADOR, role: 'viewer', permissions: [] };
 
 function requisitar(
@@ -221,7 +228,10 @@ async function principal() {
   {
     const resposta = await tratarRequisicao(
       requisitar({ action: 'list' }),
-      dependencias(criarUsuarioCliente({ context: CONTEXTO_VISUALIZADOR }), criarAdministradorCliente()),
+      dependencias(
+        criarUsuarioCliente({ context: CONTEXTO_VISUALIZADOR }),
+        criarAdministradorCliente(),
+      ),
     );
     const dadosEnvio = await resposta.json();
     verificar(
@@ -260,7 +270,9 @@ async function principal() {
     const resposta = await tratarRequisicao(
       requisitar({ action: 'list' }),
       dependencias(
-        criarUsuarioCliente({ context: { authenticated: true, sessionState: 'NO_ACTIVE_MEMBERSHIP' } }),
+        criarUsuarioCliente({
+          context: { authenticated: true, sessionState: 'NO_ACTIVE_MEMBERSHIP' },
+        }),
         criarAdministradorCliente(),
       ),
     );
@@ -274,7 +286,10 @@ async function principal() {
   {
     const resposta = await tratarRequisicao(
       requisitar({ action: 'list' }, { auth: null }),
-      dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), criarAdministradorCliente()),
+      dependencias(
+        criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }),
+        criarAdministradorCliente(),
+      ),
     );
     verificar('DB-AUD-001 requisição sem token recebe 401', resposta.status === 401);
   }
@@ -283,7 +298,10 @@ async function principal() {
   // Schema do request
   // ---------------------------------------------------------------------------
   {
-    verificar('schema recusa ação desconhecida', 'error' in interpretarCorpo({ action: 'drop_database' }));
+    verificar(
+      'schema recusa ação desconhecida',
+      'error' in interpretarCorpo({ action: 'drop_database' }),
+    );
     verificar(
       'schema recusa e-mail inválido',
       'error' in
@@ -434,7 +452,9 @@ async function principal() {
       !administrador.journal.some((evento) => evento.createUser) && resposta.status === 200,
       `status ${resposta.status}`,
     );
-    const cadastroEmpresa = administrador.journal.find((evento) => evento.rpc === 'admin_provision_member');
+    const cadastroEmpresa = administrador.journal.find(
+      (evento) => evento.rpc === 'admin_provision_member',
+    );
     verificar(
       'DB-AUD-016 provisionamento recebe o UUID da conta encontrada',
       cadastroEmpresa?.params?.p_user_id === 'user-430',
@@ -459,7 +479,8 @@ async function principal() {
     );
     verificar(
       'DB-AUD2-003 provisionamento usa uma única RPC transacional',
-      administrador.journal.filter((evento) => evento.rpc === 'admin_provision_member').length === 1,
+      administrador.journal.filter((evento) => evento.rpc === 'admin_provision_member').length ===
+        1,
     );
     verificar(
       'DB-AUD2-003 a Edge Function não escreve mais em profiles nem memberships',
@@ -558,7 +579,10 @@ async function principal() {
       'CANNOT_DEACTIVATE_SELF vira 409',
       mapearErroBanco({ hint: 'CANNOT_DEACTIVATE_SELF' })?.status === 409,
     );
-    verificar('PERMISSION_DENIED vira 403', mapearErroBanco({ hint: 'PERMISSION_DENIED' })?.status === 403);
+    verificar(
+      'PERMISSION_DENIED vira 403',
+      mapearErroBanco({ hint: 'PERMISSION_DENIED' })?.status === 403,
+    );
     verificar(
       'erro sem contrato conhecido não é traduzido',
       mapearErroBanco({ message: 'algo inesperado' }) === null,
@@ -616,10 +640,22 @@ async function principal() {
     const quartoFiltro = await impressaoDigitalAcao(EMPRESA, { ...base, action: 'deactivate' });
     const quintoFiltro = await impressaoDigitalAcao('99999999-9999-4999-8999-999999999999', base);
 
-    verificar('DB-AUD2-005 mesmo payload gera a mesma impressão digital', primeiroFiltro === segundoFiltro);
-    verificar('DB-AUD2-005 payload diferente gera impressão diferente', primeiroFiltro !== terceiroFiltro);
-    verificar('DB-AUD2-005 ação diferente gera impressão diferente', primeiroFiltro !== quartoFiltro);
-    verificar('DB-AUD2-005 empresa diferente gera impressão diferente', primeiroFiltro !== quintoFiltro);
+    verificar(
+      'DB-AUD2-005 mesmo payload gera a mesma impressão digital',
+      primeiroFiltro === segundoFiltro,
+    );
+    verificar(
+      'DB-AUD2-005 payload diferente gera impressão diferente',
+      primeiroFiltro !== terceiroFiltro,
+    );
+    verificar(
+      'DB-AUD2-005 ação diferente gera impressão diferente',
+      primeiroFiltro !== quartoFiltro,
+    );
+    verificar(
+      'DB-AUD2-005 empresa diferente gera impressão diferente',
+      primeiroFiltro !== quintoFiltro,
+    );
 
     const comSenha = await impressaoDigitalAcao(EMPRESA, {
       action: 'create',
@@ -650,10 +686,13 @@ async function principal() {
       dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), administrador),
     );
     const buscar = administrador.journal.find((evento) => evento.rpc === 'admin_find_action');
-    const alterarRegistro = administrador.journal.find((evento) => evento.rpc === 'admin_change_member_role');
+    const alterarRegistro = administrador.journal.find(
+      (evento) => evento.rpc === 'admin_change_member_role',
+    );
     verificar(
       'DB-AUD2-005 a consulta de idempotência envia a impressão digital',
-      typeof buscar?.params?.p_fingerprint === 'string' && buscar.params.p_fingerprint.length === 64,
+      typeof buscar?.params?.p_fingerprint === 'string' &&
+        buscar.params.p_fingerprint.length === 64,
     );
     verificar(
       'DB-AUD2-005 a gravação envia a MESMA impressão digital',
@@ -666,7 +705,11 @@ async function principal() {
       findError: { message: 'IDEMPOTENCY_KEY_REUSED', hint: 'IDEMPOTENCY_KEY_REUSED' },
     });
     const resposta = await tratarRequisicao(
-      requisitar({ action: 'deactivate', userId: IDENTIFICADOR_ALVO, idempotencyKey: 'chave-de-teste-0001' }),
+      requisitar({
+        action: 'deactivate',
+        userId: IDENTIFICADOR_ALVO,
+        idempotencyKey: 'chave-de-teste-0001',
+      }),
       dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), administrador),
     );
     const dadosEnvio = await resposta.json();
@@ -728,7 +771,10 @@ async function principal() {
   {
     const resposta = await tratarRequisicao(
       requisitar({ action: 'list' }, { origin: 'https://site-malicioso.example' }),
-      dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), criarAdministradorCliente()),
+      dependencias(
+        criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }),
+        criarAdministradorCliente(),
+      ),
     );
     const dadosEnvio = await resposta.json();
     verificar(
@@ -740,7 +786,10 @@ async function principal() {
   {
     const resposta = await tratarRequisicao(
       requisitar(null, { method: 'OPTIONS' }),
-      dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), criarAdministradorCliente()),
+      dependencias(
+        criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }),
+        criarAdministradorCliente(),
+      ),
     );
     verificar('DB-AUD-017 preflight de origem permitida responde 204', resposta.status === 204);
   }

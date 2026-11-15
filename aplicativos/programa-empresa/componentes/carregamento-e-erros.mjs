@@ -49,10 +49,18 @@ export function estadoErro({
     criarElemento('h3', { class: 'error-title', text: titulo || 'Não foi possível carregar' }),
     descricao ? criarElemento('p', { class: 'error-description', text: descricao }) : null,
     aoTentarNovamente
-      ? botao({ label: 'Tentar novamente', variant: 'primary', icon: 'refresh', onClick: aoTentarNovamente })
+      ? botao({
+          label: 'Tentar novamente',
+          variant: 'primary',
+          icon: 'refresh',
+          onClick: aoTentarNovamente,
+        })
       : null,
     dica
-      ? criarElemento('p', { class: 'error-meta' }, ['Código: ', criarElemento('code', { text: dica })])
+      ? criarElemento('p', { class: 'error-meta' }, [
+          'Código: ',
+          criarElemento('code', { text: dica }),
+        ])
       : null,
   ]);
 }

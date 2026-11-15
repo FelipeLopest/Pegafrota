@@ -43,7 +43,10 @@ const exatoObrigatorio = [
 ];
 const obrigatorioMigration = '20260808000200';
 
-const cliente = new ClienteBanco({ connectionString: enderecoBanco, ssl: { rejectUnauthorized: false } });
+const cliente = new ClienteBanco({
+  connectionString: enderecoBanco,
+  ssl: { rejectUnauthorized: false },
+});
 try {
   await cliente.connect();
 
@@ -66,7 +69,9 @@ try {
 
   const ausentesExato = [];
   for (const assinatura of exatoObrigatorio) {
-    const buscaAtual = await cliente.query('select to_regprocedure($1) is not null as ok', [assinatura]);
+    const buscaAtual = await cliente.query('select to_regprocedure($1) is not null as ok', [
+      assinatura,
+    ]);
     if (!buscaAtual.rows[0]?.ok) ausentesExato.push(assinatura);
   }
 
@@ -77,7 +82,8 @@ try {
   if (ausentesPorNome.length) console.log(`RPCs ausentes por nome: ${ausentesPorNome.join(', ')}`);
   else console.log('RPCs por nome: OK');
 
-  if (ausentesExato.length) console.log(`Assinaturas críticas ausentes: ${ausentesExato.join(', ')}`);
+  if (ausentesExato.length)
+    console.log(`Assinaturas críticas ausentes: ${ausentesExato.join(', ')}`);
   else console.log('Assinaturas críticas: OK');
 
   if (!migracao.rows[0]?.applied || ausentesPorNome.length || ausentesExato.length) {

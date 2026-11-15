@@ -16,7 +16,11 @@ import {
   ROTULO_STATUS_OPERACAO as ROTULO_SITUACAO_OPERACAO,
   ETAPAS_PROVISIONAMENTO,
 } from '@peganafrota/contracts';
-import { withState as carregarComEstado, secao, detalhe } from '../componentes/listas-resumos-e-detalhes.mjs';
+import {
+  withState as carregarComEstado,
+  secao,
+  detalhe,
+} from '../componentes/listas-resumos-e-detalhes.mjs';
 
 export async function telaDetalhesProvisionamento({
   outlet: conteudoTela,
@@ -102,8 +106,14 @@ export async function telaDetalhesProvisionamento({
               detalhe('Tentativas', operacao.attemptCount),
               detalhe('Erro', operacao.errorCode),
               detalhe('Detalhe', operacao.errorDetail),
-              detalhe('Iniciada em', operacao.startedAt ? formatarDadosHora(operacao.startedAt) : '—'),
-              detalhe('Concluída em', operacao.finishedAt ? formatarDadosHora(operacao.finishedAt) : '—'),
+              detalhe(
+                'Iniciada em',
+                operacao.startedAt ? formatarDadosHora(operacao.startedAt) : '—',
+              ),
+              detalhe(
+                'Concluída em',
+                operacao.finishedAt ? formatarDadosHora(operacao.finishedAt) : '—',
+              ),
             ]),
             acoes,
           ]),
@@ -113,21 +123,29 @@ export async function telaDetalhesProvisionamento({
               'div',
               { class: 'progress-steps' },
               (operacao.steps || []).map((textoItem) =>
-                criarElemento('div', { class: 'progress-step', dataset: { status: textoItem.status } }, [
-                  criarElemento('status-pill', { status: textoItem.status, label: textoItem.status }),
-                  criarElemento('div', { class: 'progress-step-body' }, [
-                    criarElemento('p', {
-                      class: 'progress-step-label',
-                      text:
-                        ETAPAS_PROVISIONAMENTO.find((parametroItem) => parametroItem.code === textoItem.code)
-                          ?.label || textoItem.code,
+                criarElemento(
+                  'div',
+                  { class: 'progress-step', dataset: { status: textoItem.status } },
+                  [
+                    criarElemento('status-pill', {
+                      status: textoItem.status,
+                      label: textoItem.status,
                     }),
-                    criarElemento('p', {
-                      class: 'progress-step-detail',
-                      text: textoItem.detail || textoItem.errorCode || '',
-                    }),
-                  ]),
-                ]),
+                    criarElemento('div', { class: 'progress-step-body' }, [
+                      criarElemento('p', {
+                        class: 'progress-step-label',
+                        text:
+                          ETAPAS_PROVISIONAMENTO.find(
+                            (parametroItem) => parametroItem.code === textoItem.code,
+                          )?.label || textoItem.code,
+                      }),
+                      criarElemento('p', {
+                        class: 'progress-step-detail',
+                        text: textoItem.detail || textoItem.errorCode || '',
+                      }),
+                    ]),
+                  ],
+                ),
               ),
             ),
           ]),

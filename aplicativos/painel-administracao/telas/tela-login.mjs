@@ -1,4 +1,6 @@
-import { el as criarElemento, notificacao, botao, campo } from '../componentes/componentes-do-painel.mjs';
+import { abrirRecuperacaoSenha } from '../formularios/formulario-senha.mjs';
+import { apresentacaoLogin } from '../componentes/apresentacao-do-login.mjs';
+import { el as criarElemento, botao, campo } from '../componentes/componentes-do-painel.mjs';
 
 import { icone } from '../componentes/icones.mjs';
 
@@ -62,61 +64,28 @@ export function renderizarLogin({ onSuccess: aoSucesso }) {
       [icone(senhaVisivel ? 'eye-off' : 'eye', { size: 'sm' })],
     );
 
-    const campoSenha = criarElemento('div', { class: 'input-affix' }, [entradaSenha, alternarSenha]);
+    const campoSenha = criarElemento('div', { class: 'input-affix' }, [
+      entradaSenha,
+      alternarSenha,
+    ]);
 
     aplicativo.replaceChildren(
       criarElemento('div', { class: 'auth-split' }, [
-        criarElemento('aside', { class: 'auth-hero' }, [
-          criarElemento('div', {}, [
-            criarElemento('div', { class: 'auth-hero-brand' }, [
-              criarElemento('span', { class: 'sidebar-brand-mark', text: 'PF' }),
-              criarElemento('span', {}, [
-                criarElemento('span', { text: 'Pega' }),
-                criarElemento('span', { class: 'auth-hero-brand-accent', text: 'NaFrota' }),
-              ]),
-            ]),
-            criarElemento('p', { class: 'auth-hero-kicker', text: 'AMBIENTE ADMINISTRATIVO' }),
-          ]),
-
-          criarElemento('div', { class: 'auth-hero-body' }, [
-            criarElemento('h2', { class: 'auth-hero-title', text: 'O painel de quem opera a plataforma.' }),
-            criarElemento('p', {
-              class: 'auth-hero-text',
-              text:
-                'Cadastro de empresas, primeiro administrador, provisionamentos ' +
-                'e auditoria global. Sem acesso à frota dos clientes.',
-            }),
-            criarElemento(
-              'ul',
-              { class: 'auth-hero-asset' },
-              [
-                ['company', 'Provisionamento de empresas com passos rastreáveis'],
-                ['admin', 'Primeiro administrador com senha para o Desktop'],
-                ['operation', 'Reprocessamento e compensação de operações'],
-                ['audit', 'Auditoria global, inclusive das tentativas negadas'],
-              ].map(([nomeIcone, rotulo]) =>
-                criarElemento('li', { class: 'auth-hero-mark' }, [
-                  icone(nomeIcone, { size: 'sm' }),
-                  criarElemento('span', { text: rotulo }),
-                ]),
-              ),
-            ),
-          ]),
-
-          criarElemento('div', { class: 'auth-hero-foot' }, [
-            criarElemento('p', { text: 'Aplicação web · acesso restrito a platform_admin' }),
-            criarElemento('p', { text: 'Não existe cadastro público.' }),
-          ]),
-        ]),
+        apresentacaoLogin(),
 
         criarElemento('main', { class: 'auth-form-pane' }, [
           criarElemento('div', { class: 'auth-form' }, [
-            criarElemento('h1', { class: 'auth-title', text: 'Entrar no painel administrativo' }),
+            criarElemento('p', {
+              class: 'auth-eyebrow',
+              text: 'ACESSO ADMINISTRATIVO',
+            }),
+            criarElemento('h1', {
+              class: 'auth-title',
+              text: 'Entre no seu painel.',
+            }),
             criarElemento('p', {
               class: 'auth-subtitle',
-              text:
-                'Acesso exclusivo do administrador da plataforma. ' +
-                'Não há criação de conta neste ambiente.',
+              text: 'Use suas credenciais de administrador para continuar.',
             }),
             campo({
               id: 'email',
@@ -139,20 +108,26 @@ export function renderizarLogin({ onSuccess: aoSucesso }) {
                   criarElemento('span', { text: erros.form }),
                 ])
               : null,
-            botao({ label: 'Continuar', variant: 'primary', size: 'block', busy: ocupado, onClick: enviar }),
+            botao({
+              label: 'Continuar',
+              variant: 'primary',
+              size: 'block',
+              busy: ocupado,
+              onClick: enviar,
+            }),
             criarElemento(
               'button',
               {
                 class: 'auth-link',
                 type: 'button',
-                onClick: () =>
-                  notificacao(
-                    'A redefinição é feita por outro administrador da plataforma ou pelo procedimento de bootstrap.',
-                    { tone: 'info', duration: 8000 },
-                  ),
+                onClick: () => abrirRecuperacaoSenha(email),
               },
               ['Esqueci minha senha'],
             ),
+            criarElemento('p', {
+              class: 'auth-form-note',
+              text: 'As contas são criadas pela administração da plataforma.',
+            }),
           ]),
         ]),
       ]),

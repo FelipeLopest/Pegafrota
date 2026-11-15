@@ -37,8 +37,16 @@ testar('as telas possuem detalhes e gestão das principais entidades', () => {
 
 testar('a tela de histórico de alterações não é oferecida na interface', () => {
   const principal = ler('iniciar-aplicativo.mjs');
-  verificarCondicao.equal(/rota\('\/auditoria'/.test(principal), false, 'rota /auditoria não deve existir');
-  verificarCondicao.equal(/Histórico de alterações/.test(principal), false, 'item de menu não deve existir');
+  verificarCondicao.equal(
+    /rota\('\/auditoria'/.test(principal),
+    false,
+    'rota /auditoria não deve existir',
+  );
+  verificarCondicao.equal(
+    /Histórico de alterações/.test(principal),
+    false,
+    'item de menu não deve existir',
+  );
 });
 
 testar('a importação por planilha está disponível', () => {
@@ -96,8 +104,17 @@ testar('listas não possuem o antigo limite silencioso de 200', () => {
 });
 
 testar('builds exigem configuração remota e não usam fallback localhost', () => {
-  for (const compilar of ['../painel-administracao/compilar-aplicativo.mjs', 'compilar-aplicativo.mjs']) {
-    const textoItem = ler(compilar) + '\n' + lerArquivoSincrono(resolverCaminho(repositorio, 'ferramentas/apoio/configuracao-publica.mjs'), 'utf8');
+  for (const compilar of [
+    '../painel-administracao/compilar-aplicativo.mjs',
+    'compilar-aplicativo.mjs',
+  ]) {
+    const textoItem =
+      ler(compilar) +
+      '\n' +
+      lerArquivoSincrono(
+        resolverCaminho(repositorio, 'ferramentas/apoio/configuracao-publica.mjs'),
+        'utf8',
+      );
     verificarCondicao.match(textoItem, /PNF_SUPABASE_URL/);
     verificarCondicao.match(textoItem, /PNF_SUPABASE_ANON_KEY/);
     verificarCondicao.doesNotMatch(textoItem, /localhost:54321/);
@@ -119,7 +136,9 @@ testar('convite de equipe tem ativação pública de senha sem MFA', () => {
   const programaEmpresaUi = ler('telas/exportar-telas.mjs');
   const principalAdministrador = ler('../painel-administracao/iniciar-aplicativo.mjs');
   const conviteAdministrador = ler('../painel-administracao/telas/exportar-telas-convite.mjs');
-  const servicosAdministrador = ler('../painel-administracao/comunicacao/comunicacao-com-servidor.mjs');
+  const servicosAdministrador = ler(
+    '../painel-administracao/comunicacao/comunicacao-com-servidor.mjs',
+  );
   const funcaoServidor = lerArquivoSincrono(
     resolverCaminho(repositorio, 'supabase/functions/admin-users/index.ts'),
     'utf8',
@@ -136,7 +155,9 @@ testar('convite de equipe tem ativação pública de senha sem MFA', () => {
 });
 
 testar('o cliente detecta backend remoto desatualizado e força refresh do PostgREST', () => {
-  const pacote = JSON.parse(lerArquivoSincrono(resolverCaminho(repositorio, 'package.json'), 'utf8'));
+  const pacote = JSON.parse(
+    lerArquivoSincrono(resolverCaminho(repositorio, 'package.json'), 'utf8'),
+  );
   verificarCondicao.equal(
     pacote.scripts['backend:verify'],
     'node ferramentas/administracao/verificar-backend.mjs',
@@ -148,7 +169,10 @@ testar('o cliente detecta backend remoto desatualizado e força refresh do Postg
   verificarCondicao.match(verificar, /20260808000200/);
   verificarCondicao.match(verificar, /yard_snapshot/);
   const migracao = lerArquivoSincrono(
-    resolverCaminho(repositorio, 'supabase/migrations/20260808000300_postgrest_contract_refresh.sql'),
+    resolverCaminho(
+      repositorio,
+      'supabase/migrations/20260808000300_postgrest_contract_refresh.sql',
+    ),
     'utf8',
   );
   verificarCondicao.match(migracao, /notify pgrst, 'reload schema'/i);

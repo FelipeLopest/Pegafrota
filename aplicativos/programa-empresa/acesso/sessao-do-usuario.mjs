@@ -81,17 +81,30 @@ export async function tentarRenovarSessao() {
           `${configuracao.supabaseUrl}/auth/v1/token?grant_type=refresh_token`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', apikey: configuracao.anonKey },
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: configuracao.anonKey,
+            },
             body: JSON.stringify({ refresh_token: renovarToken }),
           },
         );
+        if (resposta.status === 429 || resposta.status >= 500) {
+          const erro = new Error('Servidor indisponível. Sua sessão foi preservada.');
+          erro.status = 0;
+          erro.hint = 'NETWORK_ERROR';
+          throw erro;
+        }
         if (!resposta.ok) return false;
         const dadosRenovados = await resposta.json();
         if (sessao.geracao !== geracaoInicial) return false;
         await sessao.set(dadosRenovados);
         return true;
-      } catch {
-        return false;
+      } catch (falha) {
+        const erro = new Error('Não foi possível renovar a sessão agora. Tente reconectar.');
+        erro.status = 0;
+        erro.hint = 'NETWORK_ERROR';
+        erro.cause = falha;
+        throw erro;
       } finally {
         renovacaoEmAndamento = null;
       }

@@ -7,7 +7,10 @@ import {
 import { resolve as resolverCaminho } from 'node:path';
 
 const raiz = resolverCaminho(import.meta.dirname, '..');
-const dadosRecebidos = lerArquivoSincrono(resolverCaminho(raiz, 'dados/dados-do-programa.mjs'), 'utf8');
+const dadosRecebidos = lerArquivoSincrono(
+  resolverCaminho(raiz, 'dados/dados-do-programa.mjs'),
+  'utf8',
+);
 const telas = lerArquivoSincrono(resolverCaminho(raiz, 'telas/exportar-telas.mjs'), 'utf8');
 const compilacao = lerArquivoSincrono(resolverCaminho(raiz, 'compilar-aplicativo.mjs'), 'utf8');
 

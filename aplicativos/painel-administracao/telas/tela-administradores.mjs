@@ -28,7 +28,13 @@ export async function telaAdministradores({
   query: consulta,
 }) {
   definirTitulo('Admins das empresas');
-  const estado = { companyId: consulta.get('empresa') || null, search: '', access: '', account: '', page: 1 };
+  const estado = {
+    companyId: consulta.get('empresa') || null,
+    search: '',
+    access: '',
+    account: '',
+    page: 1,
+  };
   const conteiner = criarElemento('div', {});
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
@@ -51,13 +57,14 @@ export async function telaAdministradores({
           campo({
             id: 'adm-access',
             label: 'Acesso à empresa',
-            hint: 'Aplicado aos resultados desta página.',
+            hint: 'Aplicado a toda a base de administradores.',
             control: criarElemento(
               'select',
               {
                 class: 'select',
                 onChange: (evento) => {
                   estado.access = evento.target.value;
+                  estado.page = 1;
                   carregar();
                 },
               },
@@ -77,13 +84,14 @@ export async function telaAdministradores({
           campo({
             id: 'adm-account',
             label: 'Conta global',
-            hint: 'Aplicado aos resultados desta página.',
+            hint: 'Aplicado a toda a base de administradores.',
             control: criarElemento(
               'select',
               {
                 class: 'select',
                 onChange: (evento) => {
                   estado.account = evento.target.value;
+                  estado.page = 1;
                   carregar();
                 },
               },
@@ -102,7 +110,12 @@ export async function telaAdministradores({
           }),
         ],
         onClear: () => {
-          Object.assign(estado, { search: '', access: '', account: '', page: 1 });
+          Object.assign(estado, {
+            search: '',
+            access: '',
+            account: '',
+            page: 1,
+          });
           carregar();
         },
       }),
@@ -118,21 +131,13 @@ export async function telaAdministradores({
         servicos.admins.list({
           companyId: estado.companyId,
           search: estado.search || null,
+          access: estado.access || null,
+          account: estado.account || null,
           page: estado.page,
           pageSize: 25,
         }),
       (resposta) => {
-        const filtrados = resposta.items.filter(
-          (primeiroItem) =>
-            (!estado.access ||
-              (estado.access === 'active'
-                ? primeiroItem.companyAccessActive === true
-                : primeiroItem.companyAccessActive === false)) &&
-            (!estado.account ||
-              (estado.account === 'blocked'
-                ? primeiroItem.globalAccountActive === false
-                : primeiroItem.globalAccountActive === true)),
-        );
+        const filtrados = resposta.items;
         if (resposta.total === 0)
           return estadoVazio({
             title: 'Nenhum administrador encontrado',
@@ -143,11 +148,17 @@ export async function telaAdministradores({
           onRestoreCompany: async (evento) => {
             try {
               await servicos.admins.restoreCompanyAccess(evento.companyId, evento.userId);
-              notificacao(`Acesso de ${evento.fullName} restaurado.`, { tone: 'success' });
+              notificacao(`Acesso de ${evento.fullName} restaurado.`, {
+                tone: 'success',
+              });
               carregar();
             } catch (erro) {
               if (erro.isConflict)
-                mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
+                mostrarConflito({
+                  hint: erro.hint,
+                  message: erro.message,
+                  detail: erro.detail,
+                });
               else notificacao(erro.message, { tone: 'danger' });
             }
           },
@@ -155,7 +166,9 @@ export async function telaAdministradores({
           onUnblockAccount: async (evento) => {
             try {
               await servicos.admins.unblockAccount(evento.userId);
-              notificacao(`Conta de ${evento.fullName} desbloqueada.`, { tone: 'success' });
+              notificacao(`Conta de ${evento.fullName} desbloqueada.`, {
+                tone: 'success',
+              });
               carregar();
             } catch (erro) {
               notificacao(erro.message, { tone: 'danger' });
@@ -163,14 +176,23 @@ export async function telaAdministradores({
           },
           onResendInvite: async (evento) => {
             try {
-              await servicos.admins.resendInvite(evento.companyId, evento.userId, evento.email || '');
-              notificacao('Novo convite enviado. O link anterior foi invalidado.', { tone: 'success' });
+              await servicos.admins.resendInvite(
+                evento.companyId,
+                evento.userId,
+                evento.email || '',
+              );
+              notificacao('Novo convite enviado. O link anterior foi invalidado.', {
+                tone: 'success',
+              });
               carregar();
             } catch (erro) {
               if (erro.status === 429)
-                notificacao(`Aguarde ${erro.retryAfterSeconds || 'alguns'} segundos para reenviar.`, {
-                  tone: 'warning',
-                });
+                notificacao(
+                  `Aguarde ${erro.retryAfterSeconds || 'alguns'} segundos para reenviar.`,
+                  {
+                    tone: 'warning',
+                  },
+                );
               else notificacao(erro.message, { tone: 'danger' });
             }
           },
@@ -180,19 +202,22 @@ export async function telaAdministradores({
             { label: 'Exibidos', value: filtrados.length, icon: 'admin' },
             {
               label: 'Acesso ativo',
-              value: filtrados.filter((primeiroItem) => primeiroItem.companyAccessActive === true).length,
+              value: filtrados.filter((primeiroItem) => primeiroItem.companyAccessActive === true)
+                .length,
               icon: 'check',
               tone: 'success',
             },
             {
               label: 'Acesso suspenso',
-              value: filtrados.filter((primeiroItem) => primeiroItem.companyAccessActive === false).length,
+              value: filtrados.filter((primeiroItem) => primeiroItem.companyAccessActive === false)
+                .length,
               icon: 'warning',
               tone: 'warning',
             },
             {
               label: 'Conta bloqueada',
-              value: filtrados.filter((primeiroItem) => primeiroItem.globalAccountActive === false).length,
+              value: filtrados.filter((primeiroItem) => primeiroItem.globalAccountActive === false)
+                .length,
               icon: 'warning',
               tone: 'danger',
             },
@@ -216,7 +241,9 @@ export async function telaAdministradores({
                   criarElemento(
                     'tbody',
                     {},
-                    filtrados.map((primeiroItem) => linhaAdministrador(primeiroItem, manipuladores)),
+                    filtrados.map((primeiroItem) =>
+                      linhaAdministrador(primeiroItem, manipuladores),
+                    ),
                   ),
                 ]),
               ])

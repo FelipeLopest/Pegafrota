@@ -35,7 +35,8 @@ export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
         class: 'input',
         value: formulario.plate,
         disabled: editar,
-        onInput: (evento) => (formulario.plate = evento.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')),
+        onInput: (evento) =>
+          (formulario.plate = evento.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')),
       }),
     }),
     criarElemento('div', { class: 'form-row' }, [
@@ -143,7 +144,11 @@ export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
       label: 'Observações',
       control: criarElemento(
         'textarea',
-        { class: 'textarea', rows: '2', onInput: (evento) => (formulario.notes = evento.target.value) },
+        {
+          class: 'textarea',
+          rows: '2',
+          onInput: (evento) => (formulario.notes = evento.target.value),
+        },
         [formulario.notes],
       ),
     }),

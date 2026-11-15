@@ -6,8 +6,14 @@ import {
 } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 
 const telas = lerArquivoSincrono(new URL('../telas/exportar-telas.mjs', import.meta.url), 'utf8');
-const roteador = lerArquivoSincrono(new URL('../navegacao/trocar-tela.mjs', import.meta.url), 'utf8');
-const estilosCss = lerArquivoSincrono(new URL('../estilos/estilo-principal.css', import.meta.url), 'utf8');
+const roteador = lerArquivoSincrono(
+  new URL('../navegacao/trocar-tela.mjs', import.meta.url),
+  'utf8',
+);
+const estilosCss = lerArquivoSincrono(
+  new URL('../estilos/estilo-principal.css', import.meta.url),
+  'utf8',
+);
 
 testar('listagens críticas mantêm filtros e busca global', () => {
   verificarCondicao.match(telas, /function barraFiltros/);
@@ -46,13 +52,19 @@ testar('UI administrativa mantém page head, summary rail e contraste', () => {
 });
 
 testar('Admin Web não deixa imports nomeados quebrados chegarem ao navegador', () => {
-  const compilacao = lerArquivoSincrono(new URL('../compilar-aplicativo.mjs', import.meta.url), 'utf8');
+  const compilacao = lerArquivoSincrono(
+    new URL('../compilar-aplicativo.mjs', import.meta.url),
+    'utf8',
+  );
   verificarCondicao.match(compilacao, /validarImportsLocais/);
   verificarCondicao.match(compilacao, /não é exportado por/);
 });
 
 testar('fluxo TOTP antigo não faz parte do Admin Web', () => {
-  const principal = lerArquivoSincrono(new URL('../iniciar-aplicativo.mjs', import.meta.url), 'utf8');
+  const principal = lerArquivoSincrono(
+    new URL('../iniciar-aplicativo.mjs', import.meta.url),
+    'utf8',
+  );
   verificarCondicao.doesNotMatch(principal, /mfa\.mjs|TOTP|aal2|MFA_NOT_ENROLLED/);
   verificarCondicao.equal(
     arquivoExiste(new URL('../telas/tela-mfa.mjs', import.meta.url)),

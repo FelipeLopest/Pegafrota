@@ -84,12 +84,15 @@ export function situacaoMotorista(dadosRegistro) {
 }
 
 export function rotuloSituacaoMotorista(dadosRegistro) {
-  return { archived: 'Arquivado', active: 'Ativo', inactive: 'Inativo' }[situacaoMotorista(dadosRegistro)];
+  return { archived: 'Arquivado', active: 'Ativo', inactive: 'Inativo' }[
+    situacaoMotorista(dadosRegistro)
+  ];
 }
 
 export function veiculosAtivos(lista) {
   return lista.filter(
-    (veiculoItem) => !veiculoItem.archived_at && !['archived', 'inactive'].includes(veiculoItem.status),
+    (veiculoItem) =>
+      !veiculoItem.archived_at && !['archived', 'inactive'].includes(veiculoItem.status),
   );
 }
 
@@ -176,15 +179,20 @@ export function exploradorColecao(
   } catch {
     restaurado = {};
   }
-  const estado = { q: '', ...padroes, ...restaurado };
+  const remoto = itens.paginaRemota;
+  const estado = { q: '', ...padroes, ...restaurado, ...remoto?.filtros };
   estado.q = '';
 
   const conteiner = criarElemento('div', { class: 'explorer' });
   const resultadoConteiner = criarElemento('div', {});
   let buscaTemporizador = null;
   const quantidade = criarElemento('span', { class: 'filter-count' });
-  const seloAtivo = criarElemento('span', { class: 'filter-active-badge', hidden: true });
+  const seloAtivo = criarElemento('span', {
+    class: 'filter-active-badge',
+    hidden: true,
+  });
   const detalhes = criarElemento('details', { class: 'filter-drawer' });
+  let geracaoConsulta = 0;
 
   const persistir = () => {
     const salvo = { ...estado };
@@ -197,11 +205,81 @@ export function exploradorColecao(
   };
 
   const ehPadrao = (formulario) =>
-    String(estado[formulario.key] ?? '') === String(padroes[formulario.key] ?? formulario.default ?? '');
+    String(estado[formulario.key] ?? '') ===
+    String(padroes[formulario.key] ?? formulario.default ?? '');
   const quantidadeAtivos = () => filtros.filter((formulario) => !ehPadrao(formulario)).length;
 
-  const desenhar = () => {
+  const desenhar = (pagina = 1) => {
     persistir();
+    const quantidadeItem = quantidadeAtivos();
+    seloAtivo.hidden = quantidadeItem === 0;
+    seloAtivo.textContent = quantidadeItem
+      ? `${quantidadeItem} filtro${quantidadeItem === 1 ? '' : 's'} ativo${quantidadeItem === 1 ? '' : 's'}`
+      : '';
+    if (remoto) {
+      const geracao = ++geracaoConsulta;
+      resultadoConteiner.replaceChildren(tabelaEsqueleto(4, 4));
+      const filtrosAtuais = Object.fromEntries(
+        filtros.map(({ key, default: padrao }) => [
+          key,
+          estado[key] ?? padroes[key] ?? padrao ?? '',
+        ]),
+      );
+      remoto
+        .carregar({
+          q: estado.q,
+          filtros: { ...remoto.filtros, ...filtrosAtuais },
+          pagina,
+          tamanho: tamanhoPagina,
+        })
+        .then((resposta) => {
+          if (geracao !== geracaoConsulta || !conteiner.isConnected) return;
+          const lista = resposta?.items || [];
+          const total = Number(resposta?.total) || 0;
+          quantidade.textContent = `${total} de ${remoto.total} registro(s)`;
+          if (!lista.length) {
+            if (pagina > 1) return desenhar(1);
+            resultadoConteiner.replaceChildren(
+              estadoVazio({
+                title: vazioTitulo,
+                description: vazioDescricao,
+                icon: 'search',
+              }),
+            );
+            return;
+          }
+          resultadoConteiner.replaceChildren(
+            renderizar(lista),
+            criarElemento('div', { class: 'pager' }, [
+              botao({
+                label: 'Anterior',
+                variant: 'ghost',
+                disabled: pagina <= 1,
+                onClick: () => desenhar(pagina - 1),
+              }),
+              criarElemento('span', {
+                text: `Página ${pagina} de ${Math.max(1, Math.ceil(total / tamanhoPagina))}`,
+              }),
+              botao({
+                label: 'Próxima',
+                variant: 'ghost',
+                disabled: !resposta.hasNext,
+                onClick: () => desenhar(pagina + 1),
+              }),
+            ]),
+          );
+        })
+        .catch((erro) => {
+          if (geracao === geracaoConsulta && conteiner.isConnected)
+            resultadoConteiner.replaceChildren(
+              estadoErro({
+                description: erro.message,
+                onRetry: () => desenhar(pagina),
+              }),
+            );
+        });
+      return;
+    }
     const buscaAtual = normalizarTexto(estado.q);
     let filtrados = itens.filter((item) => {
       if (buscaAtual && !normalizarTexto(obterTexto(item)).includes(buscaAtual)) return false;
@@ -214,15 +292,14 @@ export function exploradorColecao(
       });
     });
     quantidade.textContent = `${filtrados.length} de ${itens.length} registro${itens.length === 1 ? '' : 's'}`;
-    const quantidadeItem = quantidadeAtivos();
-    seloAtivo.hidden = quantidadeItem === 0;
-    seloAtivo.textContent = quantidadeItem
-      ? `${quantidadeItem} filtro${quantidadeItem === 1 ? '' : 's'} ativo${quantidadeItem === 1 ? '' : 's'}`
-      : '';
     resultadoConteiner.replaceChildren(
       filtrados.length
         ? paginador(filtrados, renderizar, { pageSize: tamanhoPagina })
-        : estadoVazio({ title: vazioTitulo, description: vazioDescricao, icon: 'search' }),
+        : estadoVazio({
+            title: vazioTitulo,
+            description: vazioDescricao,
+            icon: 'search',
+          }),
     );
   };
 
@@ -297,7 +374,13 @@ export function exploradorColecao(
     criarElemento('div', { class: 'explorer-toolbar' }, [
       criarElemento('div', { class: 'search-box' }, [icone('search', { size: 'sm' }), busca]),
       detalhes,
-      botao({ label: 'Limpar', variant: 'ghost', size: 'sm', icon: 'close', onClick: redefinir }),
+      botao({
+        label: 'Limpar',
+        variant: 'ghost',
+        size: 'sm',
+        icon: 'close',
+        onClick: redefinir,
+      }),
       quantidade,
     ]),
     resultadoConteiner,
@@ -351,14 +434,19 @@ export function solicitarTexto({
         control: entrada,
       }),
       footer: criarElemento('div', { class: 'modal-actions' }, [
-        botao({ label: 'Cancelar', onClick: () => correspondenciaItem.close(null) }),
+        botao({
+          label: 'Cancelar',
+          onClick: () => correspondenciaItem.close(null),
+        }),
         botao({
           label: confirmarRotulo,
           variant: perigoso ? 'danger' : 'primary',
           onClick: () => {
             const limpos = valor.trim();
             if (obrigatorio && !limpos) {
-              notificacao(`Informe ${rotulo.toLowerCase()}.`, { tone: 'warning' });
+              notificacao(`Informe ${rotulo.toLowerCase()}.`, {
+                tone: 'warning',
+              });
               entrada.focus();
               return;
             }
@@ -371,7 +459,10 @@ export function solicitarTexto({
   });
 }
 
-export function chaveDiaLocal(iso, fusoHorario = contexto.data?.company?.timezone || 'America/Sao_Paulo') {
+export function chaveDiaLocal(
+  iso,
+  fusoHorario = contexto.data?.company?.timezone || 'America/Sao_Paulo',
+) {
   if (!iso) return '';
   const partes = new Intl.DateTimeFormat('en-CA', {
     timeZone: fusoHorario,
@@ -392,8 +483,15 @@ export function empresaLocalParaIso(
   if (!valor) return '';
   const correspondencia = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(valor);
   if (!correspondencia) return new Date(valor).toISOString();
-  const [, outroItemComparado, mesAtual, dadosRegistro, cabecalhos2, indiceManutencao, segundos = '0'] =
-    correspondencia;
+  const [
+    ,
+    outroItemComparado,
+    mesAtual,
+    dadosRegistro,
+    cabecalhos2,
+    indiceManutencao,
+    segundos = '0',
+  ] = correspondencia;
   const desejado = Date.UTC(
     +outroItemComparado,
     +mesAtual - 1,
@@ -440,24 +538,67 @@ export function indicadorSimples(rotulo, valor, subparte) {
   ]);
 }
 
-export function faixaResumo(itens) {
+export function faixaResumo(itens, { colecao } = {}) {
+  const resumo = colecao?.paginaRemota?.resumo;
+  const campos = {
+    'Em cadastro': 'current',
+    Disponíveis: 'available',
+    'Em operação': 'in_use',
+    Manutenção: 'in_maintenance',
+    Arquivados: 'archived',
+    Ativos: 'active',
+    Inativos: 'inactive',
+    'CNH até 30 dias': 'license30',
+    Planejadas: 'planned',
+    'Em andamento': 'in_progress',
+    Concluídas: 'completed',
+    Canceladas: 'cancelled',
+    Agendadas: 'scheduled',
+    'Em execução': 'in_progress',
+    Vencidas: 'overdue',
+    Lançamentos: 'total',
+    'Últimos 30 dias': 'last30',
+    'UFs cobertas': 'states',
+  };
+  const valor = (item) => {
+    if (!resumo) return item.value;
+    if (item.label === 'Volume acumulado')
+      return `${Number(resumo.liters || 0).toLocaleString('pt-BR')} L${resumo.m3 ? ` · ${Number(resumo.m3).toLocaleString('pt-BR')} m³` : ''}`;
+    if (
+      item.label === 'Valor total' ||
+      item.label === 'Total gasto' ||
+      item.label === 'Custo acumulado'
+    )
+      return formatar.money(resumo.amount || 0);
+    if (item.label === 'Custo registrado') return formatar.money(resumo.cost || 0);
+    return resumo[campos[item.label]] ?? item.value;
+  };
   return criarElemento(
     'div',
     { class: 'summary-rail' },
-    itens
-      .filter(Boolean)
-      .map((item) =>
-        criarElemento('section', { class: `summary-stat${item.tone ? ` tone-${item.tone}` : ''}` }, [
-          criarElemento('div', { class: 'summary-stat-icon', 'aria-hidden': 'true' }, [
-            icone(item.icon || 'info', { size: 'sm' }),
-          ]),
-          criarElemento('div', { class: 'summary-stat-copy' }, [
-            criarElemento('span', { class: 'summary-stat-label', text: item.label }),
-            criarElemento('strong', { class: 'summary-stat-value', text: String(item.value ?? 0) }),
-            item.hint ? criarElemento('span', { class: 'summary-stat-hint', text: item.hint }) : null,
-          ]),
+    itens.filter(Boolean).map((item) =>
+      criarElemento('section', { class: `summary-stat${item.tone ? ` tone-${item.tone}` : ''}` }, [
+        criarElemento('div', { class: 'summary-stat-icon', 'aria-hidden': 'true' }, [
+          icone(item.icon || 'info', { size: 'sm' }),
         ]),
-      ),
+        criarElemento('div', { class: 'summary-stat-copy' }, [
+          criarElemento('span', {
+            class: 'summary-stat-label',
+            text: item.label,
+          }),
+          criarElemento('strong', {
+            class: 'summary-stat-value',
+            text: String(valor(item) ?? 0),
+          }),
+          item.hint
+            ? criarElemento('span', {
+                class: 'summary-stat-hint',
+                text: item.hint,
+              })
+            : null,
+        ]),
+      ]),
+    ),
   );
 }
 

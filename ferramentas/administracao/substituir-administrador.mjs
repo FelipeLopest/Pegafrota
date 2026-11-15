@@ -14,10 +14,12 @@ async function principal() {
 
   const emailAtor = process.env.PLATFORM_ACTOR_EMAIL?.trim().toLowerCase();
   const novoEmail = process.env.PLATFORM_NEW_ADMIN_EMAIL?.trim().toLowerCase();
-  const nomeCompleto = process.env.PLATFORM_NEW_ADMIN_FULL_NAME?.trim() || novoEmail?.split('@')[0] || '';
+  const nomeCompleto =
+    process.env.PLATFORM_NEW_ADMIN_FULL_NAME?.trim() || novoEmail?.split('@')[0] || '';
   const senha = process.env.PLATFORM_NEW_ADMIN_PASSWORD ?? '';
   const telefone = process.env.PLATFORM_NEW_ADMIN_PHONE?.trim() || null;
-  const motivo = process.env.PLATFORM_REPLACE_REASON?.trim() || 'Substituição do administrador da plataforma';
+  const motivo =
+    process.env.PLATFORM_REPLACE_REASON?.trim() || 'Substituição do administrador da plataforma';
   const excluirAntigo = sinalizadorAmbiente(
     'PLATFORM_DELETE_OLD_AUTH',
     process.argv.includes('--delete-old'),
@@ -32,7 +34,9 @@ async function principal() {
   const ator = await buscarUsuarioAutenticacaoPorEmail(emailAtor);
   if (!ator) throw new Error(`Administrador atual não encontrado no Auth: ${emailAtor}`);
 
-  const atorEhAdministrador = await funcaoBancoPlataforma('is_platform_admin', { p_user_id: ator.id });
+  const atorEhAdministrador = await funcaoBancoPlataforma('is_platform_admin', {
+    p_user_id: ator.id,
+  });
   if (atorEhAdministrador !== true) throw new Error(`${emailAtor} não é platform_admin ativo.`);
 
   console.log('PegaNaFrota — substituição de platform_admin');
@@ -56,7 +60,9 @@ async function principal() {
     p_reason: motivo,
   });
 
-  const alvoEhAdministrador = await funcaoBancoPlataforma('is_platform_admin', { p_user_id: alvo.id });
+  const alvoEhAdministrador = await funcaoBancoPlataforma('is_platform_admin', {
+    p_user_id: alvo.id,
+  });
   if (alvoEhAdministrador !== true)
     throw new Error('A RPC retornou, mas o novo platform_admin não ficou ativo.');
   console.log('  Papel global: transferido com sucesso');
@@ -68,11 +74,15 @@ async function principal() {
     } catch (erro) {
       console.error('  Papel global já foi transferido, mas a conta antiga NÃO foi apagada.');
       console.error(`  Motivo: ${erro.message}`);
-      console.error('  Verifique se a conta antiga ainda é o último company_admin de alguma empresa.');
+      console.error(
+        '  Verifique se a conta antiga ainda é o último company_admin de alguma empresa.',
+      );
       process.exitCode = 2;
     }
   } else {
-    console.log('  Auth antigo: preservado. Use PLATFORM_DELETE_OLD_AUTH=true para removê-lo na troca.');
+    console.log(
+      '  Auth antigo: preservado. Use PLATFORM_DELETE_OLD_AUTH=true para removê-lo na troca.',
+    );
   }
 }
 

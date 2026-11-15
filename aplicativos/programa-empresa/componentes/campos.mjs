@@ -34,9 +34,16 @@ export function campo({
         : null,
     ]),
     envoltorio || controle,
-    dica ? criarElemento('p', { class: 'field-hint', id: `${identificador}-hint`, text: dica }) : null,
+    dica
+      ? criarElemento('p', { class: 'field-hint', id: `${identificador}-hint`, text: dica })
+      : null,
     erro
-      ? criarElemento('p', { class: 'field-error', id: `${identificador}-error`, role: 'alert', text: erro })
+      ? criarElemento('p', {
+          class: 'field-error',
+          id: `${identificador}-error`,
+          role: 'alert',
+          text: erro,
+        })
       : null,
   ]);
 }

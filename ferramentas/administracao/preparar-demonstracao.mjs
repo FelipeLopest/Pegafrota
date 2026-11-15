@@ -19,11 +19,23 @@ const REINICIAR = argumentos.has('--reset');
 
 const EMPRESAS = [
   { slug: 'auroraverde', users: ['admin', 'gestor', 'operador', 'consulta', 'desligado'] },
-  { slug: 'pedraalta', users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'] },
+  {
+    slug: 'pedraalta',
+    users: ['admin', 'gestor', 'operador', 'operador2', 'consulta', 'suspenso'],
+  },
   { slug: 'riosereno', users: ['admin', 'gestor', 'gestor2', 'operador', 'operador2', 'consulta'] },
   {
     slug: 'camponovo',
-    users: ['admin', 'admin2', 'gestor', 'gestor2', 'operador', 'operador2', 'operador3', 'consulta'],
+    users: [
+      'admin',
+      'admin2',
+      'gestor',
+      'gestor2',
+      'operador',
+      'operador2',
+      'operador3',
+      'consulta',
+    ],
   },
 ];
 
@@ -201,14 +213,20 @@ async function aplicarDadosDemonstracao(cliente, mapaUsuarios) {
 
 async function verificarVolumes(cliente) {
   console.log('\n[3/5] Volumes');
-  const um = async (codigoSql, parametros = []) => (await cliente.query(codigoSql, parametros)).rows[0];
-  const todos = async (codigoSql, parametros = []) => (await cliente.query(codigoSql, parametros)).rows;
+  const um = async (codigoSql, parametros = []) =>
+    (await cliente.query(codigoSql, parametros)).rows[0];
+  const todos = async (codigoSql, parametros = []) =>
+    (await cliente.query(codigoSql, parametros)).rows;
 
   const empresas = await um('select count(*)::int n from public.companies');
   registro('4 empresas', empresas.n === 4, `${empresas.n}`);
 
   const usuarios = await um('select count(*)::int n from public.company_memberships');
-  registro(`${ESPERADO.length} vínculos de usuário`, usuarios.n === ESPERADO.length, `${usuarios.n}`);
+  registro(
+    `${ESPERADO.length} vínculos de usuário`,
+    usuarios.n === ESPERADO.length,
+    `${usuarios.n}`,
+  );
 
   const orfao = await um(`
     select count(*)::int n from public.company_memberships m
@@ -234,7 +252,11 @@ async function verificarVolumes(cliente) {
     from public.companies c order by c.trade_name
   `);
   for (const linha of porEmpresa) {
-    registro(`${linha.trade_name}: 3–8 usuários`, linha.users >= 3 && linha.users <= 8, `${linha.users}`);
+    registro(
+      `${linha.trade_name}: 3–8 usuários`,
+      linha.users >= 3 && linha.users <= 8,
+      `${linha.users}`,
+    );
     registro(
       `${linha.trade_name}: 15–40 veículos`,
       linha.vehicles >= 15 && linha.vehicles <= 40,
@@ -270,7 +292,11 @@ async function verificarVolumes(cliente) {
     from public.companies c where c.status = 'active'
   `);
   for (const linha of administradores) {
-    registro(`${linha.trade_name}: ao menos um administrador efetivo`, Number(linha.n) >= 1, `${linha.n}`);
+    registro(
+      `${linha.trade_name}: ao menos um administrador efetivo`,
+      Number(linha.n) >= 1,
+      `${linha.n}`,
+    );
   }
 }
 
@@ -280,14 +306,18 @@ async function verificarIntegridade(cliente) {
   registro(
     'security_selftest sem desvios',
     seguranca.length === 0,
-    seguranca.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.object_name}`).join(' | '),
+    seguranca
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.object_name}`)
+      .join(' | '),
   );
 
   const integridade = (await cliente.query('select * from private.data_integrity_selftest()')).rows;
   registro(
     'data_integrity_selftest sem apontamentos',
     integridade.length === 0,
-    integridade.map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`).join(' | '),
+    integridade
+      .map((resultadoItem) => `${resultadoItem.finding}: ${resultadoItem.detail}`)
+      .join(' | '),
   );
 }
 

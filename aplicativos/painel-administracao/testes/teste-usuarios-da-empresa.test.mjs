@@ -9,7 +9,10 @@ const telas = lerArquivoSincrono(
   'utf8',
 );
 const servicos = lerArquivoSincrono(
-  resolverCaminho(raiz, 'aplicativos/painel-administracao/comunicacao/comunicacao-com-servidor.mjs'),
+  resolverCaminho(
+    raiz,
+    'aplicativos/painel-administracao/comunicacao/comunicacao-com-servidor.mjs',
+  ),
   'utf8',
 );
 const funcaoServidor = lerArquivoSincrono(
@@ -17,7 +20,10 @@ const funcaoServidor = lerArquivoSincrono(
   'utf8',
 );
 const migracaoAtual = lerArquivoSincrono(
-  resolverCaminho(raiz, 'supabase/migrations/20260812000200_platform_hard_delete_user_management.sql'),
+  resolverCaminho(
+    raiz,
+    'supabase/migrations/20260812000200_platform_hard_delete_user_management.sql',
+  ),
   'utf8',
 );
 
@@ -32,7 +38,7 @@ testar('painel oferece gestão de todos os usuários da empresa', () => {
 testar('redefinição de senha fica exclusivamente no backend com Auth Admin', () => {
   verificarCondicao.match(
     funcaoServidor,
-    /auth\.admin\.updateUserById\(parametroItem\.userId, \{\s*password: senha,?\s*\}\)/,
+    /auth\.admin\.updateUserById\(\s*parametroItem\.userId,\s*\{\s*password: senha,?\s*\},?\s*\)/,
   );
   verificarCondicao.doesNotMatch(telas, /service_role/i);
   verificarCondicao.match(migracaoAtual, /USER_NOT_ACTIVE/);
@@ -41,7 +47,10 @@ testar('redefinição de senha fica exclusivamente no backend com Auth Admin', (
 testar('exclusão individual protege o último administrador', () => {
   verificarCondicao.match(migracaoAtual, /LAST_ADMIN_PROTECTED/);
   verificarCondicao.match(migracaoAtual, /prepare_delete_company_member/);
-  verificarCondicao.match(funcaoServidor, /auth\.admin\.deleteUser\(parametroItem\.userId, false\)/);
+  verificarCondicao.match(
+    funcaoServidor,
+    /auth\.admin\.deleteUser\(\s*parametroItem\.userId,\s*false,?\s*\)/,
+  );
 });
 
 testar('empresa só pode ser apagada fisicamente depois de arquivada', () => {

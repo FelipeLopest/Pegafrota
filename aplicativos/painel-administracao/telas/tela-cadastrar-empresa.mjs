@@ -1,3 +1,4 @@
+import { criarAssistenteCep, FUSOS_HORARIOS } from '../dados/consultar-cep.mjs';
 import {
   el as criarElemento,
   botao,
@@ -57,7 +58,16 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
   const camposEditados = new Set();
   const camposAutomaticos = new Map();
   const entradasVisiveis = new Map();
-  const areaConsulta = criarElemento('div', { 'data-consulta-cnpj': '', 'aria-live': 'polite' });
+  const avisoCep = criarElemento('p', { class: 'muted', role: 'status' });
+  const cep = criarAssistenteCep({
+    estado: formulario,
+    localizar: (chave) => entradasVisiveis.get(chave),
+    avisar: (mensagem) => (avisoCep.textContent = mensagem),
+  });
+  const areaConsulta = criarElemento('div', {
+    'data-consulta-cnpj': '',
+    'aria-live': 'polite',
+  });
   let temporizadorConsulta = null;
   let controladorConsulta = null;
   let numeroConsulta = 0;
@@ -79,7 +89,10 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
       onInput: (evento) => {
         formulario[nome] = evento.target.value;
         if (nome === 'cnpj') agendarConsulta();
-        else camposEditados.add(nome);
+        else {
+          camposEditados.add(nome);
+          cep.editar(nome);
+        }
       },
     });
     entradasVisiveis.set(nome, no);
@@ -154,7 +167,9 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
     mensagemConsulta = 'Consultando os dados da empresa…';
     atualizarConsulta();
     try {
-      const dados = await consultarCnpj(formulario.cnpj, { sinal: controladorConsulta.signal });
+      const dados = await consultarCnpj(formulario.cnpj, {
+        sinal: controladorConsulta.signal,
+      });
       if (
         telaEncerrada ||
         consultaAtual !== numeroConsulta ||
@@ -194,7 +209,10 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
             },
           },
           [
-            criarElemento('span', { class: 'wizard-step-index', text: `Etapa ${indiceItem + 1}` }),
+            criarElemento('span', {
+              class: 'wizard-step-index',
+              text: `Etapa ${indiceItem + 1}`,
+            }),
             rotulo,
           ],
         ),
@@ -234,7 +252,32 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
                 entrada('addressState', 'UF', { hint: 'Duas letras.' }),
                 entrada('addressPostalCode', 'CEP'),
               ]),
-              entrada('timezone', 'Fuso horário', { required: true }),
+              criarElemento('div', { class: 'toolbar' }, [
+                botao({
+                  label: 'Consultar CEP',
+                  icon: 'search',
+                  onClick: () => cep.consultar(),
+                }),
+                avisoCep,
+              ]),
+              campo({
+                id: 'f-timezone',
+                label: 'Fuso horário',
+                control: criarElemento(
+                  'select',
+                  {
+                    class: 'select',
+                    onChange: (evento) => (formulario.timezone = evento.target.value),
+                  },
+                  FUSOS_HORARIOS.map(([id, rotulo]) =>
+                    criarElemento('option', {
+                      value: id,
+                      text: rotulo,
+                      selected: formulario.timezone === id,
+                    }),
+                  ),
+                ),
+              }),
             ])
           : criarElemento('div', {}, [
               criarElemento('p', {
@@ -274,7 +317,11 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
       }),
       etapa < 3
         ? botao({ label: 'Continuar', variant: 'primary', onClick: proximo })
-        : botao({ label: 'Provisionar empresa', variant: 'primary', onClick: enviar }),
+        : botao({
+            label: 'Provisionar empresa',
+            variant: 'primary',
+            onClick: enviar,
+          }),
     ]);
 
     conteiner.replaceChildren(etapas(), criarElemento('div', { class: 'card' }, [corpo, acoes]));
@@ -372,11 +419,15 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
               : null,
         });
       } else if (erro instanceof ErroBackend && erro.isValidation) {
-        erros = { cnpj: erro.hint === 'invalid_cnpj' ? erro.message : undefined };
+        erros = {
+          cnpj: erro.hint === 'invalid_cnpj' ? erro.message : undefined,
+        };
         etapa = 1;
         renderizar();
       } else {
-        notificacao(erro?.message || 'Falha no provisionamento.', { tone: 'danger' });
+        notificacao(erro?.message || 'Falha no provisionamento.', {
+          tone: 'danger',
+        });
       }
     }
   }

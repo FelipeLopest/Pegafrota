@@ -21,7 +21,11 @@ import {
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirEditorMotorista } from '../formularios/formulario-motorista.mjs';
 
-export function telaDetalheMotorista({ outlet: conteudoTela, setTitle: definirTitulo, params: parametros }) {
+export function telaDetalheMotorista({
+  outlet: conteudoTela,
+  setTitle: definirTitulo,
+  params: parametros,
+}) {
   definirTitulo('Motorista');
   const recarregar = () =>
     telaDetalheMotorista({ outlet: conteudoTela, setTitle: definirTitulo, params: parametros });
@@ -112,13 +116,17 @@ export function telaDetalheMotorista({ outlet: conteudoTela, setTitle: definirTi
       const recentes = viagens.slice(0, 12).map((itemAtual) =>
         criarElemento('tr', {}, [
           criarElemento('td', {
-            text: formatar.dateTime(itemAtual.actual_departure_at || itemAtual.planned_departure_at),
+            text: formatar.dateTime(
+              itemAtual.actual_departure_at || itemAtual.planned_departure_at,
+            ),
           }),
           criarElemento('td', {
             class: 'mono',
             text: formatar.plate(indiceVeiculo.get(itemAtual.vehicle_id)?.plate),
           }),
-          criarElemento('td', { text: `${itemAtual.origin_label} → ${itemAtual.destination_label}` }),
+          criarElemento('td', {
+            text: `${itemAtual.origin_label} → ${itemAtual.destination_label}`,
+          }),
           criarElemento('td', {}, [
             criarElemento('status-pill', {
               status: itemAtual.status,

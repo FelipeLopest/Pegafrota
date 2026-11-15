@@ -27,7 +27,10 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
           title: item.label,
           onClick: () => navegar(item.path),
         },
-        [icone(item.icon, { size: 'sm' }), criarElemento('span', { class: 'nav-label', text: item.label })],
+        [
+          icone(item.icon, { size: 'sm' }),
+          criarElemento('span', { class: 'nav-label', text: item.label }),
+        ],
       );
       botoesNavegacao.set(item.pattern, botao);
       return botao;
@@ -101,12 +104,16 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
   }
 
   const titulo = criarElemento('h1', { class: 'topbar-title', text: 'Visão geral' });
-  const desconectado = criarElemento('div', { class: 'offline-banner', role: 'status', hidden: true }, [
-    icone('warning', { size: 'sm' }),
-    criarElemento('span', {
-      text: 'Conexão com o servidor indisponível. O painel tentará reconectar automaticamente.',
-    }),
-  ]);
+  const desconectado = criarElemento(
+    'div',
+    { class: 'offline-banner', role: 'status', hidden: true },
+    [
+      icone('warning', { size: 'sm' }),
+      criarElemento('span', {
+        text: 'Conexão com o servidor indisponível. O painel tentará reconectar automaticamente.',
+      }),
+    ],
+  );
   const conteudoTela = criarElemento('div', { class: 'content', id: 'conteudo', tabindex: '-1' });
 
   const alternar = criarElemento(
@@ -151,7 +158,10 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
         ]),
         criarElemento('div', { class: 'sidebar-env' }, [
           criarElemento('span', { class: 'env-dot', 'aria-hidden': 'true' }),
-          criarElemento('span', { class: 'sidebar-env-label', text: `Ambiente ${rotuloAmbiente()}` }),
+          criarElemento('span', {
+            class: 'sidebar-env-label',
+            text: `Ambiente ${rotuloAmbiente()}`,
+          }),
         ]),
         navegacao,
         criarElemento('div', { class: 'sidebar-footer' }, [
@@ -166,7 +176,13 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
           ]),
           criarElemento(
             'button',
-            { class: 'icon-btn', type: 'button', title: 'Sair', 'aria-label': 'Sair', onClick: aoSair },
+            {
+              class: 'icon-btn',
+              type: 'button',
+              title: 'Sair',
+              'aria-label': 'Sair',
+              onClick: aoSair,
+            },
             [icone('logout', { size: 'sm' })],
           ),
         ]),
@@ -210,11 +226,13 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
   desconectado.hidden = estadoConectividadeServidor() !== false;
   void verificarConectividadeServidor();
 
-  if (window.__pnfAdminShortcutHandler) removeEventListener('keydown', window.__pnfAdminShortcutHandler);
+  if (window.__pnfAdminShortcutHandler)
+    removeEventListener('keydown', window.__pnfAdminShortcutHandler);
   window.__pnfAdminShortcutHandler = (evento2) => {
     const etiqueta = document.activeElement?.tagName?.toLowerCase();
     const digitando =
-      ['input', 'textarea', 'select'].includes(etiqueta) || document.activeElement?.isContentEditable;
+      ['input', 'textarea', 'select'].includes(etiqueta) ||
+      document.activeElement?.isContentEditable;
     if ((evento2.ctrlKey || evento2.metaKey) && evento2.key.toLowerCase() === 'k') {
       evento2.preventDefault();
       abrirBuscaNavegacao();
@@ -244,7 +262,8 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
     },
     setActive(padrao) {
       for (const [parametroItem, botao] of botoesNavegacao) {
-        const ativo = parametroItem === padrao || (parametroItem !== '/' && padrao.startsWith(parametroItem));
+        const ativo =
+          parametroItem === padrao || (parametroItem !== '/' && padrao.startsWith(parametroItem));
         if (ativo) botao.setAttribute('aria-current', 'page');
         else botao.removeAttribute('aria-current');
       }

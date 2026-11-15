@@ -3,7 +3,10 @@ import verificarCondicao from 'node:assert/strict';
 import { readFileSync as lerArquivoSincrono } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 
 const telas = lerArquivoSincrono(new URL('../telas/exportar-telas.mjs', import.meta.url), 'utf8');
-const roteador = lerArquivoSincrono(new URL('../navegacao/trocar-tela.mjs', import.meta.url), 'utf8');
+const roteador = lerArquivoSincrono(
+  new URL('../navegacao/trocar-tela.mjs', import.meta.url),
+  'utf8',
+);
 
 testar('admin possui filtros recolhíveis nas listagens críticas', () => {
   verificarCondicao.match(telas, /function barraFiltros/);

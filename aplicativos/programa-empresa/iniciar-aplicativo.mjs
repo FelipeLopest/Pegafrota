@@ -1,9 +1,11 @@
+import { monitorCameras } from './comunicacao/monitorar-cameras.mjs';
 import {
   el as criarElemento,
   notificacao,
   registrarComponentes,
   confirmAction as confirmarAcao,
   iniciarRoteador,
+  botao,
 } from './componentes/componentes-do-programa.mjs';
 
 import { montarSpriteIcones } from './componentes/icones.mjs';
@@ -28,6 +30,7 @@ let estruturaAtual = null;
 let revalidarAcesso = null;
 
 export async function inicializar() {
+  await monitorCameras.parar({ lembrar: false });
   estruturaAtual?.desmontar();
   estruturaAtual = null;
   if (revalidarAcesso) removeEventListener('focus', revalidarAcesso);
@@ -53,8 +56,39 @@ export async function inicializar() {
   try {
     await contexto.load();
   } catch (erro) {
-    await sessao.clear();
-    renderizarLogin({ onSuccess: inicializar });
+    if (erro?.status === 401 || erro?.hint === 'UNAUTHENTICATED') {
+      await sessao.clear();
+      renderizarLogin({ onSuccess: inicializar });
+    } else {
+      aplicativo.replaceChildren(
+        criarElemento('main', { class: 'auth-page' }, [
+          criarElemento('div', { class: 'auth-card' }, [
+            criarElemento('h1', {
+              class: 'auth-title',
+              text: 'Vamos retomar sua conexão',
+            }),
+            criarElemento('p', {
+              class: 'auth-subtitle',
+              text: 'Sua sessão foi preservada. Não foi possível confirmar o acesso ao servidor agora. Confira a conexão e tente novamente.',
+            }),
+            botao({
+              label: 'Tentar reconectar',
+              variant: 'primary',
+              onClick: () => inicializar(),
+            }),
+            botao({
+              label: 'Entrar com outra conta',
+              onClick: async () => {
+                await sessao.clear();
+                contexto.clear();
+                renderizarLogin({ onSuccess: inicializar });
+              },
+            }),
+          ]),
+        ]),
+      );
+      aplicativo.removeAttribute('aria-busy');
+    }
     return;
   }
 
@@ -76,6 +110,7 @@ export async function inicializar() {
       ],
     });
     if (!confirmado) return;
+    await monitorCameras.parar({ lembrar: false });
     await sair();
     inicializar();
   };
@@ -112,6 +147,7 @@ export async function inicializar() {
     }
   };
   addEventListener('focus', revalidarAcesso);
+  monitorCameras.restaurar().catch((erro) => notificacao(erro.message, { tone: 'warning' }));
 }
 
 registrarRotas();
@@ -121,7 +157,10 @@ inicializar().catch((erro) => {
     criarElemento('div', { class: 'auth-page' }, [
       criarElemento('div', { class: 'auth-card' }, [
         criarElemento('h1', { class: 'auth-title', text: 'Falha ao iniciar' }),
-        criarElemento('p', { class: 'auth-subtitle', text: erro?.message || String(erro) }),
+        criarElemento('p', {
+          class: 'auth-subtitle',
+          text: erro?.message || String(erro),
+        }),
       ]),
     ]),
   );

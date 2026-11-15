@@ -16,3 +16,7 @@ artifacts/
 
 .vercel/
 instaladores/
+
+servicos/**/compilado/
+**/__pycache__/
+pareamento-camera*.json

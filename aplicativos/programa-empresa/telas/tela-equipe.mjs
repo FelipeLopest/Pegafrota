@@ -32,7 +32,8 @@ export function telaUsuarios({ outlet: conteudoTela, setTitle: definirTitulo }) 
     PERMISSAO.USERS_READ,
     () => dados.users.list(),
     (resposta) => {
-      const itens = resposta?.members ?? resposta?.items ?? (Array.isArray(resposta) ? resposta : []);
+      const itens =
+        resposta?.members ?? resposta?.items ?? (Array.isArray(resposta) ? resposta : []);
       const cabecalho = cabecalhoPagina({
         title: 'Equipe',
         subtitle: 'Busque pessoas por nome ou e-mail e filtre por cargo ou situação de acesso.',
@@ -80,7 +81,9 @@ export function telaUsuarios({ outlet: conteudoTela, setTitle: definirTitulo }) 
             ],
             match: (usuarioItem, veiculoItem) =>
               !veiculoItem ||
-              (veiculoItem === 'active' ? !!usuarioItem.effective_active : !usuarioItem.effective_active),
+              (veiculoItem === 'active'
+                ? !!usuarioItem.effective_active
+                : !usuarioItem.effective_active),
           },
         ],
         render: (itensPagina) =>
@@ -107,7 +110,12 @@ export function telaUsuarios({ outlet: conteudoTela, setTitle: definirTitulo }) 
                   'td',
                   {},
                   ehProprio
-                    ? [criarElemento('span', { class: 'muted', text: 'Seu próprio acesso é protegido.' })]
+                    ? [
+                        criarElemento('span', {
+                          class: 'muted',
+                          text: 'Seu próprio acesso é protegido.',
+                        }),
+                      ]
                     : [
                         botao({
                           label: 'Alterar cargo',

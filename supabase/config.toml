@@ -77,6 +77,9 @@ additional_redirect_urls = [
   "http://localhost:5174",
   "http://localhost:5174/**",
   "peganafrota://auth-callback",
+  "https://pegafrota.vercel.app/?flow=recover",
+  "http://127.0.0.1:5174/?flow=recover",
+  "http://localhost:5174/?flow=recover",
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
@@ -120,4 +123,11 @@ policy = "oneshot"
 # invocar a função. É uma barreira a mais, não a principal — a função revalida o
 # papel global consultando o banco a cada chamada, porque um JWT válido de
 # usuário comum também passa por aqui.
+verify_jwt = true
+
+[functions.camera-intake]
+# Endpoint nativo: autenticação própria com chave revogável e hash por dispositivo.
+verify_jwt = false
+
+[functions.camera-maintenance]
 verify_jwt = true

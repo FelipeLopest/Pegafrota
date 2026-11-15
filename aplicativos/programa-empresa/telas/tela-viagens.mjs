@@ -1,3 +1,5 @@
+import { contexto } from '../acesso/sessao-e-permissoes.mjs';
+import { consumirAtalho } from '../formularios/apoio-operacoes.mjs';
 import {
   el as criarElemento,
   fmt as formatar,
@@ -23,7 +25,7 @@ import {
   contarOnde,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirModalViagemV8 as abrirFormularioViagem } from '../formularios/formulario-viagem.mjs';
-import { solicitarOdometro } from '../formularios/formulario-informar-odometro.mjs';
+import { abrirOperacaoViagem } from '../formularios/formulario-operacao-viagem.mjs';
 
 export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
   definirTitulo('Viagens');
@@ -32,16 +34,41 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
     conteudoTela,
     PERMISSAO.TRIPS_READ,
     async () => {
-      const [viagens, veiculos, motoristas] = await Promise.all([
-        dados.trips.list(),
+      const [viagens, veiculos, motoristas, locais] = await Promise.all([
+        dados.trips.page(),
         dados.vehicles.list(),
         dados.drivers.list(),
+        dados.locations.eligible().catch(() => []),
       ]);
-      return { trips: viagens, vehicles: veiculos, drivers: motoristas };
+      return {
+        trips: viagens,
+        vehicles: veiculos,
+        drivers: motoristas,
+        locais,
+      };
     },
-    ({ trips: viagens, vehicles: veiculos, drivers: motoristas }) => {
+    ({ trips: viagens, vehicles: veiculos, drivers: motoristas, locais }) => {
       const indiceVeiculo = indice(veiculos),
         indiceDestino = indice(motoristas);
+      const abrirPlanejamento = (vehicleId = '', trip = null) =>
+        abrirFormularioViagem({
+          vehicles: veiculosAtivos(veiculos),
+          drivers: somenteMotoristasElegiveis(motoristas),
+          vehicleId,
+          trip,
+          locations: locais,
+          history: viagens,
+          onDone: recarregar,
+        });
+      if (contexto.can(PERMISSAO.TRIPS_WRITE)) consumirAtalho(abrirPlanejamento);
+      const operar = (trip, action) =>
+        abrirOperacaoViagem({
+          trip,
+          action,
+          vehicle: indiceVeiculo.get(trip.vehicle_id),
+          locations: contexto.can(PERMISSAO.MOVEMENTS_WRITE) ? locais : [],
+          onDone: recarregar,
+        });
       const cabecalho = cabecalhoPagina({
         title: 'Viagens',
         subtitle:
@@ -59,14 +86,7 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
             variant: 'primary',
             icon: 'plus',
             permission: PERMISSAO.TRIPS_WRITE,
-            onClick: () =>
-              abrirFormularioViagem({
-                vehicles: veiculosAtivos(veiculos).filter(
-                  (veiculoItem) => veiculoItem.status === 'available',
-                ),
-                drivers: somenteMotoristasElegiveis(motoristas),
-                onDone: recarregar,
-              }),
+            onClick: () => abrirPlanejamento(),
           }),
         ],
       });
@@ -133,15 +153,26 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
                   class: 'mono',
                   text: formatar.plate(indiceVeiculo.get(itemAtual.vehicle_id)?.plate),
                 }),
-                criarElemento('td', { text: indiceDestino.get(itemAtual.driver_id)?.full_name || '—' }),
-                criarElemento('td', { text: `${itemAtual.origin_label} → ${itemAtual.destination_label}` }),
+                criarElemento('td', {
+                  text: indiceDestino.get(itemAtual.driver_id)?.full_name || '—',
+                }),
+                criarElemento('td', {
+                  text: `${itemAtual.origin_label} → ${itemAtual.destination_label}`,
+                }),
                 criarElemento('td', {}, [
                   criarElemento('status-pill', {
                     status: itemAtual.status,
-                    label: ROTULO_SITUACAO_VIAGEM[itemAtual.status],
+                    label:
+                      itemAtual.status === 'cancelled' && itemAtual.actual_departure_at
+                        ? 'Interrompida'
+                        : ROTULO_SITUACAO_VIAGEM[itemAtual.status],
                   }),
                 ]),
-                criarElemento('td', { text: formatar.dateTime(itemAtual.planned_departure_at) }),
+                criarElemento('td', {
+                  text: formatar.dateTime(
+                    itemAtual.actual_departure_at || itemAtual.planned_departure_at,
+                  ),
+                }),
                 criarElemento('td', {}, [
                   itemAtual.status === 'planned'
                     ? botao({
@@ -149,11 +180,7 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
                         variant: 'secondary',
                         icon: 'right',
                         permission: PERMISSAO.TRIPS_WRITE,
-                        onClick: () =>
-                          solicitarOdometro('Iniciar viagem', 'Odômetro de saída', async (km) => {
-                            await dados.trips.start(itemAtual.id, km);
-                            recarregar();
-                          }),
+                        onClick: () => operar(itemAtual, 'start'),
                       })
                     : null,
                   itemAtual.status === 'in_progress'
@@ -162,14 +189,26 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
                         variant: 'success',
                         icon: 'check',
                         permission: PERMISSAO.TRIPS_WRITE,
-                        onClick: () =>
-                          solicitarOdometro('Concluir viagem', 'Odômetro de retorno', async (km) => {
-                            await dados.trips.complete(itemAtual.id, km);
-                            recarregar();
-                          }),
+                        onClick: () => operar(itemAtual, 'complete'),
                       })
                     : null,
-                  ['planned', 'in_progress'].includes(itemAtual.status)
+                  itemAtual.status === 'planned'
+                    ? botao({
+                        label: 'Editar',
+                        icon: 'edit',
+                        permission: PERMISSAO.TRIPS_WRITE,
+                        onClick: () => abrirPlanejamento('', itemAtual),
+                      })
+                    : null,
+                  itemAtual.status === 'in_progress'
+                    ? botao({
+                        label: 'Interromper',
+                        variant: 'danger',
+                        permission: PERMISSAO.TRIPS_CANCEL,
+                        onClick: () => operar(itemAtual, 'interrupt'),
+                      })
+                    : null,
+                  itemAtual.status === 'planned'
                     ? botao({
                         label: 'Cancelar',
                         variant: 'danger',
@@ -186,10 +225,14 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
                           if (!motivo) return;
                           try {
                             await dados.trips.cancel(itemAtual.id, motivo);
-                            notificacao('Viagem cancelada.', { tone: 'success' });
+                            notificacao('Viagem cancelada.', {
+                              tone: 'success',
+                            });
                             recarregar();
                           } catch (erroCapturado) {
-                            notificacao(erroCapturado.message, { tone: 'danger' });
+                            notificacao(erroCapturado.message, {
+                              tone: 'danger',
+                            });
                           }
                         },
                       })
@@ -200,32 +243,35 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
           ),
         pageSize: 50,
       });
-      const estatisticas = faixaResumo([
-        {
-          label: 'Planejadas',
-          value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'planned'),
-          icon: 'clock',
-          tone: 'info',
-        },
-        {
-          label: 'Em andamento',
-          value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'in_progress'),
-          icon: 'route',
-          tone: 'warning',
-        },
-        {
-          label: 'Concluídas',
-          value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'completed'),
-          icon: 'check',
-          tone: 'success',
-        },
-        {
-          label: 'Canceladas',
-          value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'cancelled'),
-          icon: 'close',
-          tone: 'muted',
-        },
-      ]);
+      const estatisticas = faixaResumo(
+        [
+          {
+            label: 'Planejadas',
+            value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'planned'),
+            icon: 'clock',
+            tone: 'info',
+          },
+          {
+            label: 'Em andamento',
+            value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'in_progress'),
+            icon: 'route',
+            tone: 'warning',
+          },
+          {
+            label: 'Concluídas',
+            value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'completed'),
+            icon: 'check',
+            tone: 'success',
+          },
+          {
+            label: 'Canceladas',
+            value: contarOnde(viagens, (itemAtual) => itemAtual.status === 'cancelled'),
+            icon: 'close',
+            tone: 'muted',
+          },
+        ],
+        { colecao: viagens },
+      );
       return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
     },
   );

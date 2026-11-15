@@ -1,3 +1,4 @@
+import { comandoPara } from './identificar-comando.mjs';
 import {
   selecionar,
   contar,
@@ -34,14 +35,17 @@ export const dadosManutencoes = {
   schedule: (correspondenciaItem) =>
     executarMutacao(
       () =>
-        executarFuncaoBanco('schedule_maintenance', {
+        executarFuncaoBanco('schedule_maintenance_work', {
           p_vehicle_id: correspondenciaItem.vehicleId,
           p_maintenance_type: correspondenciaItem.maintenanceType,
           p_description: correspondenciaItem.description,
-          p_scheduled_for: correspondenciaItem.scheduledFor,
+          p_scheduled_for: correspondenciaItem.scheduledFor || null,
           p_scheduled_odometer_km: correspondenciaItem.scheduledOdometerKm || null,
           p_supplier_name: correspondenciaItem.supplierName || null,
           p_notes: correspondenciaItem.notes || null,
+          p_interval_days: correspondenciaItem.intervalDays || null,
+          p_interval_km: correspondenciaItem.intervalKm || null,
+          p_command_id: comandoPara(correspondenciaItem),
         }),
       'maintenance',
       'vehicles',
@@ -49,7 +53,10 @@ export const dadosManutencoes = {
     ),
   start: (identificador) =>
     executarMutacao(
-      () => executarFuncaoBanco('start_maintenance', { p_maintenance_id: identificador }),
+      () =>
+        executarFuncaoBanco('start_maintenance', {
+          p_maintenance_id: identificador,
+        }),
       'maintenance',
       'vehicles',
       'dashboard',
@@ -57,9 +64,12 @@ export const dadosManutencoes = {
   complete: (identificador, dadosEnvio) =>
     executarMutacao(
       () =>
-        executarFuncaoBanco('complete_maintenance', {
+        executarFuncaoBanco('complete_maintenance_v2', {
           p_maintenance_id: identificador,
           p_total_cost: Number(dadosEnvio.totalCost),
+          p_completed_at: dadosEnvio.completedAt || null,
+          p_no_charge_reason: dadosEnvio.noChargeReason || null,
+          p_command_id: comandoPara(dadosEnvio),
           p_completion_odometer_km: dadosEnvio.completionOdometerKm
             ? Number(dadosEnvio.completionOdometerKm)
             : null,
@@ -70,9 +80,24 @@ export const dadosManutencoes = {
       'vehicles',
       'dashboard',
     ),
+  pausePlan: (id, motivo) =>
+    executarMutacao(
+      () =>
+        executarFuncaoBanco('set_maintenance_plan_active', {
+          p_plan_id: id,
+          p_active: false,
+          p_reason: motivo,
+        }),
+      'maintenance',
+      'dashboard',
+    ),
   cancel: (identificador, motivo) =>
     executarMutacao(
-      () => executarFuncaoBanco('cancel_maintenance', { p_maintenance_id: identificador, p_reason: motivo }),
+      () =>
+        executarFuncaoBanco('cancel_maintenance', {
+          p_maintenance_id: identificador,
+          p_reason: motivo,
+        }),
       'maintenance',
       'vehicles',
       'dashboard',

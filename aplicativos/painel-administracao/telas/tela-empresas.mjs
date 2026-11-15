@@ -21,7 +21,11 @@ import {
   barraPaginacao,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 
-export async function telaEmpresas({ outlet: conteudoTela, setTitle: definirTitulo, query: consulta }) {
+export async function telaEmpresas({
+  outlet: conteudoTela,
+  setTitle: definirTitulo,
+  query: consulta,
+}) {
   definirTitulo('Empresas');
   const estado = {
     search: consulta.get('q') || '',
@@ -194,7 +198,10 @@ export async function telaEmpresas({ outlet: conteudoTela, setTitle: definirTitu
                       }),
                     ]),
                     criarElemento('td', { text: registro.firstAdmin?.fullName || '—' }),
-                    criarElemento('td', { class: 'col-meta', text: formatarDados(registro.createdAt) }),
+                    criarElemento('td', {
+                      class: 'col-meta',
+                      text: formatarDados(registro.createdAt),
+                    }),
                   ]),
                 ),
               ),

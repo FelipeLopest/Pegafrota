@@ -1,0 +1,58 @@
+[
+  {
+    "nome": "compilar-empresa",
+    "codigo": 0
+  },
+  {
+    "nome": "compilar-painel",
+    "codigo": 0
+  },
+  {
+    "nome": "sintaxe-e-imports",
+    "codigo": 0
+  },
+  {
+    "nome": "testes-unitarios",
+    "codigo": 0
+  },
+  {
+    "nome": "funcao-servidor",
+    "codigo": 0
+  },
+  {
+    "nome": "contratos",
+    "codigo": 0
+  },
+  {
+    "nome": "configuracao",
+    "codigo": 0
+  },
+  {
+    "nome": "segredos",
+    "codigo": 0
+  },
+  {
+    "nome": "recursos-locais",
+    "codigo": 0
+  },
+  {
+    "nome": "fronteiras",
+    "codigo": 0
+  },
+  {
+    "nome": "electron",
+    "codigo": 0
+  },
+  {
+    "nome": "prototipos",
+    "codigo": 0
+  },
+  {
+    "nome": "organizacao",
+    "codigo": 0
+  },
+  {
+    "nome": "inicializacao-painel",
+    "codigo": 0
+  }
+]

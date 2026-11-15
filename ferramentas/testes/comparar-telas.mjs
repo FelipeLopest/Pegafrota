@@ -6,7 +6,11 @@ import {
   readdirSync as listarPastaSincrona,
   mkdirSync as criarPastaSincrona,
 } from 'node:fs';
-import { join as juntarCaminhos, resolve as resolverCaminho, dirname as obterPastaPai } from 'node:path';
+import {
+  join as juntarCaminhos,
+  resolve as resolverCaminho,
+  dirname as obterPastaPai,
+} from 'node:path';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 import { PNG as ImagemPng } from 'pngjs';
 import compararPixels from 'pixelmatch';
@@ -77,7 +81,11 @@ function assinatura(imagemPng) {
         outroItemComparado < coordenadaFinalY;
         outroItemComparado += 3
       ) {
-        for (let itemComparado = coordenadaInicialX; itemComparado < coordenadaFinalX; itemComparado += 3) {
+        for (
+          let itemComparado = coordenadaInicialX;
+          itemComparado < coordenadaFinalX;
+          itemComparado += 3
+        ) {
           const indiceItem = (outroItemComparado * imagemPng.width + itemComparado) * 4;
           soma +=
             0.2126 * imagemPng.data[indiceItem] +
@@ -104,7 +112,9 @@ const arquivosDesign = listarPastaSincrona(PASTA_IMAGENS_REFERENCIA).filter((for
   formulario.endsWith('.png'),
 );
 const arquivosImplementacao = new Set(
-  listarPastaSincrona(PASTA_IMAGENS_IMPLEMENTACAO).filter((formulario) => formulario.endsWith('.png')),
+  listarPastaSincrona(PASTA_IMAGENS_IMPLEMENTACAO).filter((formulario) =>
+    formulario.endsWith('.png'),
+  ),
 );
 const pares = [];
 const semPar = [];
@@ -126,7 +136,9 @@ for (const formulario of arquivosDesign) {
   });
 }
 
-const soImpl = [...arquivosImplementacao].filter((formulario2) => !arquivosDesign.includes(formulario2));
+const soImpl = [...arquivosImplementacao].filter(
+  (formulario2) => !arquivosDesign.includes(formulario2),
+);
 
 if (pares.length === 0) ignorar('nenhum par protótipo/implementação encontrado');
 
@@ -227,11 +239,14 @@ gravarArquivoSincrono(
 if (soImpl.length) {
   console.log(`\n  ${soImpl.length} captura(s) da implementação sem tela equivalente na`);
   console.log('  navegação do protótipo (alcançadas de dentro de outras telas):');
-  for (const formulario2 of soImpl.slice(0, 8)) console.log(`    ${formulario2.replace('.png', '')}`);
+  for (const formulario2 of soImpl.slice(0, 8))
+    console.log(`    ${formulario2.replace('.png', '')}`);
 }
 
 console.log(`\n  imagens de diferença: ${DIFERENCAS}`);
-console.log(`  ${resultados.length - corrigir.length}/${resultados.length} pares acima do mínimo estrutural`);
+console.log(
+  `  ${resultados.length - corrigir.length}/${resultados.length} pares acima do mínimo estrutural`,
+);
 
 if (corrigir.length) {
   console.error(`\nvisual:similarity  FAIL — ${corrigir.length} par(es) abaixo do mínimo:`);

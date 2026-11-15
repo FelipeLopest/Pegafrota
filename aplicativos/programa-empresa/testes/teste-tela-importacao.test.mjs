@@ -2,9 +2,15 @@ import testar from 'node:test';
 import verificarCondicao from 'node:assert/strict';
 import { readFileSync as lerArquivoSincrono } from '../../../ferramentas/apoio/ler-codigo-para-testes.mjs';
 
-const tela = lerArquivoSincrono(new URL('../telas/tela-importar-planilha.mjs', import.meta.url), 'utf8');
+const tela = lerArquivoSincrono(
+  new URL('../telas/tela-importar-planilha.mjs', import.meta.url),
+  'utf8',
+);
 const telas = lerArquivoSincrono(new URL('../telas/exportar-telas.mjs', import.meta.url), 'utf8');
-const estilosCss = lerArquivoSincrono(new URL('../estilos/estilo-principal.css', import.meta.url), 'utf8');
+const estilosCss = lerArquivoSincrono(
+  new URL('../estilos/estilo-principal.css', import.meta.url),
+  'utf8',
+);
 
 testar('importação usa dropdown decorado e trilha de etapas', () => {
   verificarCondicao.match(tela, /import-select-shell/);

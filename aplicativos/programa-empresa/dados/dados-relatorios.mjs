@@ -1,26 +1,19 @@
 import { rpc as executarFuncaoBanco } from '../acesso/sessao-e-permissoes.mjs';
+
+export const consultarRelatorio = (tipo, parametros = {}) =>
+  executarFuncaoBanco('fleet_report', {
+    p_kind: tipo,
+    p_from: parametros.from || null,
+    p_to: parametros.to || null,
+    p_page: parametros.page || 1,
+    p_page_size: parametros.pageSize || 50,
+    p_vehicle_id: parametros.vehicleId || null,
+    p_location_id: parametros.locationId || null,
+  });
 export const dadosRelatorios = {
-  monthlyCosts: (parametroItem = {}) =>
-    executarFuncaoBanco('report_monthly_costs', {
-      p_from: parametroItem.from ?? null,
-      p_to: parametroItem.to ?? null,
-    }),
-  vehicleCosts: (parametroItem = {}) =>
-    executarFuncaoBanco('report_vehicle_costs', {
-      p_from: parametroItem.from ?? null,
-      p_to: parametroItem.to ?? null,
-      p_page: parametroItem.page ?? 1,
-      p_page_size: parametroItem.pageSize ?? 50,
-    }),
-  maintenanceDue: (parametroItem = {}) =>
-    executarFuncaoBanco('report_maintenance_due', { p_horizon_days: parametroItem.horizonDays ?? 30 }),
-  recentMovements: (parametroItem = {}) =>
-    executarFuncaoBanco('report_recent_movements', {
-      p_from: parametroItem.from ?? null,
-      p_to: parametroItem.to ?? null,
-      p_vehicle_id: parametroItem.vehicleId ?? null,
-      p_location_id: parametroItem.locationId ?? null,
-      p_page: parametroItem.page ?? 1,
-      p_page_size: parametroItem.pageSize ?? 50,
-    }),
+  monthlyCosts: (parametros) => consultarRelatorio('monthlyCosts', parametros),
+  vehicleCosts: (parametros) => consultarRelatorio('vehicleCosts', parametros),
+  maintenanceDue: (parametros) => consultarRelatorio('maintenanceDue', parametros),
+  recentMovements: (parametros) => consultarRelatorio('recentMovements', parametros),
+  fuelEfficiency: (parametros) => consultarRelatorio('fuelEfficiency', parametros),
 };

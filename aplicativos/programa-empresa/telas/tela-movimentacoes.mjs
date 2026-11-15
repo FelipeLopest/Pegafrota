@@ -26,7 +26,7 @@ export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitul
     PERMISSAO.MOVEMENTS_READ,
     async () => {
       const [movimentacoes, veiculos, locais] = await Promise.all([
-        dados.movements.list(),
+        dados.movements.page(),
         dados.vehicles.list(),
         dados.locations.list(),
       ]);
@@ -86,7 +86,9 @@ export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitul
             ['Quando', 'Veículo', 'Movimento', 'Local', 'Observação'],
             itens.map((correspondenciaItem) =>
               criarElemento('tr', {}, [
-                criarElemento('td', { text: formatar.dateTime(correspondenciaItem.occurred_at) }),
+                criarElemento('td', {
+                  text: formatar.dateTime(correspondenciaItem.occurred_at),
+                }),
                 criarElemento('td', {
                   class: 'mono',
                   text: formatar.plate(indiceVeiculo.get(correspondenciaItem.vehicle_id)?.plate),
@@ -94,7 +96,9 @@ export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitul
                 criarElemento('td', {
                   text: correspondenciaItem.movement_type === 'entry' ? 'Entrada' : 'Saída',
                 }),
-                criarElemento('td', { text: itemLista.get(correspondenciaItem.location_id)?.name || '—' }),
+                criarElemento('td', {
+                  text: itemLista.get(correspondenciaItem.location_id)?.name || '—',
+                }),
                 criarElemento('td', { text: correspondenciaItem.notes || '—' }),
               ]),
             ),
@@ -126,7 +130,8 @@ export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitul
         { label: 'Hoje', value: hoje, icon: 'clock', tone: 'warning' },
         {
           label: 'Veículos movimentados',
-          value: new Set(movimentacoes.map((correspondenciaItem) => correspondenciaItem.vehicle_id)).size,
+          value: new Set(movimentacoes.map((correspondenciaItem) => correspondenciaItem.vehicle_id))
+            .size,
           icon: 'truck',
         },
       ]);

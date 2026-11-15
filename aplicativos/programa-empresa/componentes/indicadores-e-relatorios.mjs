@@ -57,7 +57,9 @@ export function tabela(cabecalhos, linhas) {
 
 export function cartaoPulso(rotulo, valor, dica, nomeIcone, tom = 'neutral') {
   return criarElemento('section', { class: 'pulse-card', dataset: { tone: tom } }, [
-    criarElemento('div', { class: 'pulse-icon', 'aria-hidden': 'true' }, [icone(nomeIcone, { size: 'sm' })]),
+    criarElemento('div', { class: 'pulse-icon', 'aria-hidden': 'true' }, [
+      icone(nomeIcone, { size: 'sm' }),
+    ]),
     criarElemento('div', { class: 'pulse-copy' }, [
       criarElemento('span', { class: 'pulse-label', text: rotulo }),
       criarElemento('strong', { class: 'pulse-value', text: valor }),
@@ -94,7 +96,10 @@ export function colunasCusto(itens) {
       preencher.style.height = `${percentual}%`;
       preencher.style.background = item.color;
       return criarElemento('div', { class: 'vbar-col' }, [
-        criarElemento('div', { class: 'vbar-value', text: formatar.money(item.value) }),
+        criarElemento('div', {
+          class: 'vbar-value',
+          text: formatar.money(item.value),
+        }),
         criarElemento('div', { class: 'vbar-track' }, [preencher]),
         criarElemento('div', { class: 'vbar-label', text: item.label }),
       ]);
@@ -111,7 +116,10 @@ export function medidorOcupacao({ inside: dentro, outside: fora, neverMoved: nun
         criarElemento('strong', { text: `${percentualDentro}%` }),
         criarElemento('span', { text: ' no pátio' }),
       ]),
-      criarElemento('span', { class: 'muted', text: `${total} veículo(s) monitorados` }),
+      criarElemento('span', {
+        class: 'muted',
+        text: `${total} veículo(s) monitorados`,
+      }),
     ]),
     barraProporcao([
       { value: dentro, color: 'var(--pnf-sucesso)' },
@@ -134,7 +142,10 @@ export function barrasHorizontais(itens) {
     'div',
     { class: 'hbars', 'aria-label': 'Comparativo da operação' },
     itens.map((item) => {
-      const percentual = Math.max(item.value ? 8 : 0, Math.round(((Number(item.value) || 0) / maximo) * 100));
+      const percentual = Math.max(
+        item.value ? 8 : 0,
+        Math.round(((Number(item.value) || 0) / maximo) * 100),
+      );
       const preencher = criarElemento('i', { class: 'hbar-fill' });
       preencher.style.width = `${percentual}%`;
       preencher.style.background = item.color;
@@ -179,7 +190,10 @@ export function estatisticaRapida(rotulo, valor, nomeIcone = 'info') {
     ]),
     criarElemento('div', { class: 'summary-stat-copy' }, [
       criarElemento('span', { class: 'summary-stat-label', text: rotulo }),
-      criarElemento('strong', { class: 'summary-stat-value', text: String(valor ?? '—') }),
+      criarElemento('strong', {
+        class: 'summary-stat-value',
+        text: String(valor ?? '—'),
+      }),
     ]),
   ]);
 }
@@ -214,6 +228,7 @@ export const ROTULO_COLUNA = {
 
   // Período
   month: 'Mês',
+  month_start: 'Mês',
   occurred_at: 'Data e hora',
   scheduled_for: 'Agendada para',
   completed_at: 'Concluída em',
@@ -225,7 +240,16 @@ export const ROTULO_COLUNA = {
   total_cost: 'Custo total',
   fuel_cost: 'Combustível',
   maintenance_cost: 'Manutenção',
-  cost_per_km: 'Custo por km',
+  cost_per_km: 'Custo por km do recorte',
+  unit: 'Unidade',
+  total_quantity: 'Quantidade medida',
+  total_distance_km: 'Distância medida',
+  km_per_unit: 'Km por unidade',
+  measured_segments: 'Ciclos válidos',
+  scheduled_odometer_km: 'Km previsto',
+  km_remaining: 'Km restantes',
+  overdue_by_date: 'Vencida por data',
+  overdue_by_odometer: 'Vencida por km',
   total_amount: 'Valor total',
   price_per_liter: 'Valor por litro',
 
@@ -296,6 +320,10 @@ export function humanizarColuna(nome) {
  */
 export function formatarCelula(veiculoItem, coluna) {
   if (veiculoItem == null || veiculoItem === '') return '—';
+  if (typeof veiculoItem === 'boolean') return veiculoItem ? 'Sim' : 'Não';
+  if (coluna === 'month_start')
+    return String(veiculoItem).slice(0, 7).split('-').reverse().join('/');
+  if (coluna === 'unit' && veiculoItem === 'm3') return 'm³';
   if (typeof veiculoItem === 'object') return JSON.stringify(veiculoItem);
 
   const nome = String(coluna || '');
@@ -349,7 +377,8 @@ export function formatarCelula(veiculoItem, coluna) {
     return formatar.date(veiculoItem);
 
   // Código interno com rótulo conhecido
-  if (typeof veiculoItem === 'string' && ROTULO_VALOR[veiculoItem]) return ROTULO_VALOR[veiculoItem];
+  if (typeof veiculoItem === 'string' && ROTULO_VALOR[veiculoItem])
+    return ROTULO_VALOR[veiculoItem];
 
   return String(veiculoItem);
 }

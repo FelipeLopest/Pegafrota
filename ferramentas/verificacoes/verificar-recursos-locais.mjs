@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 import { readFileSync as lerArquivoSincrono } from 'node:fs';
-import { join as juntarCaminhos, relative as caminhoRelativo, sep as separadorAtual } from 'node:path';
+import {
+  join as juntarCaminhos,
+  relative as caminhoRelativo,
+  sep as separadorAtual,
+} from 'node:path';
 import { listarArquivos } from '../apoio/arquivos.mjs';
 
 const RAIZ = process.cwd();
@@ -20,7 +24,9 @@ const achados = [];
 let escaneados = 0;
 
 for (const diretorio of PASTAS_PRODUTO) {
-  for (const arquivo of listarArquivos(juntarCaminhos(RAIZ, diretorio), { ignorar: PASTAS_IGNORADAS })) {
+  for (const arquivo of listarArquivos(juntarCaminhos(RAIZ, diretorio), {
+    ignorar: PASTAS_IGNORADAS,
+  })) {
     if (!/\.(html|css|mjs|cjs|js|jsx)$/.test(arquivo)) continue;
     escaneados += 1;
     const caminhoRelativoAtual = caminhoRelativo(RAIZ, arquivo).split(separadorAtual).join('/');
@@ -50,5 +56,7 @@ if (achados.length === 0) {
 
 console.error(`verify:no-cdn  FAIL — ${achados.length} origem(ns) remota(s)\n`);
 for (const formulario of achados)
-  console.error(`  ${formulario.rel}:${formulario.line}  ${formulario.what}: ${formulario.snippet}`);
+  console.error(
+    `  ${formulario.rel}:${formulario.line}  ${formulario.what}: ${formulario.snippet}`,
+  );
 process.exit(1);

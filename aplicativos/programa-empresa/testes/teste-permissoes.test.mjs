@@ -14,7 +14,9 @@ globalThis.localStorage = {
   },
 };
 globalThis.matchMedia = () => ({ matches: false, addEventListener() {} });
-globalThis.window = { pnf: { getConfig: async () => ({ supabaseUrl: 'https://x.test', anonKey: 'k' }) } };
+globalThis.window = {
+  pnf: { getConfig: async () => ({ supabaseUrl: 'https://x.test', anonKey: 'k' }) },
+};
 globalThis.document = { documentElement: { setAttribute() {}, removeAttribute() {} } };
 
 const {
@@ -125,7 +127,12 @@ testar('permissão concedida limpa o estado negado anterior', () => {
   aplicarPermissao(botao, 'vehicles.write');
   verificarCondicao.equal(botao.disabled, true);
 
-  carregarContexto({ userId: 'u', companyId: 'c', role: 'fleet_manager', permissions: ['vehicles.write'] });
+  carregarContexto({
+    userId: 'u',
+    companyId: 'c',
+    role: 'fleet_manager',
+    permissions: ['vehicles.write'],
+  });
   aplicarPermissao(botao, 'vehicles.write');
 
   verificarCondicao.equal(botao.disabled, false);
@@ -173,7 +180,11 @@ testar('guardRoute distingue "carregando" de "negado"', () => {
   carregarContexto(null);
   const grupo = protegerRota('dashboard.read');
   verificarCondicao.equal(grupo.allowed, false);
-  verificarCondicao.equal(grupo.reason, 'loading', 'mostrar "sem permissão" antes de carregar seria mentira');
+  verificarCondicao.equal(
+    grupo.reason,
+    'loading',
+    'mostrar "sem permissão" antes de carregar seria mentira',
+  );
 });
 
 testar('guardRoute permite rota sem permissão exigida quando há vínculo', () => {
@@ -182,7 +193,8 @@ testar('guardRoute permite rota sem permissão exigida quando há vínculo', () 
 });
 
 testar('settings.manage não existe no vocabulário de permissões', async () => {
-  const { PERMISSAO: PERMISSAO, ROTULO_PERMISSAO: ROTULO_PERMISSAO } = await import('@peganafrota/contracts');
+  const { PERMISSAO: PERMISSAO, ROTULO_PERMISSAO: ROTULO_PERMISSAO } =
+    await import('@peganafrota/contracts');
   verificarCondicao.equal(Object.values(PERMISSAO).includes('settings.manage'), false);
   verificarCondicao.equal('settings.manage' in ROTULO_PERMISSAO, false);
 });
