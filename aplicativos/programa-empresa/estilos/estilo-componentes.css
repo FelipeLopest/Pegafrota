@@ -663,6 +663,10 @@ status-pill[data-tone="neutral"] {
   gap: var(--pnf-espaco-2);
 }
 
+.offline-banner[hidden] {
+  display: none;
+}
+
 .toast-host {
   position: fixed;
   bottom: var(--pnf-espaco-6);
