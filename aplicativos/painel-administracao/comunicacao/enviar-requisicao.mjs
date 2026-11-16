@@ -1,6 +1,6 @@
 import { ERRO_PLATAFORMA } from '@peganafrota/contracts';
 import { configuracao } from './carregar-configuracao.mjs';
-import { sessao } from '../acesso/sessao-do-usuario.mjs';
+import { renovarSessao, sessao } from '../acesso/sessao-do-usuario.mjs';
 import { requisicaoServidor } from './verificar-conexao.mjs';
 
 export class ErroBackend extends Error {
@@ -34,7 +34,22 @@ export class ErroBackend extends Error {
 
 export let requisicaoSequencia = 0;
 
-export async function chamar(acao, dadosEnvio = {}, opcoes = {}) {
+export function verificarMesmaSessao(geracaoInicial) {
+  if (sessao.geracao !== geracaoInicial)
+    throw new ErroBackend({
+      hint: 'SESSION_CHANGED',
+      message: 'A sessão mudou durante a consulta.',
+      status: 409,
+    });
+}
+
+export function chamar(acao, dadosEnvio = {}, opcoes = {}) {
+  return enviar(acao, dadosEnvio, opcoes, sessao.geracao, false);
+}
+
+async function enviar(acao, dadosEnvio, opcoes, geracaoInicial, renovou) {
+  verificarMesmaSessao(geracaoInicial);
+  if (opcoes.signal?.aborted) throw opcoes.signal.reason;
   const { supabaseUrl: enderecoSupabase, anonKey: chaveAnonima } = configuracao();
   const token = sessao.accessToken;
 
@@ -69,10 +84,13 @@ export async function chamar(acao, dadosEnvio = {}, opcoes = {}) {
   }
 
   const corpo = await resposta.json().catch(() => ({}));
-  const dica = corpo?.error?.hint;
+  verificarMesmaSessao(geracaoInicial);
 
   if (resposta.status === 401) {
-    sessao.clear();
+    if (!renovou && (await renovarSessao(token, geracaoInicial)))
+      return enviar(acao, dadosEnvio, opcoes, geracaoInicial, true);
+    verificarMesmaSessao(geracaoInicial);
+    if (sessao.accessToken === token) sessao.clear();
     throw new ErroBackend({ hint: 'UNAUTHENTICATED', message: 'Sessão expirada.', status: 401 });
   }
 

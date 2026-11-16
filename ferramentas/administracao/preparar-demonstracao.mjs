@@ -4,6 +4,7 @@ import postgres from 'pg';
 import { readFile as lerArquivo } from 'node:fs/promises';
 import { fileURLToPath as converterEnderecoEmCaminho } from 'node:url';
 import { dirname as obterPastaPai, join as juntarCaminhos } from 'node:path';
+import { validarSenha } from '../../compartilhado/validacoes/validar-senha.mjs';
 
 const AQUI = obterPastaPai(converterEnderecoEmCaminho(import.meta.url));
 const RAIZ = juntarCaminhos(AQUI, '../..');
@@ -11,7 +12,7 @@ const RAIZ = juntarCaminhos(AQUI, '../..');
 const ENDERECO_SUPABASE = process.env.SUPABASE_URL;
 const CHAVE_PRIVILEGIADA_SERVIDOR = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ENDERECO_BANCO = process.env.DATABASE_URL;
-const SENHA_DEMONSTRACAO = process.env.SEED_DEMO_PASSWORD || 'PegaNaFrota#2026';
+const SENHA_DEMONSTRACAO = process.env.SEED_DEMO_PASSWORD;
 
 const argumentos = new Set(process.argv.slice(2));
 const SOMENTE_SIMULAR = argumentos.has('--dry-run');
@@ -85,11 +86,16 @@ function exigirAmbiente() {
   if (!ENDERECO_SUPABASE) ausentes.push('SUPABASE_URL');
   if (!CHAVE_PRIVILEGIADA_SERVIDOR && !SOMENTE_SIMULAR) ausentes.push('SUPABASE_SERVICE_ROLE_KEY');
   if (!ENDERECO_BANCO && !SOMENTE_SIMULAR) ausentes.push('DATABASE_URL');
+  if (!SENHA_DEMONSTRACAO && !SOMENTE_SIMULAR) ausentes.push('SEED_DEMO_PASSWORD');
   if (ausentes.length > 0) {
     console.error(
       `Faltam variáveis de ambiente: ${ausentes.join(', ')}\n\n` +
         'Nunca coloque a service role key em arquivo versionado.',
     );
+    process.exit(1);
+  }
+  if (!SOMENTE_SIMULAR && !validarSenha(SENHA_DEMONSTRACAO).ok) {
+    console.error('Defina uma senha forte e exclusiva para o ambiente de demonstração.');
     process.exit(1);
   }
 }

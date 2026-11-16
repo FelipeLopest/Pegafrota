@@ -78,9 +78,28 @@ export async function verificarAcessoPlataforma() {
   } catch (erro) {
     if (erro instanceof ErroBackend && erro.lostAccess) return { ok: false, reason: 'not_admin' };
     if (erro instanceof ErroBackend && erro.status === 401) return { ok: false, reason: 'expired' };
-    if (erro instanceof ErroBackend && erro.status === 0) return { ok: true, degraded: true };
     return { ok: false, reason: 'error', error: erro };
   }
+}
+
+function renderizarConexaoPendente(mensagem) {
+  aplicativo.replaceChildren(
+    criarElemento('main', { class: 'auth-page' }, [
+      criarElemento('div', { class: 'auth-card' }, [
+        criarElemento('h1', {
+          class: 'auth-title',
+          text: 'Vamos retomar sua conexão',
+        }),
+        criarElemento('p', { class: 'auth-subtitle', text: mensagem }),
+        botao({
+          label: 'Tentar reconectar',
+          variant: 'primary',
+          onClick: inicializar,
+        }),
+      ]),
+    ]),
+  );
+  aplicativo.removeAttribute('aria-busy');
 }
 
 export async function inicializar() {
@@ -113,29 +132,11 @@ export async function inicializar() {
     ator = await usuarioAtual();
   } catch (erro) {
     if (erro?.status === 401) {
-      sessao.clear();
       renderizarLogin({ onSuccess: inicializar });
     } else {
-      aplicativo.replaceChildren(
-        criarElemento('main', { class: 'auth-page' }, [
-          criarElemento('div', { class: 'auth-card' }, [
-            criarElemento('h1', {
-              class: 'auth-title',
-              text: 'Vamos retomar sua conexão',
-            }),
-            criarElemento('p', {
-              class: 'auth-subtitle',
-              text: 'Sua sessão foi preservada. Confira a conexão e tente novamente.',
-            }),
-            botao({
-              label: 'Tentar reconectar',
-              variant: 'primary',
-              onClick: inicializar,
-            }),
-          ]),
-        ]),
+      renderizarConexaoPendente(
+        'Sua sessão foi preservada. Confira a conexão e tente novamente.',
       );
-      aplicativo.removeAttribute('aria-busy');
     }
     return;
   }
@@ -148,12 +149,17 @@ export async function inicializar() {
   const acesso = await verificarAcessoPlataforma();
 
   if (!acesso.ok && acesso.reason === 'expired') {
-    sessao.clear();
     renderizarLogin({ onSuccess: inicializar });
     return;
   }
   if (!acesso.ok && acesso.reason === 'not_admin') {
     renderizarSemAcesso();
+    return;
+  }
+  if (!acesso.ok) {
+    renderizarConexaoPendente(
+      'Não foi possível confirmar seu acesso ao painel. Tente reconectar para continuar.',
+    );
     return;
   }
 

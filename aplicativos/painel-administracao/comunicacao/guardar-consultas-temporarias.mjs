@@ -6,13 +6,15 @@ export let cachePainel = null;
 export let painelEmCurso = null;
 
 export async function carregarPainelComCache(parametros = {}) {
-  const chave = JSON.stringify([sessao.accessToken, parametros || {}]);
+  const geracao = sessao.geracao;
+  const chave = JSON.stringify([geracao, parametros || {}]);
   const agora = Date.now();
   if (cachePainel?.chave === chave && cachePainel.expiraEm > agora) return cachePainel.valor;
   if (painelEmCurso?.chave === chave) return painelEmCurso.promessa;
   const promessa = chamar('dashboard.get', parametros)
     .then((valor) => {
-      cachePainel = { chave, valor, expiraEm: Date.now() + 3000 };
+      if (sessao.geracao === geracao)
+        cachePainel = { chave, valor, expiraEm: Date.now() + 3000 };
       return valor;
     })
     .finally(() => {

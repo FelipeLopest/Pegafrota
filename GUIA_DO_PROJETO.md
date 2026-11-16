@@ -217,4 +217,3 @@ O limite padrão é de 1.000 fotos por câmera em 24 horas corridas, ajustável 
 | `aplicativos/painel-administracao/telas/tela-recuperar-senha.mjs` | Recebe o link de recuperação e permite definir a senha nova. |
 | `supabase/migrations/20261110*.sql` | Seis mudanças novas: reenvios, quilometragem, viagens, pátio, preventiva, consumo, consultas e importação. |
 | `ferramentas/testes/evolucao/testar-banco.cjs` | Aplica as migrations e exercita as operações num banco descartável. |
-

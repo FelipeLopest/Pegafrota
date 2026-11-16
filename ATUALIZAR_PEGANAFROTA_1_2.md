@@ -22,19 +22,22 @@ O ZIP contém uma única pasta chamada **PegaNaFrota_Reorganizado**. Extraia em 
 
 Teste primeiro com um banco separado e faça uma cópia de segurança do banco em uso. As seis migrations de nome iniciado por 20261110 complementam as anteriores. Elas precisam rodar em ordem. A versão 1.2.0 não funciona por inteiro com o banco da 1.1.1.
 
-Na raiz extraída, com o CLI do Supabase instalado, use **a referência do projeto que quer atualizar**. Os comandos abaixo usam o CLI v3:
+Abra o PowerShell na pasta extraída que contém package.json e supabase. Com Node.js instalado, rode os comandos abaixo para o projeto usado pelo app. Eles usam o CLI v2 porque o arquivo supabase/config.toml desta versão ainda contém a seção [inbucket]. [Compatibilidade do CLI](https://supabase.com/docs/guides/local-development/cli/migrating-to-v3)
 
-    supabase login
-    supabase link --project-ref REFERENCIA_DO_PROJETO
-    supabase migration list --remote
-    supabase db push --dry-run --remote
+    npx.cmd --yes supabase@v2.stable login
+    npx.cmd --yes supabase@v2.stable link --project-ref jnznizrtbivrvqkskcep
+    npx.cmd --yes supabase@v2.stable migration list --linked
+    npx.cmd --yes supabase@v2.stable db push --dry-run --linked
 
 Confira o projeto de destino e a lista exibida. Se o banco já tiver as 50 migrations até câmeras, a prévia deve indicar as seis novas. Se ele tiver só as 49 originais, a mudança de câmera 20261109000100_camera_capture_pipeline.sql também deve estar na lista antes das seis novas. Se as tabelas foram criadas pelo SQL Editor e o histórico estiver vazio ou divergente, compare o esquema e regularize o histórico antes de prosseguir. Reaplicar migrations antigas sobre tabelas existentes pode falhar.
 
 Depois de conferir a prévia e testar num banco separado:
 
-    supabase db push --remote
-    supabase functions deploy platform-admin
+    npx.cmd --yes supabase@v2.stable db push --linked
+
+Após a confirmação de que o banco foi atualizado, publique a função:
+
+    npx.cmd --yes supabase@v2.stable functions deploy platform-admin --project-ref jnznizrtbivrvqkskcep --use-api
 
 A nova função platform-admin usa a pesquisa de administradores no banco inteiro. Preserve o valor da origem em **Edge Functions → Secrets → ADMIN_WEB_ORIGINS**. Para o painel atual, é **https://pegafrota.vercel.app**, sem barra final.
 

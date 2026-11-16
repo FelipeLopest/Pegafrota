@@ -161,6 +161,7 @@ export function linhaAdministrador(
   const {
     userId: usuarioIdentificador,
     fullName: nomeCompleto,
+    email,
     companyId: empresaIdentificador,
     companyTradeName: empresaTradeNome,
     companyAccessActive: empresaAcessoAtivo,
@@ -234,7 +235,7 @@ export function linhaAdministrador(
         }[convite.status] || convite.status,
     });
 
-    const podeReenviar = convite.status !== 'accepted' && !reenviarEm;
+    const podeReenviar = convite.status !== 'accepted' && !reenviarEm && Boolean(email);
 
     return criarElemento('div', { class: 'invite-cell' }, [
       etiquetaSituacao,
@@ -249,9 +250,11 @@ export function linhaAdministrador(
             label: 'Reenviar convite',
             variant: 'ghost',
             disabled: !podeReenviar,
-            title: reenviarEm
-              ? `Reenvio disponível em ${reenviarEm}`
-              : 'Envia um novo convite e invalida o link anterior.',
+            title: !email
+              ? 'Este usuário não tem e-mail cadastrado.'
+              : reenviarEm
+                ? `Reenvio disponível em ${reenviarEm}`
+                : 'Envia um novo convite e invalida o link anterior.',
             onClick: () => aoReenviarConvite?.(entrada),
           })
         : null,
@@ -269,6 +272,7 @@ export function linhaAdministrador(
         criarElemento('div', { class: 'admin-identity' }, [
           criarElemento('span', { class: 'admin-name', text: nomeCompleto || '—' }),
           criarElemento('span', { class: 'admin-meta', text: empresaTradeNome || '' }),
+          email ? criarElemento('span', { class: 'admin-meta', text: email }) : null,
         ]),
       ]),
       criarElemento('td', { class: 'col-scope' }, [escopoEmpresa]),

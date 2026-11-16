@@ -42,12 +42,14 @@ export async function telaAdministradores({
     subtitle: 'Pesquise pessoas sem confundir acesso a uma empresa com o estado global da conta.',
   });
   const carregar = async () => {
+    const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
     const areaLista = criarElemento('div', {});
     conteiner.replaceChildren(
       cabecalho,
       barraFiltros({
         searchValue: estado.search,
-        searchPlaceholder: 'Nome ou e-mail',
+        searchPlaceholder: 'Nome, e-mail ou empresa',
+        filtersOpen: filtrosAbertos,
         onSearch: (veiculoItem) => {
           estado.search = veiculoItem;
           estado.page = 1;
@@ -141,7 +143,10 @@ export async function telaAdministradores({
         if (resposta.total === 0)
           return estadoVazio({
             title: 'Nenhum administrador encontrado',
-            description: 'Provisione uma empresa para criar o primeiro administrador.',
+            description:
+              estado.search || estado.access || estado.account || estado.companyId
+                ? 'Revise ou limpe os filtros da lista.'
+                : 'Provisione uma empresa para criar o primeiro administrador.',
           });
         const manipuladores = {
           onSuspendCompany: (evento) => executarSuspensaoEmpresa(evento, servicos, carregar),

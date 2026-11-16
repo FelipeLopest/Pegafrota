@@ -1,3 +1,7 @@
+## Atualização 1.2.2 — correções validadas em operação
+
+Se já usa o PegaNaFrota, siga [o guia 1.2.2](ATUALIZAR_PEGANAFROTA_1_2_2.md). Atualize o banco e a função platform-admin antes da publicação do painel e do novo instalador.
+
 ## Atualização 1.2.0 — operação da frota
 
 Esta versão revisa viagens, portaria, abastecimento, manutenção, relatórios, importação e acesso. **Se já usa o PegaNaFrota, siga `ATUALIZAR_PEGANAFROTA_1_2.md` antes de publicar o painel ou distribuir o instalador.** As novas migrations precisam estar aplicadas no Supabase. A câmera continua opcional.

@@ -34,12 +34,14 @@ export async function telaProvisionamentos({
       'Filtre por estado e use a busca rápida para localizar empresa, erro ou identificador na página atual.',
   });
   const carregar = async () => {
+    const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
     const areaLista = criarElemento('div', {});
     conteiner.replaceChildren(
       cabecalho,
       barraFiltros({
         searchValue: estado.search,
         searchPlaceholder: 'Buscar nesta página por empresa, ID ou erro',
+        filtersOpen: filtrosAbertos,
         onSearch: (veiculoItem) => {
           estado.search = veiculoItem;
           carregar();

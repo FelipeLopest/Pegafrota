@@ -527,6 +527,61 @@ const minuto = (deslocamento = 0) => new Date(Date.now() + deslocamento * 60000)
       /permission denied/,
     );
     passou('Filtro global antecede a paginação e exige autorização da plataforma');
+
+    const veiculoPartida = await veiculo(100);
+    const viagemPartida = await viagem(veiculoPartida);
+    await rpc('start_trip', [viagemPartida.tripId, minuto(-8), 500]);
+    const partida = (await rpc('odometer_effective_history', [veiculoPartida])).items[0];
+    verificar.equal(partida.source_type, 'trip_departure');
+    verificar.equal(Number(partida.effective_km), 500);
+    verificar.equal(Number(partida.previous_km), 100);
+    verificar.equal(
+      Number((await linha('select current_odometer_km from public.vehicles where id=$1', [veiculoPartida])).current_odometer_km),
+      500,
+    );
+    await verificar.rejects(
+      () => abastecer(veiculoPartida, 200, minuto(-7)),
+      /ODOMETER_CHRONOLOGY_CONFLICT/,
+    );
+    const retornoComLeitura = await rpc('complete_trip', [viagemPartida.tripId, 550, minuto(-6)]);
+    const corrigir = (evento, km) => rpc('correct_odometer', [
+      veiculoPartida, evento, km, 'Leitura conferida com o comprovante', randomUUID(),
+    ]);
+    await verificar.rejects(() => corrigir(retornoComLeitura.odometerEventId, 400), /CORRECTION_CONFLICT/);
+    await corrigir(retornoComLeitura.odometerEventId, 530);
+    await corrigir(partida.id, 490);
+    const atualizado = await rpc('fleet_list', ['trips', null, { vehicle: veiculoPartida }]);
+    verificar.equal(Number(atualizado.items[0].start_odometer_km), 490);
+    verificar.equal(Number(atualizado.items[0].end_odometer_km), 530);
+    const relatado = await rpc('fleet_report', ['vehicleCosts', null, null, 1, 50, veiculoPartida]);
+    verificar.equal(Number(relatado.items[0].distance_km), 40);
+    const historia = (await rpc('odometer_effective_history', [veiculoPartida])).items;
+    verificar.equal(Number(historia.find((item) => item.id === partida.id).odometer_km), 500);
+    verificar.equal(Number(historia.find((item) => item.id === retornoComLeitura.odometerEventId).odometer_km), 550);
+    passou('Partida define limite e correções da viagem preservam as leituras originais');
+
+    const veiculoRecorrente = await veiculo(100);
+    const recorrente = await rpc('schedule_maintenance_work', [
+      veiculoRecorrente, 'preventive', 'Revisão por quilometragem', null, 1200,
+      null, null, null, 500, randomUUID(),
+    ]);
+    const servico = await rpc('complete_maintenance_v2', [
+      recorrente.maintenanceId, 70, minuto(-4), 1200, null, null, null, randomUUID(),
+    ]);
+    const ajustarRevisao = (km) => rpc('correct_odometer', [
+      veiculoRecorrente, servico.odometerEventId, km, 'Leitura corrigida com a nota', randomUUID(),
+    ]);
+    const limiteProxima = async () => Number(
+      (await linha('select scheduled_odometer_km from public.maintenance_records where id=$1', [servico.nextMaintenanceId])).scheduled_odometer_km,
+    );
+    verificar.equal(await limiteProxima(), 1700);
+    await ajustarRevisao(1000);
+    verificar.equal(await limiteProxima(), 1500);
+    await rpc('start_maintenance', [servico.nextMaintenanceId, minuto(-3)]);
+    await ajustarRevisao(1050);
+    verificar.equal(await limiteProxima(), 1500);
+    passou('Odômetro corrigido recalcula preventiva pendente e preserva a revisão iniciada');
+
     process.stdout.write(
       `${aprovados} cenários operacionais aprovados com ${migracoes.length} migrations em PostgreSQL descartável.\n`,
     );

@@ -237,22 +237,30 @@ export function barraFiltros({
   searchPlaceholder: textoBusca = 'Buscar…',
   onSearch: aoBuscar,
   fields: campos = [],
+  filtersOpen: filtrosAbertos = false,
   onClear: aoLimpar,
   countText: textoContagem = '',
 }) {
+  let buscaEnviada = valorBusca;
+  const buscar = (texto) => {
+    const termo = texto.trim();
+    if (termo === buscaEnviada) return;
+    buscaEnviada = termo;
+    aoBuscar?.(termo);
+  };
   const busca = criarElemento('input', {
     class: 'input',
     type: 'search',
     value: valorBusca,
     placeholder: textoBusca,
     dataset: { listSearch: 'true' },
-    onChange: (evento) => aoBuscar?.(evento.target.value),
+    onChange: (evento) => buscar(evento.target.value),
     onKeydown: (evento) => {
-      if (evento.key === 'Enter') aoBuscar?.(evento.target.value);
+      if (evento.key === 'Enter') buscar(evento.target.value);
     },
   });
   const avancado = campos.length
-    ? criarElemento('details', { class: 'filter-drawer' }, [
+    ? criarElemento('details', { class: 'filter-drawer', open: filtrosAbertos }, [
         criarElemento('summary', { class: 'filter-summary' }, [
           icone('filter', { size: 'sm' }),
           criarElemento('span', { text: 'Filtros' }),

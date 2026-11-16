@@ -16,15 +16,17 @@
  * nunca é impressa e NUNCA vai para o pacote do Electron (ADR-003).
  *
  * Uso:
- *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node ferramentas/administracao/preparar-usuarios-demonstracao.mjs
+ *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... SEED_DEMO_PASSWORD=... node ferramentas/administracao/preparar-usuarios-demonstracao.mjs
  *   ... node ferramentas/administracao/preparar-usuarios-demonstracao.mjs --reset-passwords
  *   ... node ferramentas/administracao/preparar-usuarios-demonstracao.mjs --dry-run
  * =============================================================================
  */
 
+import { validarSenha } from '../../compartilhado/validacoes/validar-senha.mjs';
+
 const ENDERECO_SUPABASE = process.env.SUPABASE_URL;
 const CHAVE_PRIVILEGIADA_SERVIDOR = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SENHA_DEMONSTRACAO = process.env.SEED_DEMO_PASSWORD || 'PegaNaFrota#2026';
+const SENHA_DEMONSTRACAO = process.env.SEED_DEMO_PASSWORD;
 
 const argumentos = new Set(process.argv.slice(2));
 const SOMENTE_SIMULAR = argumentos.has('--dry-run');
@@ -37,6 +39,11 @@ if (!ENDERECO_SUPABASE || (!CHAVE_PRIVILEGIADA_SERVIDOR && !SOMENTE_SIMULAR)) {
       '  SUPABASE_SERVICE_ROLE_KEY (obtida com `supabase status`)\n\n' +
       'Nunca coloque a service role key em arquivo versionado.',
   );
+  process.exit(1);
+}
+
+if (!SOMENTE_SIMULAR && !validarSenha(SENHA_DEMONSTRACAO).ok) {
+  console.error('Defina SEED_DEMO_PASSWORD com uma senha forte e exclusiva antes de gravar contas.');
   process.exit(1);
 }
 

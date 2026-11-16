@@ -54,7 +54,9 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
   };
   let etapa = 1;
   let erros = {};
-  const chaveIdempotencia = novaChaveIdempotencia('prov');
+  let chaveIdempotencia;
+  let ultimoConteudo;
+  let enviando = false;
   const camposEditados = new Set();
   const camposAutomaticos = new Map();
   const entradasVisiveis = new Map();
@@ -343,6 +345,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
   }
 
   async function enviar() {
+    if (enviando) return;
     const resultadoItem = validarEtapaPrimeiroAdministrador({
       fullName: formulario.fullName,
       email: formulario.adminEmail,
@@ -364,38 +367,50 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
       return;
     }
 
+    const pedido = {
+      company: {
+        legalName: formulario.legalName,
+        tradeName: formulario.tradeName,
+        cnpj: formulario.cnpj,
+        email: formulario.email || null,
+        phone: formulario.phone || null,
+        addressStreet: formulario.addressStreet,
+        addressNumber: formulario.addressNumber,
+        addressComplement: formulario.addressComplement,
+        addressDistrict: formulario.addressDistrict,
+        addressCity: formulario.addressCity,
+        addressState: formulario.addressState,
+        addressPostalCode: formulario.addressPostalCode,
+        timezone: formulario.timezone,
+      },
+      firstAdmin: {
+        fullName: formulario.fullName,
+        email: formulario.adminEmail,
+        phone: formulario.adminPhone || null,
+      },
+    };
+    const conteudo = JSON.stringify(pedido);
+    if (conteudo !== ultimoConteudo) {
+      ultimoConteudo = conteudo;
+      chaveIdempotencia = novaChaveIdempotencia('prov');
+    }
+    enviando = true;
     const progresso = mostrarProgressoCadastroEmpresa();
 
     try {
       const operacao = await servicos.companies.provision({
+        ...pedido,
         idempotencyKey: chaveIdempotencia,
-        company: {
-          legalName: formulario.legalName,
-          tradeName: formulario.tradeName,
-          cnpj: formulario.cnpj,
-          email: formulario.email || null,
-          phone: formulario.phone || null,
-          addressStreet: formulario.addressStreet,
-          addressNumber: formulario.addressNumber,
-          addressComplement: formulario.addressComplement,
-          addressDistrict: formulario.addressDistrict,
-          addressCity: formulario.addressCity,
-          addressState: formulario.addressState,
-          addressPostalCode: formulario.addressPostalCode,
-          timezone: formulario.timezone,
-        },
         firstAdmin: {
-          fullName: formulario.fullName,
-          email: formulario.adminEmail,
-          phone: formulario.adminPhone || null,
+          ...pedido.firstAdmin,
           password: formulario.adminPassword,
         },
       });
 
       progresso.update(operacao);
+      progresso.close();
 
       if (operacao.status === 'succeeded') {
-        progresso.close();
         notificacao(
           'Empresa provisionada. O administrador já pode entrar no Electron com e-mail e senha.',
           {
@@ -404,10 +419,18 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
           },
         );
         navegar(`/empresas/${operacao.companyId}`);
+      } else {
+        notificacao('O cadastro ainda está em andamento. Aguarde e consulte com os mesmos dados.', {
+          tone: 'warning',
+        });
       }
     } catch (erro) {
       progresso.close();
-      if (erro instanceof ErroBackend && erro.isConflict) {
+      if (erro instanceof ErroBackend && ['auth_email_conflict', 'invalid_email'].includes(erro.hint)) {
+        erros = { adminEmail: erro.message };
+        renderizar();
+        entradasVisiveis.get('adminEmail')?.focus();
+      } else if (erro instanceof ErroBackend && erro.isConflict) {
         mostrarConflito({
           hint: erro.hint,
           message: erro.message,
@@ -429,6 +452,8 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
           tone: 'danger',
         });
       }
+    } finally {
+      enviando = false;
     }
   }
 

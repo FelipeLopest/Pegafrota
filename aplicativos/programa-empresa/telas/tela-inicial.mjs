@@ -413,7 +413,7 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
                   habilitacao
                     ? linhaAtencao(
                         habilitacao,
-                        'CNH a vencer',
+                        'CNH vencida ou a vencer',
                         'var(--pnf-aviso-texto)',
                         'habilitações próximas do fim',
                         'alerts-license',

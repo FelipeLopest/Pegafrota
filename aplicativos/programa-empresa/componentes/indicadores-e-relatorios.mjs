@@ -200,7 +200,8 @@ export function estatisticaRapida(rotulo, valor, nomeIcone = 'info') {
 
 export const ORIGENS_ODOMETRO = {
   vehicle_registration: 'Cadastro',
-  trip_completion: 'Viagem',
+  trip_departure: 'Saída de viagem',
+  trip_completion: 'Retorno de viagem',
   fueling: 'Abastecimento',
   maintenance_completion: 'Manutenção',
   manual_adjustment: 'Ajuste manual',

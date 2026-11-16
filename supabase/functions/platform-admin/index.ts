@@ -70,6 +70,7 @@ const SITUACAO_HTTP_POR_DICA: Record<string, number> = {
   USER_NOT_ACTIVE: 409,
   AUTH_UPDATE_FAILED: 502,
   AUTH_DELETE_FAILED: 502,
+  AUTH_PROVISIONING_UNAVAILABLE: 502,
   CANNOT_BLOCK_SELF: 409,
   CONFLICT_STALE: 409,
   CONFLICT_STATE: 409,
@@ -453,12 +454,12 @@ async function chamarPlataforma(funcao: string, argumentos: Record<string, unkno
   return dados;
 }
 
-const provisionarEmpresa: Manipulador = async (ator, dadosEnvio, requisicao) => {
+const provisionarEmpresa: Manipulador = async (ator, dadosEnvio) => {
   const {
     company: empresa,
     firstAdmin: primeiroAdministrador,
     idempotencyKey: chaveIdempotencia,
-  } = dadosEnvio;
+  } = dadosEnvio ?? {};
   const senha =
     typeof primeiroAdministrador?.password === 'string' ? primeiroAdministrador.password : '';
 
@@ -484,141 +485,86 @@ const provisionarEmpresa: Manipulador = async (ator, dadosEnvio, requisicao) => 
     accessMode: 'password',
   };
 
-  const aberto = await chamarPlataforma('open_operation', {
-    p_kind: 'provision_company',
+  const aberto = await chamarPlataforma('prepare_company_provisioning', {
     p_actor_user_id: ator.userId,
     p_idempotency_key: chaveIdempotencia,
-    p_payload: { company: empresa, firstAdmin: primeiroAdministradorAuditavel },
-    p_steps: ['create_company', 'create_auth_user', 'link_company_admin', 'send_invite'],
+    p_company: empresa,
+    p_first_admin: primeiroAdministradorAuditavel,
   });
-
-  const linha = Array.isArray(aberto) ? aberto[0] : aberto;
-  const operacaoIdentificador = linha.operation_id ?? linha.operationId;
-
-  if (linha.is_replay && ['succeeded', 'running'].includes(linha.current_status)) {
+  const operacaoIdentificador = aberto.operationId;
+  const tentativa = aberto.attempt;
+  if (!aberto.execute) {
     return await chamarPlataforma('get_operation', {
       p_actor_user_id: ator.userId,
       p_operation_id: operacaoIdentificador,
     });
   }
 
-  let empresaIdentificador: string | null = null;
-  let usuarioAutenticacaoCriadoIdentificador: string | null = null;
+  let usuarioAutenticacao: string | null = aberto.authUserId ?? null;
 
   try {
-    const criado: any = await chamarPlataforma('provision_company_record', {
-      p_operation_id: operacaoIdentificador,
-      p_actor_user_id: ator.userId,
-      p_company: empresa,
-    });
-    empresaIdentificador = criado.companyId;
-
-    await chamarPlataforma('mark_step', {
-      p_operation_id: operacaoIdentificador,
-      p_step_code: 'create_auth_user',
-      p_status: 'running',
-    });
-
-    const email = String(primeiroAdministrador.email).trim().toLowerCase();
-    const identidade = await resolverIdentidade(email);
-
-    // Não sobrescrevemos senha de uma conta já existente. Isso evita que o
-    // administrador da plataforma redefina, sem perceber, credenciais usadas
-    // por outra pessoa/empresa.
-    if (identidade.state !== 'absent') {
-      await chamarPlataforma('mark_step', {
-        p_operation_id: operacaoIdentificador,
-        p_step_code: 'create_auth_user',
-        p_status: 'failed',
-        p_detail: 'O e-mail já possui uma conta no Supabase Auth.',
-        p_error_code: 'auth_email_conflict',
-      });
-      throw {
-        hint: 'auth_email_conflict',
-        message:
-          'Este e-mail já possui uma conta. Use outro e-mail para o primeiro administrador ou trate a conta existente separadamente.',
-      };
-    }
-
-    const { data: dadosAutenticacao, error: erroAutenticacao } =
-      await administrador.auth.admin.createUser({
-        email,
-        password: senha,
-        email_confirm: true,
-        user_metadata: { full_name: primeiroAdministrador.fullName },
-      });
-
-    if (erroAutenticacao || !dadosAutenticacao?.user?.id) {
-      await chamarPlataforma('mark_step', {
-        p_operation_id: operacaoIdentificador,
-        p_step_code: 'create_auth_user',
-        p_status: 'failed',
-        p_detail: erroAutenticacao?.message ?? 'Supabase Auth não devolveu o usuário.',
-        p_error_code: 'auth_email_conflict',
-      });
-      throw {
-        hint: 'auth_email_conflict',
-        message: erroAutenticacao?.message ?? 'Não foi possível criar a conta de acesso.',
-      };
-    }
-
-    usuarioAutenticacaoCriadoIdentificador = dadosAutenticacao.user.id;
-
-    await chamarPlataforma('mark_step', {
-      p_operation_id: operacaoIdentificador,
-      p_step_code: 'create_auth_user',
-      p_status: 'succeeded',
-      p_detail: 'Conta criada com e-mail confirmado e login por senha habilitado.',
-    });
-
-    // Esta RPC vincula o company_admin ATIVO, marca a antiga etapa de convite
-    // como "skipped" e conclui a operação na mesma transação do banco.
-    const concluida = await chamarPlataforma('provision_first_admin_password', {
-      p_operation_id: operacaoIdentificador,
-      p_actor_user_id: ator.userId,
-      p_company_id: empresaIdentificador,
-      p_user_id: usuarioAutenticacaoCriadoIdentificador,
-      p_email: email,
-      p_full_name: primeiroAdministrador.fullName,
-      p_phone: primeiroAdministrador.phone ?? null,
-    });
-
-    return concluida;
-  } catch (erro: any) {
-    // Se a conta Auth nasceu nesta tentativa mas o vínculo transacional falhou,
-    // removemos a identidade para não deixar uma conta órfã.
-    if (usuarioAutenticacaoCriadoIdentificador) {
-      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(
-        usuarioAutenticacaoCriadoIdentificador,
-      );
-      if (erroExclusao) {
-        console.error('platform-admin: falha ao compensar usuário Auth', {
-          userId: usuarioAutenticacaoCriadoIdentificador,
-          message: erroExclusao.message,
+    if (!usuarioAutenticacao) {
+      const { data: dadosAutenticacao, error: erroAutenticacao } =
+        await administrador.auth.admin.createUser({
+          email: String(primeiroAdministrador.email).trim().toLowerCase(),
+          password: senha,
+          email_confirm: true,
+          user_metadata: { full_name: primeiroAdministrador.fullName },
+          app_metadata: { pnf_provisioning_operation: operacaoIdentificador },
         });
+      if (erroAutenticacao?.code === 'email_exists' || erroAutenticacao?.code === 'user_already_exists') {
+        throw {
+          hint: 'auth_email_conflict',
+          message: 'Este e-mail já possui uma conta. Informe outro e-mail para o primeiro administrador.',
+        };
       }
+      if (erroAutenticacao?.code === 'weak_password' || erroAutenticacao?.code === 'validation_failed') {
+        throw { hint: 'INVALID_INPUT', message: 'Confira o e-mail e a senha do primeiro administrador.' };
+      }
+      if (erroAutenticacao || !dadosAutenticacao?.user?.id) {
+        throw {
+          hint: 'AUTH_PROVISIONING_UNAVAILABLE',
+          message: 'Não foi possível confirmar a criação da conta. Tente novamente com os mesmos dados.',
+        };
+      }
+      usuarioAutenticacao = dadosAutenticacao.user.id;
     }
 
+    return await chamarPlataforma('complete_company_provisioning', {
+      p_operation_id: operacaoIdentificador,
+      p_actor_user_id: ator.userId,
+      p_attempt: tentativa,
+      p_auth_user_id: usuarioAutenticacao,
+    });
+  } catch (erro: any) {
     const dica = erro?.hint ?? 'partial_failure';
     const podeRepetir = ![
       'invalid_cnpj',
+      'invalid_email',
       'cnpj_already_exists',
       'INVALID_INPUT',
       'auth_email_conflict',
+      'PROFILE_GLOBALLY_INACTIVE',
     ].includes(dica);
 
-    await chamarPlataforma('fail_provisioning', {
+    const falha = await chamarPlataforma('fail_company_provisioning_attempt', {
       p_operation_id: operacaoIdentificador,
       p_actor_user_id: ator.userId,
+      p_attempt: tentativa,
       p_error_code: dica,
-      p_error_detail: erro?.message ?? null,
+      p_error_detail: erro?.hint ? erro?.message ?? null : 'Falha ao confirmar o provisionamento.',
       p_retryable: podeRepetir,
-    }).catch(() => {});
+      p_auth_user_id: usuarioAutenticacao,
+    }).catch(() => null);
+    if (falha?.status === 'succeeded') return falha;
+    if (falha?.deleteAuthUser && usuarioAutenticacao) {
+      const { error: erroExclusao } = await administrador.auth.admin.deleteUser(usuarioAutenticacao);
+      if (erroExclusao) console.error('platform-admin: falha ao remover identidade não vinculada', {
+        operationId: operacaoIdentificador,
+        code: erroExclusao.code,
+      });
+    }
 
-    await registrarNegacao(ator.userId, 'company.provision', dica, requisicao, {
-      operationId: operacaoIdentificador,
-      companyId: empresaIdentificador,
-    });
     throw erro;
   }
 };
@@ -918,11 +864,22 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       p_page_size: parametroItem?.pageSize ?? 25,
     }),
 
-  'operation.retry': (primeiroItem, parametroItem) =>
-    chamarPlataforma('retry_provisioning', {
-      p_operation_id: parametroItem.operationId,
-      p_actor_user_id: primeiroItem.userId,
-    }),
+  'operation.retry': async (ator, parametros, requisicao) => {
+    const consulta = {
+      p_operation_id: parametros.operationId,
+      p_actor_user_id: ator.userId,
+    };
+    const operacao = await chamarPlataforma('get_operation', consulta);
+    if (operacao?.requestPayload?.firstAdmin?.accessMode !== 'password') {
+      return await chamarPlataforma('retry_provisioning', consulta);
+    }
+    if (operacao.status === 'succeeded') return operacao;
+    const dados = await chamarPlataforma('get_company_provisioning_retry_request', consulta);
+    return await provisionarEmpresa(ator, {
+      ...dados,
+      firstAdmin: { ...dados.firstAdmin, password: parametros.password },
+    }, requisicao);
+  },
 
   'operation.compensate': (primeiroItem, parametroItem) =>
     chamarPlataforma('compensate_provisioning', {
@@ -1019,7 +976,7 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
   },
 
   'audit.list': (primeiroItem, parametroItem) =>
-    chamarPlataforma('list_audit_events', {
+    chamarPlataforma('list_audit_events_filtered', {
       p_actor_user_id: primeiroItem.userId,
       p_action: parametroItem?.action ?? null,
       p_result: parametroItem?.result ?? null,
@@ -1027,6 +984,8 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       p_to: parametroItem?.to ?? null,
       p_page: parametroItem?.page ?? 1,
       p_page_size: parametroItem?.pageSize ?? 50,
+      p_search: parametroItem?.search ?? null,
+      p_timezone: parametroItem?.timezone ?? 'America/Sao_Paulo',
     }),
 
   'audit.get': (primeiroItem, parametroItem) =>

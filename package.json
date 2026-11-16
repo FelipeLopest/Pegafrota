@@ -1,6 +1,6 @@
 {
   "name": "peganafrota",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "private": true,
   "description": "PegaNaFrota — monorepo de produção (Desktop das empresas + Admin Web da plataforma)",
   "engines": {
@@ -65,7 +65,9 @@
     "test:camera:edge": "node --experimental-strip-types --test supabase/tests/edge/camera-intake.test.mjs",
     "compilar:leitor": "node ferramentas/compilacao/gerar-leitor-placas.mjs",
     "deploy:cameras": "npx supabase functions deploy camera-intake && npx supabase functions deploy camera-maintenance",
-    "test:evolucao:db": "node ferramentas/testes/evolucao/testar-banco.cjs"
+    "test:evolucao:db": "node ferramentas/testes/evolucao/testar-banco.cjs",
+    "test:auditoria:db": "node ferramentas/testes/evolucao/testar-auditoria.cjs",
+    "test:provisionamento:db": "node ferramentas/testes/evolucao/testar-provisionamento.cjs"
   },
   "devDependencies": {
     "electron-builder": "^26.15.3",

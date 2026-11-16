@@ -16,6 +16,10 @@ const migracaoAtual = lerArquivoSincrono(
   resolverCaminho(raiz, 'supabase/migrations/20260812000100_company_admin_password_login.sql'),
   'utf8',
 );
+const migracaoAtomica = lerArquivoSincrono(
+  resolverCaminho(raiz, 'supabase/migrations/20261116000300_provisionamento_atomico.sql'),
+  'utf8',
+);
 
 // Garante que a senha é definida no painel e enviada apenas para a Edge Function.
 testar('primeiro administrador usa senha direta, sem convite', () => {
@@ -25,15 +29,17 @@ testar('primeiro administrador usa senha direta, sem convite', () => {
   verificarCondicao.match(funcaoServidor, /auth\.admin\.createUser\(\{/);
   verificarCondicao.match(funcaoServidor, /password:\s*senha/);
   verificarCondicao.match(funcaoServidor, /email_confirm:\s*true/);
-  verificarCondicao.match(funcaoServidor, /provision_first_admin_password/);
+  verificarCondicao.match(funcaoServidor, /complete_company_provisioning/);
+  verificarCondicao.match(migracaoAtomica, /platform\.provision_first_admin_password/);
 });
 
 testar('senha não é persistida no payload auditável da operação', () => {
   verificarCondicao.match(funcaoServidor, /primeiroAdministradorAuditavel/);
   const trecho = funcaoServidor.slice(
     funcaoServidor.indexOf('const primeiroAdministradorAuditavel'),
-    funcaoServidor.indexOf("const aberto = await chamarPlataforma('open_operation'"),
+    funcaoServidor.indexOf("const aberto = await chamarPlataforma('prepare_company_provisioning'"),
   );
+  verificarCondicao.ok(trecho.length > 0);
   verificarCondicao.doesNotMatch(trecho, /password\s*:/);
 });
 

@@ -1,6 +1,7 @@
 const CHAVE_TEMA = 'pnf.admin.theme';
 
 import { icone } from './icones.mjs';
+import { formatarDataCalendario } from '@peganafrota/validation';
 
 export const tema = {
   get() {
@@ -62,8 +63,7 @@ export function formatarDadosHora(iso) {
 }
 
 export function formatarDados(iso) {
-  if (!iso) return '—';
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(iso));
+  return formatarDataCalendario(iso);
 }
 
 export function formatarDuracao(milissegundos) {

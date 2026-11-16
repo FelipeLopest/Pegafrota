@@ -1,7 +1,7 @@
 import { configuracao } from '../comunicacao/carregar-configuracao.mjs';
 import { requisicaoServidor } from '../comunicacao/verificar-conexao.mjs';
-import { ErroBackend, chamar } from '../comunicacao/enviar-requisicao.mjs';
-import { sessao } from './sessao-do-usuario.mjs';
+import { ErroBackend, chamar, verificarMesmaSessao } from '../comunicacao/enviar-requisicao.mjs';
+import { renovarSessao, sessao } from './sessao-do-usuario.mjs';
 
 export async function chamarAutenticacao(caminho, corpo, cabecalhosExtras = {}) {
   const { supabaseUrl: enderecoSupabase, anonKey: chaveAnonima } = configuracao();
@@ -33,13 +33,18 @@ export async function entrar(email, senha) {
 
 export async function sair() {
   const token = sessao.accessToken;
+  sessao.clear();
   if (token) {
     await chamarAutenticacao('/logout', {}, { Authorization: `Bearer ${token}` }).catch(() => {});
   }
-  sessao.clear();
 }
 
-export async function usuarioAtual() {
+export function usuarioAtual() {
+  return carregarUsuario(sessao.geracao, false);
+}
+
+async function carregarUsuario(geracaoInicial, renovou) {
+  verificarMesmaSessao(geracaoInicial);
   const { supabaseUrl: enderecoSupabase, anonKey: chaveAnonima } = configuracao();
   const token = sessao.accessToken;
   if (!token) return null;
@@ -48,8 +53,14 @@ export async function usuarioAtual() {
     headers: { apikey: chaveAnonima, Authorization: `Bearer ${token}` },
   });
   const dados = await resposta.json().catch(() => ({}));
+  verificarMesmaSessao(geracaoInicial);
   if (!resposta.ok) {
-    if (resposta.status === 401) sessao.clear();
+    if (resposta.status === 401) {
+      if (!renovou && (await renovarSessao(token, geracaoInicial)))
+        return carregarUsuario(geracaoInicial, true);
+      verificarMesmaSessao(geracaoInicial);
+      if (sessao.accessToken === token) sessao.clear();
+    }
     throw new ErroBackend({
       hint: dados.error_code || 'AUTH_ERROR',
       message: dados.msg || dados.error_description || 'Não foi possível validar a sessão.',

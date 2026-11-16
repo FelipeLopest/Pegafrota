@@ -1,6 +1,8 @@
 import {
   el as criarElemento,
   botao,
+  campo,
+  modal,
   notificacao,
   formatarDataHora as formatarDadosHora,
 } from '../componentes/componentes-do-painel.mjs';
@@ -16,11 +18,61 @@ import {
   ROTULO_STATUS_OPERACAO as ROTULO_SITUACAO_OPERACAO,
   ETAPAS_PROVISIONAMENTO,
 } from '@peganafrota/contracts';
+import { validarSenha } from '@peganafrota/validation';
 import {
   withState as carregarComEstado,
   secao,
   detalhe,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
+
+function solicitarSenhaInicial(aoConfirmar) {
+  let janela;
+  const senha = criarElemento('input', {
+    class: 'input',
+    type: 'password',
+    autocomplete: 'new-password',
+    maxlength: '72',
+  });
+  const erro = criarElemento('p', { class: 'field-error', role: 'alert' });
+  const continuar = botao({
+    label: 'Retentar cadastro',
+    variant: 'primary',
+    onClick: async () => {
+      const validacao = validarSenha(senha.value);
+      if (!validacao.ok) {
+        erro.textContent = validacao.errors.password;
+        return;
+      }
+      continuar.disabled = true;
+      try {
+        await aoConfirmar(senha.value);
+        senha.value = '';
+        janela.close();
+      } catch (falha) {
+        erro.textContent = falha.message || 'Não foi possível retomar o cadastro.';
+      } finally {
+        continuar.disabled = false;
+      }
+    },
+  });
+  janela = modal({
+    title: 'Retentar cadastro',
+    body: criarElemento('div', {}, [
+      campo({
+        id: 'senha-retomar-cadastro',
+        label: 'Senha inicial do primeiro administrador',
+        required: true,
+        hint: 'Informe a senha definida na primeira tentativa.',
+        control: senha,
+      }),
+      erro,
+    ]),
+    footer: criarElemento('div', { class: 'modal-actions' }, [
+      botao({ label: 'Cancelar', onClick: () => janela.close() }),
+      continuar,
+    ]),
+  });
+}
 
 export async function telaDetalhesProvisionamento({
   outlet: conteudoTela,
@@ -34,19 +86,34 @@ export async function telaDetalhesProvisionamento({
       conteudoTela,
       () => servicos.operations.get(parametros.id),
       (operacao) => {
+        const usaSenha = operacao.requestPayload?.firstAdmin?.accessMode === 'password';
+        const cadastroAnteriorIncompleto = usaSenha && Boolean(operacao.companyId);
+        const podeRetentar = operacao.retryable && !cadastroAnteriorIncompleto;
+        async function retentar(senha) {
+          const resultado = await servicos.operations.retry(operacao.operationId, senha);
+          notificacao(
+            resultado.status === 'succeeded' ? 'Cadastro concluído.' : 'Operação retomada.',
+            { tone: 'success' },
+          );
+          await renderizar();
+        }
         const acoes = criarElemento('div', { class: 'modal-actions' }, [
           botao({
             label: 'Retentar',
             variant: 'primary',
-            disabled: !operacao.retryable,
-            title: operacao.retryable
+            disabled: !podeRetentar,
+            title: podeRetentar
               ? 'Retoma a operação a partir da etapa que falhou.'
-              : 'O backend não marcou esta operação como repetível.',
+              : cadastroAnteriorIncompleto
+                ? 'Cadastro anterior com empresa já gravada. Revise o caso antes de retomar.'
+                : 'O servidor não marcou esta operação como repetível.',
             onClick: async () => {
+              if (usaSenha) {
+                solicitarSenhaInicial(retentar);
+                return;
+              }
               try {
-                await servicos.operations.retry(operacao.operationId);
-                notificacao('Operação retomada.', { tone: 'success' });
-                renderizar();
+                await retentar();
               } catch (erro) {
                 if (erro.isConflict) mostrarConflito({ hint: erro.hint, message: erro.message });
                 else notificacao(erro.message, { tone: 'danger' });

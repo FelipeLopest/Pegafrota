@@ -24,6 +24,8 @@ import {
   secao,
   detalhe,
   tabelaMembrosEmpresa,
+  barraFiltros,
+  barraPaginacao,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { excluirEmpresaDefinitivamente } from '../formularios/formulario-excluir-empresa.mjs';
 import { abrirEditorEmpresaPlataforma } from '../formularios/formulario-empresa.mjs';
@@ -34,19 +36,75 @@ export async function telaDetalhesEmpresa({
   params: parametros,
 }) {
   definirTitulo('Empresa');
+  const membrosNaPagina = 100;
+  const equipe = { busca: '', pagina: 1 };
+
+  async function consultarEquipe(busca, pagina) {
+    const parametrosEquipe = {
+      companyId: parametros.id,
+      search: busca || null,
+      page: pagina,
+      pageSize: membrosNaPagina,
+    };
+    const resposta = await servicos.members.list(parametrosEquipe);
+    const ultimaPagina = Math.max(1, Math.ceil(resposta.total / membrosNaPagina));
+    if (pagina <= ultimaPagina) return resposta;
+    return servicos.members.list({ ...parametrosEquipe, page: ultimaPagina });
+  }
 
   const renderizar = async () => {
     await carregarComEstado(
       conteudoTela,
       async () => {
-        const [empresa, membros] = await Promise.all([
+        const [empresa, membros, totalSemFiltro] = await Promise.all([
           servicos.companies.get(parametros.id),
-          servicos.members.list({ companyId: parametros.id, page: 1, pageSize: 100 }),
+          consultarEquipe(equipe.busca, equipe.pagina),
+          equipe.busca
+            ? servicos.members.list({ companyId: parametros.id, page: 1, pageSize: 1 })
+            : null,
         ]);
-        return { empresa, membros: membros.items || [], totalMembros: membros.total || 0 };
+        return { empresa, membros, totalMembros: totalSemFiltro?.total ?? membros.total ?? 0 };
       },
       ({ empresa: registro, membros, totalMembros }) => {
         definirTitulo(registro.tradeName);
+
+        const listaMembros = criarElemento('div', {});
+        const preencherEquipe = (resposta) => {
+          equipe.pagina = resposta.page;
+          return criarElemento('div', {}, [
+            tabelaMembrosEmpresa(registro, resposta.items || [], renderizar),
+            barraPaginacao({
+              page: resposta.page,
+              pageSize: resposta.pageSize || membrosNaPagina,
+              total: resposta.total ?? 0,
+              onPage: (pagina) => {
+                equipe.pagina = pagina;
+                carregarEquipe();
+              },
+            }),
+          ]);
+        };
+        const carregarEquipe = () => {
+          const { busca, pagina } = equipe;
+          return carregarComEstado(listaMembros, () => consultarEquipe(busca, pagina), preencherEquipe);
+        };
+        listaMembros.replaceChildren(preencherEquipe(membros));
+        const buscaEquipe = (busca) => {
+          equipe.busca = busca;
+          equipe.pagina = 1;
+          carregarEquipe();
+        };
+        const montarBuscaEquipe = () =>
+          barraFiltros({
+            searchValue: equipe.busca,
+            searchPlaceholder: 'Buscar usuário por nome ou e-mail',
+            onSearch: buscaEquipe,
+            onClear: () => {
+              buscaEquipe('');
+              filtroEquipe.replaceChildren(montarBuscaEquipe());
+            },
+          });
+        const filtroEquipe = criarElemento('div', {}, [montarBuscaEquipe()]);
 
         const cicloVida = criarElemento('div', { class: 'modal-actions lifecycle-actions' }, [
           registro.status === 'active'
@@ -170,7 +228,8 @@ export async function telaDetalhesEmpresa({
               class: 'muted',
               text: 'O administrador da plataforma pode redefinir a senha de usuários ativos ou removê-los da empresa. Senhas nunca são armazenadas no painel.',
             }),
-            tabelaMembrosEmpresa(registro, membros, renderizar),
+            filtroEquipe,
+            listaMembros,
           ]),
 
           secao('Administradores da empresa', [

@@ -1,3 +1,5 @@
+import { formatarDataCalendario } from '@peganafrota/validation';
+
 export const formatar = {
   dateTime: (iso) =>
     iso
@@ -5,8 +7,7 @@ export const formatar = {
           new Date(iso),
         )
       : '—',
-  date: (iso) =>
-    iso ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(iso)) : '—',
+  date: formatarDataCalendario,
   km: (veiculoItem) =>
     veiculoItem == null ? '—' : `${new Intl.NumberFormat('pt-BR').format(Number(veiculoItem))} km`,
   money: (veiculoItem) =>

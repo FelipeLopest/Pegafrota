@@ -49,12 +49,14 @@ export async function telaEmpresas({
     ],
   });
   const carregar = async () => {
+    const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
     const areaLista = criarElemento('div', {});
     conteiner.replaceChildren(
       cabecalho,
       barraFiltros({
         searchValue: estado.search,
         searchPlaceholder: 'Nome, CNPJ ou e-mail',
+        filtersOpen: filtrosAbertos,
         onSearch: (veiculoItem) => {
           estado.search = veiculoItem;
           estado.page = 1;

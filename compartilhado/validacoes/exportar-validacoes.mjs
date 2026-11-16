@@ -5,3 +5,4 @@ export * from './validar-abastecimento.mjs';
 export * from './validar-viagem.mjs';
 export * from './validar-odometro.mjs';
 export * from './validar-senha.mjs';
+export * from './formatar-data-calendario.mjs';

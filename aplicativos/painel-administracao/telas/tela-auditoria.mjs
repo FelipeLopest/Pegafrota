@@ -11,7 +11,6 @@ import {
   cabecalhoPagina,
   barraFiltros,
   withState as carregarComEstado,
-  normalizarTexto,
   resumoAdministrador,
   barraPaginacao,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
@@ -20,22 +19,25 @@ import { abrirDetalheAuditoria } from '../formularios/formulario-detalhes-audito
 export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTitulo }) {
   definirTitulo('Auditoria global');
   const estado = { search: '', action: '', result: '', from: '', to: '', page: 1 };
+  const fusoHorario = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo';
   const conteiner = criarElemento('div', {});
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
     title: 'Auditoria global',
-    subtitle:
-      'Use filtros por resultado, ação e período; detalhes técnicos só abrem quando você clicar no evento.',
+    subtitle: 'Busque em todo o histórico e abra o evento para conferir seus detalhes.',
   });
   const carregar = async () => {
+    const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
     const areaLista = criarElemento('div', {});
     conteiner.replaceChildren(
       cabecalho,
       barraFiltros({
         searchValue: estado.search,
-        searchPlaceholder: 'Buscar nesta página por ator, empresa ou ação',
+        searchPlaceholder: 'Buscar por ator, empresa ou ação',
+        filtersOpen: filtrosAbertos,
         onSearch: (veiculoItem) => {
           estado.search = veiculoItem;
+          estado.page = 1;
           carregar();
         },
         fields: [
@@ -117,7 +119,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
       }),
       criarElemento('p', {
         class: 'muted',
-        text: 'Registro das ações da plataforma. Não inclui a operação de frota dos clientes.',
+        text: `Registro das ações da plataforma. Período e horários no fuso ${fusoHorario}.`,
       }),
       areaLista,
     );
@@ -125,25 +127,20 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
       areaLista,
       () =>
         servicos.audit.list({
+          search: estado.search || null,
           action: estado.action || null,
           result: estado.result || null,
           from: estado.from || null,
           to: estado.to || null,
+          timezone: fusoHorario,
           page: estado.page,
           pageSize: 50,
         }),
       (resposta) => {
-        const buscaAtual = normalizarTexto(estado.search);
-        const itens = buscaAtual
-          ? resposta.items.filter((evento) =>
-              normalizarTexto(
-                `${evento.actorName || ''} ${evento.companyTradeName || ''} ${evento.action || ''} ${evento.result || ''}`,
-              ).includes(buscaAtual),
-            )
-          : resposta.items;
+        const itens = resposta.items || [];
         if (resposta.total === 0)
           return estadoVazio({
-            title: 'Sem eventos no período',
+            title: 'Nenhum evento encontrado',
             description: 'Ajuste ou limpe os filtros.',
           });
         return criarElemento('div', {}, [
@@ -208,8 +205,8 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                 ]),
               ])
             : estadoVazio({
-                title: 'Nada nesta página corresponde à busca',
-                description: 'Limpe a busca ou avance para outra página.',
+                title: 'Sem eventos nesta página',
+                description: 'Use a paginação para ver os demais resultados.',
               }),
           barraPaginacao({
             page: resposta.page,

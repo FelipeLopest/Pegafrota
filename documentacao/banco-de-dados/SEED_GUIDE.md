@@ -37,9 +37,12 @@ SEED_DEMO_PASSWORD='SENHA_DEMO_FORTE' \
 npm run seed:remote
 ```
 
-O comando cria/localiza as contas, aplica `supabase/seed.sql` e executa as
-verificações. A `service_role` deve existir apenas no ambiente temporário do
-operador, nunca em `.env` versionado.
+O comando cria ou localiza as contas, aplica `supabase/seed.sql` e executa as
+verificações. Use um projeto de demonstração e defina uma senha exclusiva em
+`SEED_DEMO_PASSWORD` antes de gravar contas. Guarde a `service_role` e a senha
+fora dos arquivos versionados. As contas existentes conservam suas credenciais
+ao rodar o seed novamente. Revise e redefina as senhas de demonstração antigas
+na conta que administra o ambiente.
 
 Para reconstruir somente os dados de demonstração, preservando `auth.users`:
 
