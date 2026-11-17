@@ -396,6 +396,32 @@ const minuto = (deslocamento = 0) => new Date(Date.now() + deslocamento * 60000)
     verificar.equal(Number(proxima.scheduled_odometer_km), 10290);
     passou('Vencimento por km consistente, garantia sem custo e próxima preventiva');
 
+    const diagnosticoCusto = `select severity from private.data_integrity_selftest()
+      where detail = $1 and finding = 'manutenção concluída sem custo positivo'`;
+    const manutencaoEmGarantia = [manutencao.maintenanceId];
+    verificar.deepEqual((await banco.query(diagnosticoCusto, manutencaoEmGarantia)).rows, []);
+    const manutencaoInvalida = randomUUID();
+    const desfazerDadosInvalidos = new Error('Desfazer dados inválidos do autoteste');
+    await verificar.rejects(
+      banco.transaction(async (transacao) => {
+        await transacao.exec(
+          'alter table public.maintenance_records drop constraint maintenance_status_completed',
+        );
+        await transacao.query(
+          `insert into public.maintenance_records
+             (id, company_id, vehicle_id, maintenance_type, status, description, completed_at, total_cost, no_charge_reason)
+           values ($1, $2, $3, 'preventive', 'completed', 'Garantia inválida de teste', now(), 0, '  curta  ')`,
+          [manutencaoInvalida, empresa, consumo],
+        );
+        verificar.deepEqual((await transacao.query(diagnosticoCusto, [manutencaoInvalida])).rows, [
+          { severity: 'critical' },
+        ]);
+        throw desfazerDadosInvalidos;
+      }),
+      (erro) => erro === desfazerDadosInvalidos,
+    );
+    passou('Autoteste aceita garantia justificada e detecta custo zero sem justificativa válida');
+
     const plano = await linha('select plan_id from public.maintenance_records where id=$1', [
       concluida.nextMaintenanceId,
     ]);

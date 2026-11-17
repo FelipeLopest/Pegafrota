@@ -43,14 +43,6 @@ export const MENU = [
     roles: ['company_admin', 'fleet_manager', 'operator'],
   },
 
-  {
-    path: '/cameras',
-    pattern: '/cameras',
-    label: 'Câmeras e leituras',
-    icon: 'camera',
-    permission: PERMISSAO.CAMERAS_READ,
-  },
-
   { group: 'FROTA' },
   {
     path: '/veiculos',

@@ -27,7 +27,7 @@ export function abrirConviteUsuario(aoConcluir) {
       return;
     }
     if (formulario.mode === 'create' && formulario.password.length < 12) {
-      notificacao('A senha temporária precisa ter pelo menos 12 caracteres.', {
+      notificacao('A senha inicial precisa ter pelo menos 12 caracteres.', {
         tone: 'warning',
       });
       return;
@@ -147,7 +147,7 @@ export function abrirConviteUsuario(aoConcluir) {
             }),
             criarElemento('option', {
               value: 'create',
-              text: 'Criar com senha temporária',
+              text: 'Criar com senha inicial',
               selected: formulario.mode === 'create',
             }),
           ],
@@ -156,7 +156,7 @@ export function abrirConviteUsuario(aoConcluir) {
       formulario.mode === 'create'
         ? campo({
             id: 'iu-password',
-            label: 'Senha temporária',
+            label: 'Senha inicial',
             required: true,
             hint: 'Mínimo de 12 caracteres. Entregue a senha por um canal seguro e peça a troca em Meu perfil → Alterar minha senha.',
             control: criarElemento('input', {

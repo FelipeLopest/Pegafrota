@@ -1,3 +1,5 @@
+import { buscarUsuarioAutenticacaoPorEmail } from '../_shared/buscar-identidade.ts';
+
 export const PAPEIS_VALIDOS = ['company_admin', 'fleet_manager', 'operator', 'viewer'] as const;
 export type Papel = (typeof PAPEIS_VALIDOS)[number];
 
@@ -61,8 +63,6 @@ const EXPRESSAO_IDENTIFICADOR =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EXPRESSAO_EMAIL = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i;
 const TAMANHO_MINIMO_SENHA = 12;
-const TAMANHO_PAGINA_USUARIOS_AUTENTICACAO = 200;
-const LIMITE_PAGINAS_USUARIOS_AUTENTICACAO = 100;
 
 export function cabecalhosCors(origem: string | null, permitido: string[]): Record<string, string> {
   const base: Record<string, string> = {
@@ -146,6 +146,11 @@ const ERROS_POR_DICA: Record<string, ErroMapeado> = {
     status: 403,
     code: 'PERMISSION_DENIED',
     message: 'Permissão insuficiente para esta operação.',
+  },
+  AUTH_EMAIL_AMBIGUOUS: {
+    status: 409,
+    code: 'AUTH_EMAIL_AMBIGUOUS',
+    message: 'Há mais de uma conta de autenticação para este e-mail.',
   },
   INVALID_INPUT: {
     status: 400,
@@ -274,27 +279,6 @@ export async function impressaoDigitalAcao(
   return Array.from(new Uint8Array(resumoCriptografico))
     .map((segundoItem) => segundoItem.toString(16).padStart(2, '0'))
     .join('');
-}
-
-export async function buscarUsuarioAutenticacaoPorEmail(
-  administrador: any,
-  email: string,
-): Promise<any | null> {
-  const alvo = email.toLowerCase();
-  for (let pagina = 1; pagina <= LIMITE_PAGINAS_USUARIOS_AUTENTICACAO; pagina += 1) {
-    const { data: dados, error: erro } = await administrador.auth.admin.listUsers({
-      page: pagina,
-      perPage: TAMANHO_PAGINA_USUARIOS_AUTENTICACAO,
-    });
-    if (erro) throw erro;
-    const usuarios = dados?.users ?? [];
-    const ocorrencia = usuarios.find(
-      (usuarioItem: any) => usuarioItem.email?.toLowerCase() === alvo,
-    );
-    if (ocorrencia) return ocorrencia;
-    if (usuarios.length < TAMANHO_PAGINA_USUARIOS_AUTENTICACAO) return null;
-  }
-  throw new Error('AUTH_USER_SCAN_EXHAUSTED');
 }
 
 export async function tratarRequisicao(
@@ -557,4 +541,7 @@ export type { CorpoRequisicao as RequestBody };
 export type { CorpoInterpretado as ParsedBody };
 export type { Chamador as Caller };
 export type { Dependencias as Deps };
-export { buscarUsuarioAutenticacaoPorEmail as buscarUsuarioAuthPorEmail };
+export {
+  buscarUsuarioAutenticacaoPorEmail,
+  buscarUsuarioAutenticacaoPorEmail as buscarUsuarioAuthPorEmail,
+};

@@ -1,4 +1,3 @@
-import { monitorCameras } from './comunicacao/monitorar-cameras.mjs';
 import {
   el as criarElemento,
   notificacao,
@@ -30,7 +29,6 @@ let estruturaAtual = null;
 let revalidarAcesso = null;
 
 export async function inicializar() {
-  await monitorCameras.parar({ lembrar: false });
   estruturaAtual?.desmontar();
   estruturaAtual = null;
   if (revalidarAcesso) removeEventListener('focus', revalidarAcesso);
@@ -110,7 +108,6 @@ export async function inicializar() {
       ],
     });
     if (!confirmado) return;
-    await monitorCameras.parar({ lembrar: false });
     await sair();
     inicializar();
   };
@@ -147,7 +144,6 @@ export async function inicializar() {
     }
   };
   addEventListener('focus', revalidarAcesso);
-  monitorCameras.restaurar().catch((erro) => notificacao(erro.message, { tone: 'warning' }));
 }
 
 registrarRotas();

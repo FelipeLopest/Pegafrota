@@ -134,7 +134,7 @@ export function criarConsultaCnpj({
       if (resposta.status === 404)
         throw new ErroConsultaCnpj(
           'NAO_ENCONTRADO',
-          'CNPJ não encontrado. Confira o número ou preencha manualmente.',
+          'O serviço de consulta não encontrou este CNPJ. Confira o número ou preencha os dados manualmente.',
         );
       if (resposta.status === 429)
         throw new ErroConsultaCnpj(

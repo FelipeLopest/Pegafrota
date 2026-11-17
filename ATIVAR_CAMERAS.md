@@ -1,5 +1,7 @@
 # Câmera ESP32-S3 no PegaNaFrota 1.1.0
 
+> Guia de referência da integração. A partir da versão 1.2.3, a aba de câmeras e o leitor ficaram fora da edição distribuída. Use o Pátio e as Viagens para registrar a operação manualmente.
+
 ## O que esta versão entrega
 
 O fluxo implementado é: câmera captura JPEG por Wi-Fi → Supabase autentica o dispositivo e guarda uma imagem privada → aplicativo Windows busca o trabalho → leitor local reconhece a placa → banco confere frota, confiança, repetição e presença → movimentação ou revisão manual.

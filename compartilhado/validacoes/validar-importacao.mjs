@@ -132,6 +132,13 @@ export function dadosBrasileiro(valor) {
   return null;
 }
 
+function validarDataHoraLocal(dataHora) {
+  const data = new Date(`${dataHora}Z`);
+  return Number.isFinite(data.getTime()) && data.toISOString().slice(0, 19) === dataHora
+    ? dataHora
+    : null;
+}
+
 /** Retorna data/hora local sem offset: a UI converte usando o fuso da empresa. */
 export function dadosHoraPlanilha(valor) {
   const texto = String(valor ?? '').trim();
@@ -141,28 +148,26 @@ export function dadosHoraPlanilha(valor) {
   const brasileiro =
     /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(texto);
   if (brasileiro) {
-    const [
-      ,
-      dadosRegistro,
-      correspondenciaItem,
-      primeiroItem,
-      cabecalhos = '0',
-      indiceManutencao = '0',
-      textoItem = '0',
-    ] = brasileiro;
-    return `${primeiroItem}-${correspondenciaItem.padStart(2, '0')}-${dadosRegistro.padStart(2, '0')}T${cabecalhos.padStart(2, '0')}:${indiceManutencao}:${textoItem.padStart(2, '0')}`;
+    const [, dia, mes, ano, hora = '00', minuto = '00', segundo = '00'] = brasileiro;
+    return validarDataHoraLocal(
+      `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${hora.padStart(2, '0')}:${minuto}:${segundo}`,
+    );
   }
 
   const isoLocal = /^(\d{4}-\d{2}-\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(texto);
-  if (isoLocal)
-    return `${isoLocal[1]}T${(isoLocal[2] || '0').padStart(2, '0')}:${isoLocal[3] || '00'}:${isoLocal[4] || '00'}`;
+  if (isoLocal) {
+    const [, dia, hora = '00', minuto = '00', segundo = '00'] = isoLocal;
+    return validarDataHoraLocal(`${dia}T${hora.padStart(2, '0')}:${minuto}:${segundo}`);
+  }
 
   // Se já vier com offset/Z, preserve o instante como ISO absoluto.
-  if (/T.*(?:Z|[+-]\d{2}:?\d{2})$/i.test(texto)) {
-    const dadosRegistro = new Date(texto);
-    return Number.isNaN(dadosRegistro.getTime()) ? null : dadosRegistro.toISOString();
-  }
-  return null;
+  const isoAbsoluto =
+    /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})$/i.exec(texto);
+  if (!isoAbsoluto) return null;
+  const [, minutoLocal, segundo = '00'] = isoAbsoluto;
+  if (!validarDataHoraLocal(`${minutoLocal.toUpperCase()}:${segundo}`)) return null;
+  const instante = new Date(texto);
+  return Number.isNaN(instante.getTime()) ? null : instante.toISOString();
 }
 
 export function booleanoPlanilha(valor) {
@@ -374,7 +379,7 @@ export const MODELOS = {
     descricao: 'Importe lançamentos do posto ou cartão de combustível.',
     colunas: [
       { nome: 'Placa', obrigatoria: true, exemplo: 'ABC1D23' },
-      { nome: 'Data hora', obrigatoria: false, exemplo: '18/08/2026 14:30' },
+      { nome: 'Data hora', obrigatoria: true, exemplo: '18/08/2026 14:30' },
       { nome: 'Litros', obrigatoria: true, exemplo: '120,5' },
       { nome: 'Valor por litro', obrigatoria: true, exemplo: '6,19' },
       { nome: 'Odometro', obrigatoria: true, exemplo: '125430' },
@@ -393,19 +398,17 @@ export const MODELOS = {
         coluna(linha, 'valor por litro', 'preco por litro', 'preco', 'valor litro'),
       );
       const odometro = numeroBrasileiro(coluna(linha, 'odometro', 'km', 'quilometragem'));
-      const combustivelTipo = normalizarCombustivel(
-        coluna(linha, 'combustivel', 'produto') || 'diesel s10',
-        {
-          paraBomba: true,
-        },
-      );
       if (!litros || litros <= 0) return { erro: 'Litros inválido.' };
       if (!preco || preco <= 0) return { erro: 'Valor por litro inválido.' };
       if (odometro == null || odometro < 0) return { erro: 'Odômetro inválido.' };
+      const produto = coluna(linha, 'combustivel', 'produto');
+      if (!produto) return { erro: 'Informe o combustível do abastecimento.' };
+      const combustivelTipo = normalizarCombustivel(produto, { paraBomba: true });
       if (!combustivelTipo) return { erro: 'Combustível/produto inválido.' };
-      const dadosBruta = coluna(linha, 'data hora', 'data', 'abastecido em');
-      const dadosLocal = dadosBruta ? dadosHoraPlanilha(dadosBruta) : null;
-      if (dadosBruta && !dadosLocal) return { erro: 'Data/hora do abastecimento inválida.' };
+      const dataInformada = coluna(linha, 'data hora', 'data', 'abastecido em');
+      if (!dataInformada) return { erro: 'Informe a data do abastecimento.' };
+      const dataLocal = dadosHoraPlanilha(dataInformada);
+      if (!dataLocal) return { erro: 'Data/hora do abastecimento inválida.' };
       const motoristaTexto = coluna(linha, 'motorista', 'documento motorista');
       const motoristaIdentificador = motoristaTexto
         ? contexto.resolverMotorista?.(motoristaTexto)
@@ -419,7 +422,7 @@ export const MODELOS = {
           pricePerLiter: preco,
           odometerKm: odometro,
           fuelType: combustivelTipo,
-          fueledAt: dadosLocal ? contexto.converterDataHora?.(dadosLocal) || dadosLocal : null,
+          fueledAt: contexto.converterDataHora?.(dataLocal) || dataLocal,
           driverId: motoristaIdentificador || null,
           stationName: coluna(linha, 'posto', 'estabelecimento') || null,
           fullTank: booleanoPlanilha(

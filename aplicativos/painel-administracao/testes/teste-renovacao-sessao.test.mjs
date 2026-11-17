@@ -1,5 +1,6 @@
 import testar from 'node:test';
 import verificar from 'node:assert/strict';
+import { usuarioAtual } from '../acesso/entrar-e-sair.mjs';
 import { renovarSessao, sessao } from '../acesso/sessao-do-usuario.mjs';
 
 testar('chamadas paralelas compartilham a renovação e não recuperam sessão encerrada', async (teste) => {
@@ -43,6 +44,47 @@ testar('chamadas paralelas compartilham a renovação e não recuperam sessão e
     responder(Response.json(nova));
     verificar.equal(await pendente, false);
     verificar.deepEqual(sessao.get(), outroUsuario);
+  } finally {
+    globalThis.document = documentoAnterior;
+    globalThis.sessionStorage = armazenamentoAnterior;
+  }
+});
+
+testar('sessão encerrada em 403 retorna ao login e falha temporária preserva o acesso', async (teste) => {
+  const armazenamento = new Map();
+  teste.mock.method(globalThis, 'fetch', async (url) => {
+    if (url.includes('refresh_token')) {
+      return Response.json({ error_code: 'refresh_token_not_found' }, { status: 400 });
+    }
+    return Response.json({ error_code: 'session_not_found' }, { status: 403 });
+  });
+  const documentoAnterior = globalThis.document;
+  const armazenamentoAnterior = globalThis.sessionStorage;
+  globalThis.document = {
+    getElementById: () => ({
+      textContent: JSON.stringify({ supabaseUrl: 'http://127.0.0.1:54321', anonKey: 'simulada' }),
+    }),
+  };
+  globalThis.sessionStorage = {
+    getItem: (chave) => armazenamento.get(chave),
+    setItem: (chave, valor) => armazenamento.set(chave, valor),
+    removeItem: (chave) => armazenamento.delete(chave),
+  };
+  const acesso = { access_token: 'anterior', refresh_token: 'renovacao' };
+  try {
+    sessao.set(acesso);
+    await verificar.rejects(usuarioAtual(), { hint: 'session_not_found', status: 401 });
+    verificar.equal(sessao.accessToken, null);
+    verificar.equal(globalThis.fetch.mock.callCount(), 2);
+
+    globalThis.fetch.mock.mockImplementation(async () => Response.json({}, { status: 503 }));
+    sessao.set(acesso);
+    await verificar.rejects(usuarioAtual(), { status: 503 });
+    verificar.deepEqual(sessao.get(), acesso);
+
+    globalThis.fetch.mock.mockImplementation(async () => Response.json({}, { status: 403 }));
+    await verificar.rejects(usuarioAtual(), { status: 403 });
+    verificar.deepEqual(sessao.get(), acesso);
   } finally {
     globalThis.document = documentoAnterior;
     globalThis.sessionStorage = armazenamentoAnterior;

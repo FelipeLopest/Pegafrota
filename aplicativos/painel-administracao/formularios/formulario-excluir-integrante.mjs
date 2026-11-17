@@ -11,12 +11,13 @@ export async function excluirMembroEmpresa(empresa, membro, aoConcluir) {
   const identidade = membro.email || membro.fullName;
   const confirmado = await confirmarAcaoDestrutiva({
     title: 'Excluir usuário da empresa',
-    description: `${membro.fullName} será removido de ${empresa.tradeName}. Se esta identidade não for usada em outro lugar da plataforma, a conta de login também será excluída.`,
+    description: `${membro.fullName} perderá o acesso a ${empresa.tradeName}.`,
     expectedName: identidade,
     confirmLabel: 'Excluir usuário',
     consequences: [
-      'O vínculo com esta empresa será removido definitivamente.',
-      'Se a conta for exclusiva desta empresa, o login no Supabase Auth também será apagado.',
+      'Se houver autoria nos registros da empresa, o vínculo ficará inativo para manter o histórico válido.',
+      'Contas com outros vínculos ou com autoria no histórico operacional serão preservadas.',
+      'Contas exclusivas sem essas dependências terão o login excluído.',
       'O último administrador ativo da empresa continua protegido.',
     ],
   });
@@ -31,12 +32,12 @@ export async function excluirMembroEmpresa(empresa, membro, aoConcluir) {
     notificacao(
       resultado.authUserDeleted
         ? `${membro.fullName} e a conta de login foram excluídos.`
-        : `${membro.fullName} foi removido da empresa. A conta global foi mantida.`,
+        : `${membro.fullName} perdeu o acesso a ${empresa.tradeName}. ${resultado.accountRetainedReason || 'A conta de login foi mantida.'}`,
       { tone: 'success' },
     );
     aoConcluir?.();
   } catch (erro) {
-    if (erro.isConflict)
+    if (erro.isConflict || erro.hint === 'CONFIRMATION_MISMATCH')
       mostrarConflito({ hint: erro.hint, message: erro.message, detail: erro.detail });
     else notificacao(erro.message || 'Não foi possível excluir o usuário.', { tone: 'danger' });
   }

@@ -10,11 +10,11 @@ const pastaMigracoes = caminhos.join(raiz, 'supabase/migrations');
 const migracoes = arquivos.readdirSync(pastaMigracoes).filter(nome => nome.endsWith('.sql')).sort();
 const banco = new PGlite({ extensions: { pgcrypto } });
 
-async function rpc(funcao, valores = [], papel = 'service_role') {
+async function rpc(funcao, valores = [], papel = 'service_role', esquema = 'platform') {
   return banco.transaction(async transacao => {
     await transacao.exec(`set local role ${papel}`);
     const argumentos = valores.map((_, indice) => '$' + (indice + 1)).join(', ');
-    return (await transacao.query(`select platform.${funcao}(${argumentos}) resultado`, valores)).rows[0].resultado;
+    return (await transacao.query(`select ${esquema}.${funcao}(${argumentos}) resultado`, valores)).rows[0].resultado;
   });
 }
 
@@ -59,6 +59,20 @@ const erroComDica = dica => erro => erro.hint === dica;
     const ator = await administrador('plataforma@example.test');
     const outroAtor = await administrador('outra.plataforma@example.test');
     const existente = await conta('ja.existe@example.test');
+    const buscarIdentidade = (email, papel = 'service_role') =>
+      rpc('pnf_auth_user_by_email', [email], papel, 'public');
+    const identidadeEncontrada = await buscarIdentidade('  JA.EXISTE@example.test  ');
+    verificar.equal(identidadeEncontrada.id, existente);
+    verificar.equal(identidadeEncontrada.email, 'ja.existe@example.test');
+    verificar.ok(identidadeEncontrada.email_confirmed_at);
+    verificar.equal(await buscarIdentidade('ausente@example.test'), null);
+    for (const papel of ['anon', 'authenticated']) {
+      await verificar.rejects(buscarIdentidade('ja.existe@example.test', papel), /permission denied/i);
+    }
+    await conta('Duplicado@example.test');
+    await conta('duplicado@example.test');
+    await verificar.rejects(buscarIdentidade('duplicado@example.test'), erroComDica('AUTH_EMAIL_AMBIGUOUS'));
+    console.log('OK Busca direta de identidade normaliza e-mail, detecta ambiguidade e só permite service_role');
     const provisao = 'prov-' + randomUUID();
     const dadosEmpresa = empresa('11444777000161');
     const preparar = (...argumentos) => rpc('prepare_company_provisioning', argumentos);

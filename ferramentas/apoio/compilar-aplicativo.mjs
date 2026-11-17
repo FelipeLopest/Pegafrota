@@ -16,6 +16,17 @@ import {
 } from 'node:path';
 import { fileURLToPath as caminhoDoEndereco } from 'node:url';
 
+// O leitor fica no repositório enquanto a integração com câmera está fora do produto.
+const arquivosCameras = new Set([
+  'comunicacao/monitorar-cameras.mjs',
+  'dados/dados-cameras.mjs',
+  'formularios/formulario-camera.mjs',
+  'formularios/formulario-parear-camera.mjs',
+  'formularios/formulario-revisar-leitura.mjs',
+  'sistema/processar-imagem.cjs',
+  'telas/tela-cameras.mjs',
+]);
+
 export function listarArquivos(pasta) {
   return listarPasta(pasta, { withFileTypes: true }).flatMap((entrada) =>
     entrada.isDirectory()
@@ -113,6 +124,9 @@ export function compilarAplicativo(enderecoEntrada, programaEmpresa = false) {
     if (existe(juntar(pastaAplicativo, nome)))
       copiar(juntar(pastaAplicativo, nome), juntar(pastaSaida, nome), {
         recursive: true,
+        filter: (arquivo) =>
+          !programaEmpresa ||
+          !arquivosCameras.has(caminhoRelativo(pastaAplicativo, arquivo).replaceAll('\\', '/')),
       });
   for (const nome of [
     'index.html',

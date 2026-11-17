@@ -119,9 +119,9 @@ testar('uma linha ruim não derruba as boas', () => {
 testar('abastecimento exige veículo já cadastrado', () => {
   const { linhas } = lerCsv(
     [
-      'Placa;Litros;Valor por litro;Odometro',
-      'ABC1D23;120,5;6,19;125430',
-      'ZZZ9Z99;80;6,00;90000',
+      'Placa;Litros;Valor por litro;Odometro;Combustivel;Data hora',
+      'ABC1D23;120,5;6,19;125430;Diesel S10;18/08/2026 14:30',
+      'ZZZ9Z99;80;6,00;90000;Diesel S10;18/08/2026 14:30',
     ].join('\n'),
   );
 
@@ -136,9 +136,37 @@ testar('abastecimento exige veículo já cadastrado', () => {
 
 testar('o total enviado NÃO é calculado no cliente', () => {
   // O servidor calcula; enviar arriscaria divergência de centavo e recusa.
-  const { linhas } = lerCsv('Placa;Litros;Valor por litro;Odometro\nABC1D23;10;5,50;1000');
+  const { linhas } = lerCsv(
+    'Placa;Litros;Valor por litro;Odometro;Combustivel;Data hora\nABC1D23;10;5,50;1000;Gasolina;18/08/2026 14:30',
+  );
   const resultadoItem = conferir('abastecimentos', linhas, { resolverVeiculo: () => 'uuid' });
   verificarCondicao.equal('totalAmount' in resultadoItem.validas[0].dados, false);
+});
+
+testar('abastecimento de planilha exige produto e data explícitos e rejeita datas inexistentes', () => {
+  const { linhas } = lerCsv(
+    [
+      'Placa;Litros;Valor por litro;Odometro;Combustivel;Data hora',
+      'ABC1D23;10;5,50;1000;;18/08/2026 14:30',
+      'ABC1D23;10;5,50;1001;Gasolina;',
+      'ABC1D23;10;5,50;1002;Gasolina;31/02/2026 14:30',
+      'ABC1D23;10;5,50;1003;Gasolina;18/08/2026',
+      'ABC1D23;10;5,50;1004;Gasolina;2026-02-31T14:30:00-03:00',
+    ].join('\n'),
+  );
+  const resultado = conferir('abastecimentos', linhas, { resolverVeiculo: () => 'uuid' });
+  verificarCondicao.deepEqual(
+    resultado.invalidas.map(({ linha, motivo }) => [linha, motivo]),
+    [
+      [2, 'Informe o combustível do abastecimento.'],
+      [3, 'Informe a data do abastecimento.'],
+      [4, 'Data/hora do abastecimento inválida.'],
+      [6, 'Data/hora do abastecimento inválida.'],
+    ],
+  );
+  verificarCondicao.equal(resultado.validas.length, 1);
+  verificarCondicao.equal(resultado.validas[0].dados.fuelType, 'gasoline');
+  verificarCondicao.equal(resultado.validas[0].dados.fueledAt, '2026-08-18T00:00:00');
 });
 
 // ---------------------------------------------------------------------------

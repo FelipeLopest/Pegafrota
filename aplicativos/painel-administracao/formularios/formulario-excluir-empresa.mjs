@@ -17,7 +17,7 @@ export async function excluirEmpresaDefinitivamente(empresa) {
     confirmLabel: 'Excluir definitivamente',
     consequences: [
       'Veículos, motoristas, viagens, abastecimentos, manutenções, locais, OCR e movimentações serão excluídos.',
-      'Usuários exclusivos desta empresa terão a conta de login removida.',
+      'Contas usadas somente nesta empresa serão excluídas quando não houver vínculos nem autoria a preservar em outros registros.',
       'A auditoria operacional do tenant será apagada; a trilha global da plataforma preserva apenas o registro saneado da exclusão.',
     ],
   });
@@ -29,10 +29,14 @@ export async function excluirEmpresaDefinitivamente(empresa) {
       confirmado.confirmedName,
     );
     const falhas = Number(resultado?.authCleanup?.failed || 0);
+    const contasMantidas = Number(resultado?.authCleanup?.retained || 0);
+    const resumo = [`${empresa.tradeName} foi excluída definitivamente.`];
+    if (contasMantidas === 1) resumo.push('Uma conta de login foi preservada.');
+    else if (contasMantidas > 1) resumo.push(`${contasMantidas} contas de login foram preservadas.`);
+    if (falhas === 1) resumo.push('Uma conta de login ficou sem vínculo após falha na remoção.');
+    else if (falhas > 1) resumo.push(`${falhas} contas de login ficaram sem vínculo após falha na remoção.`);
     notificacao(
-      falhas
-        ? `Empresa excluída. ${falhas} conta(s) de autenticação não puderam ser removidas e ficaram sem vínculo.`
-        : `${empresa.tradeName} foi excluída definitivamente.`,
+      resumo.join(' '),
       { tone: falhas ? 'warning' : 'success' },
     );
     navegar('/empresas');

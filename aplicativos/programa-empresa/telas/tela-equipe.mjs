@@ -46,7 +46,7 @@ export function telaUsuarios({ outlet: conteudoTela, setTitle: definirTitulo }) 
             onClick: () => navegar('/importar?tipo=equipe'),
           }),
           botao({
-            label: 'Convidar pessoa',
+            label: 'Adicionar pessoa',
             variant: 'primary',
             icon: 'plus',
             permission: PERMISSAO.USERS_MANAGE,

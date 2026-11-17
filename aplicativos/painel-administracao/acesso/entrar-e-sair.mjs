@@ -3,6 +3,14 @@ import { requisicaoServidor } from '../comunicacao/verificar-conexao.mjs';
 import { ErroBackend, chamar, verificarMesmaSessao } from '../comunicacao/enviar-requisicao.mjs';
 import { renovarSessao, sessao } from './sessao-do-usuario.mjs';
 
+const CODIGOS_SESSAO_ENCERRADA = new Set([
+  'bad_jwt',
+  'session_expired',
+  'session_not_found',
+  'user_banned',
+  'user_not_found',
+]);
+
 export async function chamarAutenticacao(caminho, corpo, cabecalhosExtras = {}) {
   const { supabaseUrl: enderecoSupabase, anonKey: chaveAnonima } = configuracao();
   const resposta = await requisicaoServidor(`${enderecoSupabase}/auth/v1${caminho}`, {
@@ -55,16 +63,19 @@ async function carregarUsuario(geracaoInicial, renovou) {
   const dados = await resposta.json().catch(() => ({}));
   verificarMesmaSessao(geracaoInicial);
   if (!resposta.ok) {
-    if (resposta.status === 401) {
-      if (!renovou && (await renovarSessao(token, geracaoInicial)))
+    const codigo = dados.error_code || resposta.headers.get('x-sb-error-code') || 'AUTH_ERROR';
+    const sessaoEncerrada = resposta.status === 401 || CODIGOS_SESSAO_ENCERRADA.has(codigo);
+    if (sessaoEncerrada) {
+      const podeRenovar = codigo !== 'user_banned' && codigo !== 'user_not_found';
+      if (podeRenovar && !renovou && (await renovarSessao(token, geracaoInicial)))
         return carregarUsuario(geracaoInicial, true);
       verificarMesmaSessao(geracaoInicial);
       if (sessao.accessToken === token) sessao.clear();
     }
     throw new ErroBackend({
-      hint: dados.error_code || 'AUTH_ERROR',
+      hint: codigo,
       message: dados.msg || dados.error_description || 'Não foi possível validar a sessão.',
-      status: resposta.status,
+      status: sessaoEncerrada ? 401 : resposta.status,
     });
   }
   return dados;

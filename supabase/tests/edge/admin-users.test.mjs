@@ -91,18 +91,17 @@ function criarAdministradorCliente({
         return { data: anteriorAcao, error: null };
       }
       if (funcaoBancoErros[nome]) return { data: null, error: funcaoBancoErros[nome] };
+      if (nome === 'pnf_auth_user_by_email') {
+        const email = parametros.p_email.trim().toLowerCase();
+        return {
+          data: usuariosAutenticacao.find((usuario) => usuario.email.toLowerCase() === email) ?? null,
+          error: null,
+        };
+      }
       return { data: funcaoBancoResultados[nome] ?? { ok: true, rpc: nome }, error: null };
     },
     auth: {
       admin: {
-        listUsers: async ({ page: pagina, perPage: porPagina }) => {
-          historicoOperacoes.push({ listUsers: { page: pagina, perPage: porPagina } });
-          const inicio = (pagina - 1) * porPagina;
-          return {
-            data: { users: usuariosAutenticacao.slice(inicio, inicio + porPagina) },
-            error: null,
-          };
-        },
         createUser: async (dadosEnvio) => {
           historicoOperacoes.push({ createUser: dadosEnvio.email });
           return { data: { user: { id: proximoUsuarioIdentificador } }, error: null };
@@ -421,10 +420,10 @@ async function principal() {
   }
 
   // ---------------------------------------------------------------------------
-  // DB-AUD-016 — paginação da busca no Auth
+  // DB-AUD-016 — busca direta no Auth com uma base grande
   // ---------------------------------------------------------------------------
   {
-    const usuariosAutenticacao = Array.from({ length: 450 }, (ignorado, indiceItem) => ({
+    const usuariosAutenticacao = Array.from({ length: 20050 }, (ignorado, indiceItem) => ({
       id: `user-${indiceItem}`,
       email: `pessoa${indiceItem}@empresa.example.com`,
     }));
@@ -432,23 +431,20 @@ async function principal() {
     const resposta = await tratarRequisicao(
       requisitar({
         action: 'create',
-        email: 'pessoa430@empresa.example.com',
-        fullName: 'Pessoa 430',
+        email: 'pessoa20010@empresa.example.com',
+        fullName: 'Pessoa 20010',
         role: 'viewer',
         password: 'senha-bem-longa-1',
       }),
       dependencias(criarUsuarioCliente({ context: CONTEXTO_ADMINISTRADOR }), administrador),
     );
-    const paginas = administrador.journal
-      .filter((evento) => evento.listUsers)
-      .map((evento) => evento.listUsers.page);
+    const consultas = administrador.journal.filter((evento) => evento.rpc === 'pnf_auth_user_by_email');
     verificar(
-      'DB-AUD-016 busca percorre mais de uma página',
-      paginas.length >= 3,
-      `páginas: ${paginas.join(',')}`,
+      'DB-AUD-016 busca o e-mail em uma só chamada com mais de vinte mil contas',
+      consultas.length === 1 && consultas[0].params?.p_email === 'pessoa20010@empresa.example.com',
     );
     verificar(
-      'DB-AUD-016 usuário fora da primeira página é reaproveitado, não recriado',
+      'DB-AUD-016 usuário é reaproveitado pelo e-mail, não recriado',
       !administrador.journal.some((evento) => evento.createUser) && resposta.status === 200,
       `status ${resposta.status}`,
     );
@@ -457,7 +453,7 @@ async function principal() {
     );
     verificar(
       'DB-AUD-016 provisionamento recebe o UUID da conta encontrada',
-      cadastroEmpresa?.params?.p_user_id === 'user-430',
+      cadastroEmpresa?.params?.p_user_id === 'user-20010',
       cadastroEmpresa?.params?.p_user_id,
     );
   }

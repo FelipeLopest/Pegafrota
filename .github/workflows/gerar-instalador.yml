@@ -18,17 +18,7 @@ jobs:
       - run: npm run test:evolucao:db
       - run: npm run test:auditoria:db
       - run: npm run test:provisionamento:db
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: servicos/leitor-placas/requirements.txt
-      - run: python -m pip install -r servicos/leitor-placas/requirements.txt
-      - run: python servicos/leitor-placas/teste_reconhecimento.py
-      - run: npm run test:camera:db
-      - run: npm run test:camera:edge
-      - run: npm run compilar:leitor
-      - run: python servicos/leitor-placas/verificar_executavel.py
+      - run: npm run test:exclusoes:db
       - run: npm run gerar:instalador
       - uses: actions/upload-artifact@v4
         with:

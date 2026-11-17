@@ -91,11 +91,21 @@ function renderizarConexaoPendente(mensagem) {
           text: 'Vamos retomar sua conexão',
         }),
         criarElemento('p', { class: 'auth-subtitle', text: mensagem }),
-        botao({
-          label: 'Tentar reconectar',
-          variant: 'primary',
-          onClick: inicializar,
-        }),
+        criarElemento('div', { class: 'form-row' }, [
+          botao({
+            label: 'Tentar reconectar',
+            variant: 'primary',
+            onClick: inicializar,
+          }),
+          botao({
+            label: 'Entrar novamente',
+            onClick: () => {
+              sessao.clear();
+              ator = null;
+              renderizarLogin({ onSuccess: inicializar });
+            },
+          }),
+        ]),
       ]),
     ]),
   );
@@ -131,6 +141,7 @@ export async function inicializar() {
   try {
     ator = await usuarioAtual();
   } catch (erro) {
+    if (erro?.hint === 'SESSION_CHANGED') return;
     if (erro?.status === 401) {
       renderizarLogin({ onSuccess: inicializar });
     } else {
@@ -148,6 +159,7 @@ export async function inicializar() {
 
   const acesso = await verificarAcessoPlataforma();
 
+  if (!acesso.ok && acesso.error?.hint === 'SESSION_CHANGED') return;
   if (!acesso.ok && acesso.reason === 'expired') {
     renderizarLogin({ onSuccess: inicializar });
     return;

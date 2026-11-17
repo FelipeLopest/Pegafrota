@@ -23,6 +23,8 @@ export function abrirOperacaoViagem({
     : interromper
       ? 'Encerrar viagem interrompida'
       : 'Concluir viagem';
+  const basesAtivas = locais.filter((item) => item.active && !item.archived_at);
+  const baseSugerida = basesAtivas.length === 1 ? basesAtivas[0].id : '';
   const formulario = {
     tripId: viagem.id,
     action: acao,
@@ -47,15 +49,16 @@ export function abrirOperacaoViagem({
   });
   const local = criarElemento(
     'select',
-    {
-      class: 'select',
-      onChange: (evento) => (formulario.locationId = evento.target.value),
-    },
+    { class: 'select' },
     [
       criarElemento('option', { value: '', text: 'Selecione a base' }),
-      ...locais
-        .filter((item) => item.active && !item.archived_at)
-        .map((item) => criarElemento('option', { value: item.id, text: item.name })),
+      ...basesAtivas.map((item) =>
+        criarElemento('option', {
+          value: item.id,
+          text: item.name,
+          selected: item.id === baseSugerida,
+        }),
+      ),
     ],
   );
   const areaLocal = campo({
@@ -68,10 +71,6 @@ export function abrirOperacaoViagem({
     type: 'checkbox',
     onChange: (evento) => {
       areaLocal.hidden = !evento.target.checked;
-      if (!evento.target.checked) {
-        formulario.locationId = '';
-        local.value = '';
-      }
     },
   });
   const corpo = criarElemento('div', {}, [
@@ -108,7 +107,7 @@ export function abrirOperacaoViagem({
           }),
         })
       : null,
-    locais.length
+    basesAtivas.length
       ? criarElemento('label', { class: 'auth-remember' }, [
           integrar,
           `Registrar também ${inicio ? 'saída' : 'entrada'} na portaria`,
@@ -130,6 +129,7 @@ export function abrirOperacaoViagem({
         formulario.occurredAt = instanteEmpresa(data.value);
         if (interromper && formulario.reason.trim().length < 10)
           throw new Error('Informe um motivo com pelo menos 10 caracteres.');
+        formulario.locationId = integrar.checked ? local.value : '';
         if (integrar.checked && !formulario.locationId)
           throw new Error('Selecione a base para registrar a passagem.');
         if (

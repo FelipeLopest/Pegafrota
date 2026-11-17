@@ -1,4 +1,5 @@
 import { createClient as criarCliente } from '@supabase/supabase-js';
+import { buscarUsuarioAutenticacaoPorEmail } from '../_shared/buscar-identidade.ts';
 
 const ENDERECO_SUPABASE = Deno.env.get('SUPABASE_URL')!;
 const CHAVE_PUBLICA = Deno.env.get('SUPABASE_ANON_KEY')!;
@@ -64,6 +65,7 @@ const SITUACAO_HTTP_POR_DICA: Record<string, number> = {
   IDEMPOTENCY_REUSE: 409,
   cnpj_already_exists: 409,
   auth_email_conflict: 409,
+  AUTH_EMAIL_AMBIGUOUS: 409,
   USER_ALREADY_LINKED: 409,
   LAST_ADMIN_PROTECTED: 409,
   LAST_PLATFORM_ADMIN_PROTECTED: 409,
@@ -233,35 +235,6 @@ function gerarTokenAleatorio(bytes = 32): string {
   ).join('');
 }
 
-const LIMITE_PAGINAS_USUARIOS = 50;
-const TAMANHO_PAGINA_USUARIOS = 200;
-
-async function buscarUsuarioIdentificadorPorEmail(email: string): Promise<string | null> {
-  const termoBusca = email.trim().toLowerCase();
-  for (let pagina = 1; pagina <= LIMITE_PAGINAS_USUARIOS; pagina += 1) {
-    const { data: dados, error: erro } = await administrador.auth.admin.listUsers({
-      page: pagina,
-      perPage: TAMANHO_PAGINA_USUARIOS,
-    });
-    if (erro) {
-      console.error('listUsers falhou', {
-        page: pagina,
-        message: erro.message,
-      });
-      return null;
-    }
-    const usuarios = dados?.users ?? [];
-    const ocorrencia = usuarios.find(
-      (usuarioItem: { id: string; email?: string }) =>
-        usuarioItem.email?.toLowerCase() === termoBusca,
-    );
-    if (ocorrencia) return ocorrencia.id;
-    if (usuarios.length < TAMANHO_PAGINA_USUARIOS) return null;
-  }
-  console.error('findUserIdByEmail: limite de páginas atingido');
-  return null;
-}
-
 type identityEstado = 'absent' | 'unconfirmed' | 'confirmed';
 
 interface Identidade {
@@ -270,17 +243,11 @@ interface Identidade {
 }
 
 async function resolverIdentidade(email: string): Promise<Identidade> {
-  const usuarioIdentificador = await buscarUsuarioIdentificadorPorEmail(email);
-  if (!usuarioIdentificador) return { state: 'absent', userId: null };
-
-  const { data: dados, error: erro } =
-    await administrador.auth.admin.getUserById(usuarioIdentificador);
-  if (erro || !dados?.user) return { state: 'absent', userId: null };
-
-  const confirmado = Boolean(dados.user.email_confirmed_at ?? dados.user.confirmed_at);
+  const conta = await buscarUsuarioAutenticacaoPorEmail(administrador, email);
+  if (!conta) return { state: 'absent', userId: null };
   return {
-    state: confirmado ? 'confirmed' : 'unconfirmed',
-    userId: usuarioIdentificador,
+    state: conta.email_confirmed_at ? 'confirmed' : 'unconfirmed',
+    userId: conta.id,
   };
 }
 
@@ -610,6 +577,12 @@ async function registrarEventoPlataforma(
   }).catch(() => {});
 }
 
+const MOTIVOS_CONTA_MANTIDA: Readonly<Record<string, string>> = {
+  platform_admin: 'A conta é administradora da plataforma.',
+  other_company_membership: 'A conta possui outro vínculo com empresa.',
+  operational_history: 'A conta foi mantida para preservar a autoria do histórico operacional.',
+};
+
 const ACOES_ATENDIDAS: Record<string, Manipulador> = {
   'dashboard.get': (primeiroItem, parametroItem) =>
     chamarPlataforma('get_dashboard', {
@@ -678,17 +651,14 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
 
     const membros = Array.isArray(resultado?.members) ? resultado.members : [];
     const excluidos: string[] = [];
-    const mantidos: Array<{ userId: string; reason: string }> = [];
+    let mantidos = 0;
     const falhas: Array<{ userId: string; message: string }> = [];
 
     for (const membro of membros) {
       const usuarioIdentificador = typeof membro?.userId === 'string' ? membro.userId : null;
       if (!usuarioIdentificador) continue;
       if (membro?.deleteAuthUser !== true) {
-        mantidos.push({
-          userId: usuarioIdentificador,
-          reason: 'Conta usada fora da empresa excluída.',
-        });
+        mantidos += 1;
         continue;
       }
 
@@ -720,7 +690,7 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
       ...resultado,
       authCleanup: {
         deleted: excluidos.length,
-        retained: mantidos.length,
+        retained: mantidos,
         failed: falhas.length,
         failures: falhas,
       },
@@ -844,9 +814,10 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
 
     return {
       ...resultado,
-      accountRetainedReason: preparado?.isPlatformAdmin
-        ? 'A conta é administradora da plataforma.'
-        : 'A conta possui outro vínculo com empresa.',
+      accountRetainedReason: MOTIVOS_CONTA_MANTIDA[preparado?.retainedReason]
+        ?? (preparado?.isPlatformAdmin
+          ? MOTIVOS_CONTA_MANTIDA.platform_admin
+          : MOTIVOS_CONTA_MANTIDA.other_company_membership),
     };
   },
 
@@ -927,7 +898,7 @@ const ACOES_ATENDIDAS: Record<string, Manipulador> = {
     const alvoIdentificador =
       parametroItem?.userId ??
       (parametroItem?.email
-        ? await buscarUsuarioIdentificadorPorEmail(String(parametroItem.email))
+        ? (await buscarUsuarioAutenticacaoPorEmail(administrador, String(parametroItem.email)))?.id
         : null);
     if (!alvoIdentificador) {
       throw Object.assign(new Error('Conta de destino não encontrada.'), {

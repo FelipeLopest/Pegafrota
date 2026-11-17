@@ -14,6 +14,7 @@ import {
   notificacao,
   cabecalhoPagina,
   cartao,
+  estadoErro,
   estadoVazio,
 } from '../componentes/componentes-do-programa.mjs';
 import { dados } from '../dados/dados-do-programa.mjs';
@@ -100,8 +101,8 @@ const ICONE_POR_MODELO = {
   equipe: 'users',
 };
 
-function trilhaImportacao({ resultado, relatorio, enviando }) {
-  const atual = relatorio && !enviando ? 4 : resultado ? 3 : 2;
+function trilhaImportacao({ emConferencia, relatorio, enviando }) {
+  const atual = relatorio && !enviando ? 4 : emConferencia ? 3 : 2;
   const passos = [
     ['1', 'Modelo'],
     ['2', 'Enviar dados'],
@@ -230,10 +231,12 @@ async function prepararContextoImportacao(modeloIdentificador) {
   const precisaUsuarios = modeloIdentificador === 'equipe';
 
   const [veiculos, motoristas, usuarios] = await Promise.all([
-    precisaVeiculos ? dados.vehicles.list().catch(() => []) : [],
-    precisaMotoristas ? dados.drivers.list().catch(() => []) : [],
-    precisaUsuarios ? dados.users.list().catch(() => ({ members: [] })) : { members: [] },
-  ]);
+    precisaVeiculos ? dados.vehicles.list() : [],
+    precisaMotoristas ? dados.drivers.list() : [],
+    precisaUsuarios ? dados.users.list() : { members: [] },
+  ]).catch((erro) => {
+    throw new Error('Não foi possível consultar os cadastros da empresa.', { cause: erro });
+  });
 
   const porPlaca = new Map(
     (veiculos || []).map((veiculoItem) => [normalizarPlaca(veiculoItem.plate), veiculoItem.id]),
@@ -333,6 +336,7 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
   let linhasOriginais = [];
   let sessaoDoEnvio;
   let sequenciaConferencia = 0;
+  let conferenciaPendente = null;
 
   const area = criarElemento('div', { class: 'import-page' });
   conteudoTela.replaceChildren(area);
@@ -372,49 +376,57 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     const conferencia = ++sequenciaConferencia;
     const modeloConferido = modeloIdentificador;
     const sessaoConferida = sessao.geracao;
+    const pedido = { leitura, descricaoOrigem, erro: null };
     resultado = null;
     relatorio = null;
     lote = null;
     origem = descricaoOrigem;
-    renderizar();
+    conferenciaPendente = null;
     if (!leitura?.linhas?.length) {
+      renderizar();
       notificacao('A planilha está vazia ou só tem o cabeçalho.', {
         tone: 'warning',
       });
       return;
     }
     if (leitura.linhas.length > 10000) {
+      renderizar();
       notificacao('O limite é de 10.000 linhas por importação. Divida a planilha.', {
         tone: 'warning',
       });
       return;
     }
+    conferenciaPendente = pedido;
+    renderizar();
+    let resultadoConferido;
+    let loteConferido;
     try {
       const contextoImportacao = await prepararContextoImportacao(modeloConferido);
-      const loteConferido = await identificarImportacao({
+      loteConferido = await identificarImportacao({
         empresa: contexto.data?.companyId,
         usuario: contexto.data?.userId,
         modelo: modeloConferido,
         linhas: leitura.linhas,
       });
-      if (
-        conferencia !== sequenciaConferencia ||
-        modeloConferido !== modeloIdentificador ||
-        sessaoConferida !== sessao.geracao ||
-        origem !== descricaoOrigem
-      )
-        return;
-      resultado = conferir(modeloConferido, leitura.linhas, contextoImportacao);
+      resultadoConferido = conferir(modeloConferido, leitura.linhas, contextoImportacao);
+    } catch (erro) {
+      pedido.erro = erro?.message || 'Não foi possível conferir a planilha.';
+    }
+    if (
+      conferencia !== sequenciaConferencia ||
+      sessaoConferida !== sessao.geracao ||
+      !area.isConnected
+    )
+      return;
+    if (resultadoConferido) {
+      resultado = resultadoConferido;
       linhasOriginais = leitura.linhas;
       lote = loteConferido;
       resultado.invalidas = resultado.invalidas.filter((item) => !lote.gravadas.has(item.linha));
       resultado.cabecalho = leitura.cabecalho;
       resultado.formato = leitura.formato;
       resultado.aba = leitura.aba || null;
-    } catch (erro) {
-      notificacao(erro?.message || 'Não foi possível conferir a planilha.', {
-        tone: 'danger',
-      });
+      conferenciaPendente = null;
     }
     renderizar();
   }
@@ -590,6 +602,8 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
           modeloIdentificador = evento.target.value;
           resultado = null;
           relatorio = null;
+          lote = null;
+          conferenciaPendente = null;
           origem = null;
           textoColado = '';
           renderizar();
@@ -703,6 +717,13 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     });
     passo1.classList.add('import-card');
 
+    const botaoConferirColagem = botao({
+      label: 'Conferir dados colados',
+      icon: 'check',
+      variant: 'automation',
+      disabled: enviando || !textoColado.trim(),
+      onClick: conferirColado,
+    });
     const colar = criarElemento(
       'textarea',
       {
@@ -712,6 +733,7 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         placeholder: 'Ou copie no Excel incluindo o cabeçalho e cole aqui…',
         onInput: (evento) => {
           textoColado = evento.target.value;
+          botaoConferirColagem.disabled = enviando || !textoColado.trim();
         },
       },
       [textoColado],
@@ -788,15 +810,7 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
             ]),
           ]),
           colar,
-          criarElemento('div', { class: 'import-paste-actions' }, [
-            botao({
-              label: 'Conferir dados colados',
-              icon: 'check',
-              variant: 'automation',
-              disabled: enviando || !textoColado.trim(),
-              onClick: conferirColado,
-            }),
-          ]),
+          criarElemento('div', { class: 'import-paste-actions' }, [botaoConferirColagem]),
         ]),
         criarElemento('div', { class: 'import-safety-note' }, [
           icone('shield', { size: 'sm' }),
@@ -809,6 +823,23 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
     passo2.classList.add('import-card');
 
     let passo3 = null;
+    if (conferenciaPendente) {
+      const { leitura, descricaoOrigem, erro } = conferenciaPendente;
+      passo3 = cartao({
+        title: '3. Confira e importe',
+        children: [
+          criarElemento('p', { class: 'field-hint', text: `Fonte: ${descricaoOrigem}` }),
+          erro
+            ? estadoErro({
+                title: 'Conferência interrompida',
+                description: `${erro} Você pode conferir a mesma planilha novamente.`,
+                onRetry: () => conferirLinhas(leitura, descricaoOrigem),
+              })
+            : criarElemento('p', { role: 'status', text: 'Conferindo a planilha…' }),
+        ],
+      });
+      passo3.classList.add('import-card');
+    }
     if (resultado) {
       const prontas = resultado.validas.filter((item) => !lote?.gravadas.has(item.linha));
       const resumo = criarElemento('div', { class: 'kpi-grid import-kpi-grid' }, [
@@ -1048,7 +1079,7 @@ export function telaImportacao({ outlet: conteudoTela, setTitle: definirTitulo, 
         subtitle:
           'Automatize cadastros grandes com Excel, CSV ou copiando células. O sistema confere antes de gravar e mostra o resultado por linha.',
       }),
-      trilhaImportacao({ resultado, relatorio, enviando }),
+      trilhaImportacao({ emConferencia: resultado || conferenciaPendente, relatorio, enviando }),
       passo1,
       passo2,
       passo3,

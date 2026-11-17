@@ -13,15 +13,6 @@ const {
 const caminho = require('node:path');
 const arquivosSistema = require('node:fs');
 
-const { criarProcessador } = require('./processar-imagem.cjs');
-const pastaRecursosLeitor = aplicativo.isPackaged
-  ? process.resourcesPath
-  : caminho.resolve(__dirname, '../../../..', 'servicos/leitor-placas/compilado');
-const processadorImagem = criarProcessador({
-  pastaRecursos: pastaRecursosLeitor,
-});
-aplicativo.on('before-quit', () => processadorImagem.encerrar());
-
 const ehDesenvolvimento = process.env.PNF_DEV === '1';
 
 if (!aplicativo.requestSingleInstanceLock()) {
@@ -354,27 +345,6 @@ function fortalecerSessao() {
 }
 
 function registrarComunicacao() {
-  function verificarOrigem(evento) {
-    if (
-      !janelaPrincipal ||
-      evento.sender !== janelaPrincipal.webContents ||
-      evento.senderFrame !== janelaPrincipal.webContents.mainFrame
-    )
-      throw new Error('Origem de comunicação inválida.');
-  }
-  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_STATUS, (evento) => {
-    verificarOrigem(evento);
-    return processadorImagem.disponivel();
-  });
-  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_ANALISAR, (evento, imagem) => {
-    verificarOrigem(evento);
-    return processadorImagem.analisar(imagem);
-  });
-  comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.LEITOR_PARAR, (evento) => {
-    verificarOrigem(evento);
-    processadorImagem.encerrar();
-    return true;
-  });
   comunicacaoPrincipal.handle(CANAIS_COMUNICACAO.GET_CONFIG, () => ({
     supabaseUrl: configuracao.supabaseUrl,
     anonKey: configuracao.anonKey,
