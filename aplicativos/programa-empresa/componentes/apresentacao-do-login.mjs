@@ -3,8 +3,8 @@ import { icone } from './icones.mjs';
 
 export function apresentacaoLogin() {
   const recursos = [
-    ['vehicles', 'Frota organizada', 'Veículos e motoristas no mesmo lugar.'],
-    ['reports', 'Decisões com contexto', 'Custos e histórico para acompanhar a operação.'],
+    ['vehicles', 'Veículos e motoristas', 'Acompanhe viagens, entradas e saídas.'],
+    ['reports', 'Custos da frota', 'Consulte abastecimentos, manutenções e relatórios.'],
   ];
   return criarElemento('aside', { class: 'auth-hero', 'aria-label': 'Conheça o PegaNaFrota' }, [
     criarElemento('div', { class: 'auth-hero-brand' }, [
@@ -22,21 +22,13 @@ export function apresentacaoLogin() {
       criarElemento('span', { class: 'auth-product-tag', text: 'EMPRESA' }),
     ]),
     criarElemento('div', { class: 'auth-hero-body' }, [
-      criarElemento('p', { class: 'auth-hero-kicker', text: 'CADA MOVIMENTO CONTA' }),
-      criarElemento('h2', { class: 'auth-hero-title', text: 'Sua operação no caminho certo.' }),
-      criarElemento('p', {
-        class: 'auth-hero-text',
-        text: 'Do pátio à estrada, acompanhe sua frota com clareza e mantenha a rotina da equipe organizada.',
-      }),
+      criarElemento('h2', { class: 'auth-hero-title', text: 'Controle de frota' }),
       criarElemento('figure', { class: 'auth-illustration' }, [
         criarElemento('img', {
           src: './recursos/ilustracao-operacao.svg',
           alt: 'Ilustração de um caminhão em uma rota entre a entrada e a saída do pátio.',
           width: '560',
           height: '232',
-        }),
-        criarElemento('figcaption', {
-          text: 'Uma rotina conectada, da entrada ao próximo destino.',
         }),
       ]),
       criarElemento(
@@ -52,10 +44,6 @@ export function apresentacaoLogin() {
           ]),
         ),
       ),
-    ]),
-    criarElemento('p', { class: 'auth-hero-foot' }, [
-      icone('shield', { size: 'sm' }),
-      criarElemento('span', { text: 'Gestão da frota, com cada pessoa no seu papel.' }),
     ]),
   ]);
 }

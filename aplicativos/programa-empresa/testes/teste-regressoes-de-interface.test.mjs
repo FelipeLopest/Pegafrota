@@ -55,12 +55,12 @@ testar('dashboard usa gráficos leves variados e resumo compacto', () => {
     verificarCondicao.match(analise, new RegExp(trecho.replace('(', '\\(')));
   verificarCondicao.doesNotMatch(analise, /donutChart\(/);
   for (const rotulo of [
-    'Frota ativa',
     'Disponíveis',
-    'Viagens agora',
-    'Dentro do pátio',
+    'Viagens em andamento',
+    'No pátio',
     'Custo no período',
-    'Atenções',
+    'Pendências',
+    'Ver indicadores da frota',
   ])
     verificarCondicao.match(analise, new RegExp(rotulo));
   verificarCondicao.match(estilosCss, /pnf-vbar/);

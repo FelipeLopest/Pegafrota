@@ -10,7 +10,7 @@ import { dados } from '../dados/dados-do-programa.mjs';
 
 import { TIPOS_COMBUSTIVEL_VEICULO } from '@peganafrota/contracts';
 
-export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
+export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir, onCancel: aoCancelar }) {
   const editar = !!veiculo;
   const formulario = {
     plate: veiculo?.plate || '',
@@ -164,7 +164,8 @@ export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
       return;
     }
     try {
-      if (editar)
+      let resultado;
+      if (editar) {
         await dados.vehicles.update(veiculo.id, {
           brand: formulario.brand,
           model: formulario.model,
@@ -175,10 +176,10 @@ export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
           tankCapacityL: formulario.tankCapacityL,
           notes: formulario.notes,
         });
-      else await dados.vehicles.create(formulario);
-      correspondenciaItem.close();
+      } else resultado = await dados.vehicles.create(formulario);
+      correspondenciaItem.close(true);
       notificacao(editar ? 'Veículo atualizado.' : 'Veículo cadastrado.', { tone: 'success' });
-      aoConcluir?.();
+      aoConcluir?.(resultado, formulario);
     } catch (erroCapturado) {
       notificacao(erroCapturado.message, { tone: 'danger' });
     }
@@ -187,6 +188,9 @@ export function abrirEditorVeiculo({ vehicle: veiculo, onDone: aoConcluir }) {
     title: editar ? `Editar ${veiculo.plate}` : 'Novo veículo',
     size: 'lg',
     body: corpo,
+    onClose: (salvo) => {
+      if (!salvo) aoCancelar?.();
+    },
     footer: criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Cancelar', onClick: () => correspondenciaItem.close() }),
       botao({ label: 'Salvar', variant: 'primary', onClick: salvar }),

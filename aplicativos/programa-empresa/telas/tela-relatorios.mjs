@@ -256,7 +256,6 @@ export function telaRelatorios({ outlet: conteudoTela, setTitle: definirTitulo, 
       return criarElemento('div', {}, [
         cabecalhoPagina({
           title: 'Relatórios',
-          subtitle: 'Escolha o recorte, confira o total e exporte todos os registros do resultado.',
         }),
         criarElemento('div', { class: 'toolbar report-toolbar' }, [
           campo({ id: 'r-kind', label: 'Relatório', control: seletor }),

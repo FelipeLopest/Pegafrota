@@ -20,7 +20,7 @@ import {
 import { abrirEditorLocal } from '../formularios/formulario-local.mjs';
 
 export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
-  definirTitulo('Locais');
+  definirTitulo('Locais e pátios');
   const recarregar = () => telaLocais({ outlet: conteudoTela, setTitle: definirTitulo });
   return tela(
     conteudoTela,
@@ -28,9 +28,8 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
     () => dados.locations.page(),
     (locais) => {
       const cabecalho = cabecalhoPagina({
-        title: 'Locais',
-        subtitle:
-          'Encontre pátios e pontos de acesso por nome, cidade ou UF. Arquivados ficam ocultos por padrão.',
+        title: 'Locais e pátios',
+        subtitle: 'Cadastre os locais usados para registrar entradas e saídas.',
         actions: [
           botao({
             label: 'Importar planilha',

@@ -8,8 +8,8 @@ import {
 import { api as servicos } from '../comunicacao/comunicacao-com-servidor.mjs';
 
 import { navegar } from '../navegacao/trocar-tela.mjs';
+import { ETAPAS_PROVISIONAMENTO } from '@peganafrota/contracts';
 
-import { ROTULO_STATUS_OPERACAO as ROTULO_SITUACAO_OPERACAO } from '@peganafrota/contracts';
 import {
   cabecalhoPagina,
   barraFiltros,
@@ -17,6 +17,7 @@ import {
   normalizarTexto,
   resumoAdministrador,
   barraPaginacao,
+  ROTULO_SITUACAO_CADASTRO,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 
 export async function telaProvisionamentos({
@@ -24,14 +25,14 @@ export async function telaProvisionamentos({
   setTitle: definirTitulo,
   query: consulta,
 }) {
-  definirTitulo('Provisionamentos');
+  definirTitulo('Acompanhar cadastros');
   const estado = { status: consulta.get('status') || '', search: '', page: 1 };
   const conteiner = criarElemento('div', {});
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
-    title: 'Provisionamentos',
+    title: 'Acompanhar cadastros',
     subtitle:
-      'Filtre por estado e use a busca rápida para localizar empresa, erro ou identificador na página atual.',
+      'Confira quais cadastros terminaram e quais precisam de atenção.',
   });
   const carregar = async () => {
     const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
@@ -49,7 +50,7 @@ export async function telaProvisionamentos({
         fields: [
           campo({
             id: 'st',
-            label: 'Estado',
+            label: 'Situação',
             control: criarElemento(
               'select',
               {
@@ -62,7 +63,7 @@ export async function telaProvisionamentos({
               },
               [
                 criarElemento('option', { value: '', text: 'Todos' }),
-                ...Object.entries(ROTULO_SITUACAO_OPERACAO).map(([veiculoItem, linhaItem]) =>
+                ...Object.entries(ROTULO_SITUACAO_CADASTRO).map(([veiculoItem, linhaItem]) =>
                   criarElemento('option', {
                     value: veiculoItem,
                     text: linhaItem,
@@ -101,8 +102,8 @@ export async function telaProvisionamentos({
           : resposta.items;
         if (resposta.total === 0)
           return estadoVazio({
-            title: 'Nenhum provisionamento registrado',
-            description: 'As operações aparecem aqui assim que uma empresa é criada.',
+            title: 'Nenhum cadastro nesta lista',
+            description: 'Os cadastros de empresas aparecem aqui, inclusive as tentativas com erro.',
           });
         return criarElemento('div', {}, [
           resumoAdministrador([
@@ -114,7 +115,7 @@ export async function telaProvisionamentos({
               tone: 'success',
             },
             {
-              label: 'Em execução',
+              label: 'Em andamento',
               value: itens.filter((objetoItem) =>
                 ['running', 'pending'].includes(objetoItem.status),
               ).length,
@@ -136,12 +137,12 @@ export async function telaProvisionamentos({
                 criarElemento('table', {}, [
                   criarElemento('thead', {}, [
                     criarElemento('tr', {}, [
-                      criarElemento('th', { text: 'Operação' }),
                       criarElemento('th', { text: 'Empresa' }),
-                      criarElemento('th', { text: 'Estado' }),
+                      criarElemento('th', { text: 'Situação' }),
                       criarElemento('th', { text: 'Etapa' }),
                       criarElemento('th', { text: 'Erro' }),
-                      criarElemento('th', { text: 'Criada em' }),
+                      criarElemento('th', { text: 'Data' }),
+                      criarElemento('th', { text: 'Código' }),
                     ]),
                   ]),
                   criarElemento(
@@ -150,27 +151,22 @@ export async function telaProvisionamentos({
                     itens.map((objetoItem) =>
                       criarElemento('tr', {}, [
                         criarElemento('td', {}, [
-                          criarElemento(
-                            'button',
-                            {
-                              class: 'row-link',
-                              onClick: () => navegar(`/provisionamentos/${objetoItem.operationId}`),
-                            },
-                            [
-                              criarElemento('code', {
-                                text: String(objetoItem.operationId).slice(0, 8),
-                              }),
-                            ],
-                          ),
+                          criarElemento('button', {
+                            class: 'row-link',
+                            text: objetoItem.companyTradeName || 'Cadastro sem nome',
+                            onClick: () => navegar(`/provisionamentos/${objetoItem.operationId}`),
+                          }),
                         ]),
-                        criarElemento('td', { text: objetoItem.companyTradeName || '—' }),
                         criarElemento('td', {}, [
                           criarElemento('status-pill', {
                             status: objetoItem.status,
-                            label: ROTULO_SITUACAO_OPERACAO[objetoItem.status] || objetoItem.status,
+                            label: ROTULO_SITUACAO_CADASTRO[objetoItem.status] || objetoItem.status,
                           }),
                         ]),
-                        criarElemento('td', { text: objetoItem.currentStep || '—' }),
+                        criarElemento('td', {
+                          text: ETAPAS_PROVISIONAMENTO.find((etapa) => etapa.code === objetoItem.currentStep)
+                            ?.label || objetoItem.currentStep || '—',
+                        }),
                         criarElemento('td', {}, [
                           objetoItem.errorCode
                             ? criarElemento('code', { text: objetoItem.errorCode })
@@ -180,6 +176,12 @@ export async function telaProvisionamentos({
                           class: 'col-meta',
                           text: formatarDadosHora(objetoItem.createdAt),
                         }),
+                        criarElemento('td', {}, [
+                          criarElemento('code', {
+                            title: objetoItem.operationId,
+                            text: String(objetoItem.operationId).slice(0, 8),
+                          }),
+                        ]),
                       ]),
                     ),
                   ),

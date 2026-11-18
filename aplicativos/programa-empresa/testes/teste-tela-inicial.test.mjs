@@ -17,17 +17,17 @@ testar('dashboard usa modelos variados e não depende de rosca', () => {
 });
 testar('dashboard tem resumo compacto das áreas essenciais', () => {
   for (const textoItem of [
-    'Frota ativa',
     'Disponíveis',
-    'Viagens agora',
-    'Dentro do pátio',
+    'Viagens em andamento',
+    'No pátio',
+    'Pendências',
+    'Ver indicadores da frota',
     'Custo no período',
-    'Atenções',
   ])
     verificarCondicao.match(telas, new RegExp(textoItem));
 });
 testar('botões têm contraste reforçado', () => {
-  verificarCondicao.match(estilosCss, /\.btn-secondary \{/);
-  verificarCondicao.match(estilosCss, /\.btn-primary \{/);
+  verificarCondicao.match(estilosCss, /\.btn-secondary(?:,|\s*\{)/);
+  verificarCondicao.match(estilosCss, /\.btn-primary(?:,|\s*\{)/);
   verificarCondicao.match(estilosCss, /var\(--pnf-destaque-sob-ponteiro\)/);
 });

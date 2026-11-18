@@ -4,16 +4,16 @@ export const MENU = [
   {
     path: '/administradores',
     pattern: '/administradores',
-    label: 'Admins das empresas',
+    label: 'Administradores',
     icon: 'admin',
   },
   {
     path: '/provisionamentos',
     pattern: '/provisionamentos',
-    label: 'Provisionamentos',
+    label: 'Cadastros',
     icon: 'operation',
   },
-  { path: '/auditoria', pattern: '/auditoria', label: 'Auditoria global', icon: 'audit' },
+  { path: '/auditoria', pattern: '/auditoria', label: 'Histórico de ações', icon: 'audit' },
   { path: '/perfil', pattern: '/perfil', label: 'Meu perfil', icon: 'user' },
 ];
 

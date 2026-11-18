@@ -6,6 +6,7 @@ import {
   estadoErro,
   formatarDataHora as formatarDadosHora,
 } from './componentes-do-painel.mjs';
+import { ROTULO_STATUS_OPERACAO } from '@peganafrota/contracts';
 
 import { icone } from './icones.mjs';
 
@@ -18,6 +19,49 @@ export const ROTULO_PAPEL_MEMBRO = {
   operator: 'Operador',
   viewer: 'Visualizador',
 };
+
+export const ROTULO_SITUACAO_CADASTRO = {
+  ...ROTULO_STATUS_OPERACAO,
+  compensating: 'Desfazendo',
+  compensated: 'Desfeito',
+  needs_manual: 'Precisa de revisão',
+};
+
+export const ROTULO_RESULTADO_ACAO = {
+  success: 'Concluída',
+  failure: 'Falhou',
+  denied: 'Negada',
+  compensated: 'Desfeita',
+};
+
+const ROTULOS_ACOES = {
+  'admin.account_blocked': 'Bloquear conta',
+  'admin.account_unblocked': 'Desbloquear conta',
+  'admin.replace': 'Transferir administração',
+  'company.archived': 'Arquivar empresa',
+  'company.created': 'Criar empresa',
+  'company.delete': 'Excluir empresa',
+  'company.deleted_permanently': 'Excluir empresa definitivamente',
+  'company.member.deleted': 'Remover usuário da empresa',
+  'company.member.password_reset': 'Alterar senha de usuário',
+  'company.provision_compensated': 'Desfazer cadastro',
+  'company.provision_compensation_blocked': 'Pedir revisão antes de desfazer cadastro',
+  'company.provision_failed': 'Cadastrar empresa',
+  'company.provision_retried': 'Tentar cadastro novamente',
+  'company.provision': 'Cadastrar empresa',
+  'company.provisioned': 'Cadastrar empresa',
+  'company.reactivated': 'Reativar empresa',
+  'company.suspended': 'Suspender empresa',
+  'company.update': 'Editar cadastro da empresa',
+  'company.updated': 'Editar cadastro da empresa',
+  'invite.accepted': 'Aceitar convite',
+  'invite.resent': 'Reenviar convite',
+  'invite.sent': 'Enviar convite',
+};
+
+export function rotuloAcao(codigo) {
+  return Object.hasOwn(ROTULOS_ACOES, codigo) ? ROTULOS_ACOES[codigo] : codigo || '—';
+}
 
 export function secao(titulo, filhos) {
   return criarElemento('section', { class: 'card' }, [
@@ -33,9 +77,13 @@ export const METADADOS_PAGINAS_ADMINISTRACAO = {
   'Nova empresa': ['plus', 'GESTÃO'],
   'Administradores das empresas': ['admin', 'GESTÃO'],
   'Admins das empresas': ['admin', 'GESTÃO'],
+  Administradores: ['admin', 'GESTÃO'],
   Provisionamentos: ['operation', 'SISTEMA'],
   Provisionamento: ['operation', 'SISTEMA'],
+  'Acompanhar cadastros': ['operation', 'SISTEMA'],
+  'Detalhes do cadastro': ['operation', 'SISTEMA'],
   'Auditoria global': ['audit', 'SISTEMA'],
+  'Histórico de ações': ['audit', 'SISTEMA'],
   'Meu perfil': ['user', 'CONTA'],
 };
 
@@ -43,23 +91,15 @@ export function cabecalhoPagina({
   title: titulo,
   subtitle: subtitulo,
   actions: acoes = [],
-  iconName: nomeIcone,
-  eyebrow: sobreTitulo,
 }) {
-  const metadados = METADADOS_PAGINAS_ADMINISTRACAO[titulo] || ['info', 'PLATAFORMA'];
+  const acoesDisponiveis = acoes.filter(Boolean);
   return criarElemento('div', { class: 'page-head' }, [
-    criarElemento('div', { class: 'page-head-main' }, [
-      criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [
-        icone(nomeIcone || metadados[0]),
-      ]),
-      criarElemento('div', { class: 'page-head-copy' }, [
-        criarElemento('p', { class: 'page-eyebrow', text: sobreTitulo || metadados[1] }),
-        criarElemento('h2', { class: 'page-title', text: titulo }),
-        subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
-      ]),
+    criarElemento('div', { class: 'page-head-copy' }, [
+      criarElemento('h2', { class: 'page-title', text: titulo }),
+      subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
     ]),
-    acoes.filter(Boolean).length
-      ? criarElemento('div', { class: 'page-actions' }, acoes.filter(Boolean))
+    acoesDisponiveis.length
+      ? criarElemento('div', { class: 'page-actions' }, acoesDisponiveis)
       : null,
   ]);
 }
@@ -153,7 +193,7 @@ export function tabelaMembrosEmpresa(empresa, membros, aoConcluir) {
                   disabled: !(membro.companyAccessActive && membro.globalAccountActive),
                   title:
                     membro.companyAccessActive && membro.globalAccountActive
-                      ? 'Define uma nova senha diretamente no Supabase Auth.'
+                      ? 'Defina uma nova senha para esta pessoa.'
                       : 'A senha só pode ser alterada quando o usuário está ativo.',
                   onClick: () => abrirAlteracaoSenhaMembro(empresa, membro, aoConcluir),
                 }),
@@ -253,6 +293,7 @@ export function barraFiltros({
     type: 'search',
     value: valorBusca,
     placeholder: textoBusca,
+    'aria-label': textoBusca,
     dataset: { listSearch: 'true' },
     onChange: (evento) => buscar(evento.target.value),
     onKeydown: (evento) => {
@@ -282,7 +323,7 @@ export function pulsoAdministrador(rotulo, valor, dica, nomeIcone, tom = 'neutra
     criarElemento('div', { class: 'admin-pulse-copy' }, [
       criarElemento('span', { class: 'admin-pulse-label', text: rotulo }),
       criarElemento('strong', { class: 'admin-pulse-value', text: valor }),
-      criarElemento('span', { class: 'admin-pulse-hint', text: dica }),
+      dica ? criarElemento('span', { class: 'admin-pulse-hint', text: dica }) : null,
     ]),
   ]);
 }

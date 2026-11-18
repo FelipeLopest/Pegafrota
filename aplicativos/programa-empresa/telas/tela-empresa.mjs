@@ -22,8 +22,7 @@ export function telaEmpresa({ outlet: conteudoTela, setTitle: definirTitulo }) {
       criarElemento('div', {}, [
         cabecalhoPagina({
           title: 'Empresa',
-          subtitle:
-            'Dados operacionais da sua organização. CNPJ e situação da conta são administrados pela plataforma.',
+          subtitle: 'Para alterar o CNPJ ou a situação da conta, fale com o suporte.',
           actions: [
             botao({
               label: 'Editar dados',

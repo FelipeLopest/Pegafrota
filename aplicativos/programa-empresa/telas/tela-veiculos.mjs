@@ -36,8 +36,6 @@ export function telaVeiculos({ outlet: conteudoTela, setTitle: definirTitulo }) 
         consumirAtalho(() => abrirEditorVeiculo({ onDone: recarregar }));
       const cabecalho = cabecalhoPagina({
         title: 'Veículos',
-        subtitle:
-          'Pesquise a frota por qualquer dado e use os filtros para esconder arquivados, separar estados e combustíveis.',
         actions: [
           botao({
             label: 'Importar planilha',

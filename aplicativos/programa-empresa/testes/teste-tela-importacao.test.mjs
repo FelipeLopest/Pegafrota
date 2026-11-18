@@ -12,19 +12,21 @@ const estilosCss = lerArquivoSincrono(
   'utf8',
 );
 
-testar('importação usa dropdown decorado e trilha de etapas', () => {
-  verificarCondicao.match(tela, /import-select-shell/);
-  verificarCondicao.match(tela, /import-stepper/);
-  verificarCondicao.match(tela, /import-step-number/);
-  verificarCondicao.match(estilosCss, /\.import-select-shell/);
-  verificarCondicao.match(estilosCss, /\.import-stepper/);
+testar('a importação mantém o modelo Excel visível e inclui instruções, exemplos e CSV', () => {
+  verificarCondicao.match(tela, /class: 'import-modelo-pronto'/);
+  verificarCondicao.match(tela, /label: 'Baixar modelo Excel'/);
+  verificarCondicao.match(tela, /detalhes\('modelo', 'Como preencher a planilha'/);
+  verificarCondicao.match(tela, /label: 'Baixar modelo CSV'/);
+  verificarCondicao.match(tela, /coluna\.exemplo/);
+  verificarCondicao.match(tela, /detalhes\('colagem', 'Colar dados do Excel'/);
+  verificarCondicao.match(tela, /detalhes\('trocar', 'Trocar arquivo ou tipo'/);
+  verificarCondicao.match(estilosCss, /\.import-details > summary:focus-visible/);
 });
 
-testar('upload usa dropzone visual e seletor de arquivo customizado', () => {
-  verificarCondicao.match(tela, /import-drop-icon/);
-  verificarCondicao.match(tela, /import-file-trigger/);
+testar('a planilha pode ser arrastada ou escolhida por um botão nativo', () => {
+  verificarCondicao.match(tela, /type: 'file'/);
+  verificarCondicao.match(tela, /onClick: \(\) => entradaArquivo\.click\(\)/);
   verificarCondicao.match(tela, /is-dragging/);
-  verificarCondicao.match(estilosCss, /\.import-file-input/);
   verificarCondicao.match(estilosCss, /\.import-drop\.is-dragging/);
 });
 
@@ -34,9 +36,9 @@ testar('ações de importação nas telas usam variante visual própria', () => 
   verificarCondicao.match(estilosCss, /\.btn-automation/);
 });
 
-testar('validação e progresso possuem estados visuais sem remover o fluxo', () => {
-  verificarCondicao.match(tela, /import-validation-panel is-danger/);
-  verificarCondicao.match(tela, /import-validation-panel is-success/);
-  verificarCondicao.match(tela, /import-progress-percent/);
-  verificarCondicao.match(tela, /Importar \$\{resultado\.validas\.length\} registro\(s\)/);
+testar('conferência exibe prévia, erros e progresso e só oferece importação de linhas pendentes', () => {
+  verificarCondicao.match(tela, /detalhes\('previa', 'Prévia das linhas prontas'/);
+  verificarCondicao.match(tela, /listarErros\('corrigir', 'Linhas que precisam de correção'/);
+  verificarCondicao.match(tela, /criarElemento\('progress'/);
+  verificarCondicao.match(tela, /prontas\.length && !enviando\s*\? botao\(/);
 });

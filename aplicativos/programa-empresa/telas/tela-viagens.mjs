@@ -38,7 +38,7 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
         dados.trips.page(),
         dados.vehicles.list(),
         dados.drivers.list(),
-        dados.locations.eligible().catch(() => []),
+        dados.locations.eligible().catch(() => null),
       ]);
       return {
         trips: viagens,
@@ -50,14 +50,23 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
     ({ trips: viagens, vehicles: veiculos, drivers: motoristas, locais }) => {
       const indiceVeiculo = indice(veiculos),
         indiceDestino = indice(motoristas);
+      let patios = locais;
       const abrirPlanejamento = (vehicleId = '', trip = null) =>
         abrirFormularioViagem({
           vehicles: veiculosAtivos(veiculos),
           drivers: somenteMotoristasElegiveis(motoristas),
           vehicleId,
           trip,
-          locations: locais,
+          locations: patios || [],
           history: viagens,
+          onVehicleAdded: (veiculo) => {
+            veiculos.push(veiculo);
+            indiceVeiculo.set(veiculo.id, veiculo);
+          },
+          onDriverAdded: (motorista) => {
+            motoristas.push(motorista);
+            indiceDestino.set(motorista.id, motorista);
+          },
           onDone: recarregar,
         });
       if (contexto.can(PERMISSAO.TRIPS_WRITE)) consumirAtalho(abrirPlanejamento);
@@ -66,13 +75,13 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
           trip,
           action,
           vehicle: indiceVeiculo.get(trip.vehicle_id),
-          locations: contexto.can(PERMISSAO.MOVEMENTS_WRITE) ? locais : [],
+          locations: patios,
+          onLocationsChanged: (atualizados) => (patios = atualizados),
           onDone: recarregar,
         });
       const cabecalho = cabecalhoPagina({
         title: 'Viagens',
-        subtitle:
-          'Busque por rota, placa ou motorista. Os filtros ajudam a separar o que está em andamento do histórico.',
+        subtitle: 'Planeje, registre as saídas e acompanhe os retornos.',
         actions: [
           botao({
             label: 'Importar planilha',

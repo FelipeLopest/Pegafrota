@@ -22,6 +22,8 @@ import {
   tabela,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirModalMovimentacaoV8 as abrirFormularioMovimentacao } from '../formularios/formulario-movimentacao.mjs';
+import { abrirEditorLocal } from '../formularios/formulario-local.mjs';
+import { abrirEditorVeiculo } from '../formularios/formulario-veiculo.mjs';
 
 export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
   definirTitulo('Pátio');
@@ -43,8 +45,12 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
       ({ snap: captura, moves: movimentacoes, locations: locais }) => {
         const linhaItem = indice(locais);
         const listaVeiculos = captura?.vehicles || [];
+        const faltaVeiculo = listaVeiculos.length === 0;
+        const faltaPatio = locais.length === 0;
+        const faltaCadastro = faltaVeiculo || faltaPatio;
+        const permissaoCadastro = faltaVeiculo ? PERMISSAO.VEHICLES_WRITE : PERMISSAO.LOCATIONS_WRITE;
         const registrar = (id = '', inicial = false) =>
-          abrirFormularioMovimentacao({
+          !faltaCadastro && abrirFormularioMovimentacao({
             vehicle: listaVeiculos.find((item) => item.id === id),
             vehicles: inicial
               ? listaVeiculos.filter((item) => item.presence === 'unknown')
@@ -56,10 +62,8 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
         if (contexto.can(PERMISSAO.MOVEMENTS_WRITE)) consumirAtalho(registrar);
         const cabecalho = cabecalhoPagina({
           title: 'Pátio',
-          subtitle:
-            'Localize rapidamente um veículo, filtre por presença e registre a próxima entrada ou saída.',
           actions: [
-            captura?.neverMoved
+            !faltaCadastro && captura?.neverMoved
               ? botao({
                   label: 'Conferir presença inicial',
                   icon: 'yard',
@@ -68,28 +72,24 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
                 })
               : null,
             botao({
-              label: 'Registrar entrada/saída',
+              label: 'Registrar entrada ou saída',
               variant: 'primary',
               icon: 'plus',
               permission: PERMISSAO.MOVEMENTS_WRITE,
-              onClick: () =>
-                abrirFormularioMovimentacao({
-                  vehicles: listaVeiculos,
-                  locations: locais,
-                  onDone: recarregar,
-                }),
+              disabled: faltaCadastro,
+              onClick: () => registrar(),
             }),
           ],
         });
-        const indicadores = criarElemento('div', { class: 'kpi-grid' }, [
-          indicadorSimples('No pátio', captura?.inside ?? 0, 'veículos dentro'),
-          indicadorSimples('Fora do pátio', captura?.outside ?? 0, 'veículos fora'),
+        const indicadores = criarElemento('div', { class: 'kpi-grid patio-indicadores' }, [
+          indicadorSimples('No pátio', captura?.inside ?? 0),
+          indicadorSimples('Fora do pátio', captura?.outside ?? 0),
           indicadorSimples(
             'Entradas hoje',
             captura?.entriesToday ?? 0,
-            `dia local · ${captura?.timezone || ''}`,
+            captura?.timezone || '',
           ),
-          indicadorSimples('Saídas hoje', captura?.exitsToday ?? 0, 'movimentos registrados'),
+          indicadorSimples('Saídas hoje', captura?.exitsToday ?? 0, captura?.timezone || ''),
         ]);
         const presenca = exploradorColecao(listaVeiculos, {
           key: 'yard',
@@ -156,6 +156,7 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
                           label: 'Conferir presença',
                           variant: 'ghost',
                           permission: PERMISSAO.MOVEMENTS_WRITE,
+                          disabled: faltaPatio,
                           onClick: () => registrar(veiculoItem.id, true),
                         })
                       : null,
@@ -164,6 +165,7 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
                         veiculoItem.presence === 'inside' ? 'Registrar saída' : 'Registrar entrada',
                       variant: 'ghost',
                       permission: PERMISSAO.MOVEMENTS_WRITE,
+                      disabled: faltaPatio,
                       onClick: () =>
                         abrirFormularioMovimentacao({
                           vehicle: veiculoItem,
@@ -202,13 +204,39 @@ export function telaPatio({ outlet: conteudoTela, setTitle: definirTitulo }) {
         );
         return criarElemento('div', {}, [
           cabecalho,
+          faltaCadastro && contexto.can(PERMISSAO.MOVEMENTS_WRITE)
+            ? criarElemento('section', { class: 'card primeiros-passos' }, [
+                criarElemento('div', { class: 'primeiros-passos-cabecalho' }, [
+                  criarElemento('div', {}, [
+                    criarElemento('h2', {
+                      class: 'card-title',
+                      text: faltaVeiculo ? 'Adicione o primeiro veículo' : 'Adicione um pátio',
+                    }),
+                    criarElemento('p', {
+                      class: 'muted',
+                      text: contexto.can(permissaoCadastro)
+                        ? 'Depois do cadastro você poderá registrar entradas e saídas aqui.'
+                        : 'Peça ao administrador da empresa para concluir esse cadastro.',
+                    }),
+                  ]),
+                  botao({
+                    label: faltaVeiculo ? 'Cadastrar veículo' : 'Cadastrar pátio',
+                    variant: 'primary',
+                    permission: permissaoCadastro,
+                    onClick: () => faltaVeiculo
+                      ? abrirEditorVeiculo({ onDone: recarregar })
+                      : abrirEditorLocal({ onDone: recarregar }),
+                  }),
+                ]),
+              ])
+            : null,
           indicadores,
-          cartao({ title: 'Presença atual', children: [presenca] }),
+          cartao({ title: 'Onde estão os veículos', children: [presenca] }),
           criarElemento('details', { class: 'collapsible-section' }, [
             criarElemento('summary', {}, [
               icone('clock', { size: 'sm' }),
               criarElemento('span', {
-                text: `Movimentações recentes · ${Math.min(movimentacoes.length, 60)}`,
+                text: `Entradas e saídas recentes · ${Math.min(movimentacoes.length, 60)}`,
               }),
             ]),
             recentes.length

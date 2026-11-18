@@ -12,13 +12,13 @@ import { navegar } from '../navegacao/trocar-tela.mjs';
 export async function excluirEmpresaDefinitivamente(empresa) {
   const confirmado = await confirmarAcaoDestrutiva({
     title: 'Excluir empresa definitivamente',
-    description: `${empresa.tradeName} e todos os dados operacionais do tenant serão apagados. Esta operação não pode ser desfeita.`,
+    description: `${empresa.tradeName} e os dados de operação dela serão apagados de forma definitiva.`,
     expectedName: empresa.tradeName,
     confirmLabel: 'Excluir definitivamente',
     consequences: [
-      'Veículos, motoristas, viagens, abastecimentos, manutenções, locais, OCR e movimentações serão excluídos.',
+      'Serão apagados veículos, motoristas, viagens, abastecimentos, manutenções, locais e registros de passagem e leitura de placas.',
       'Contas usadas somente nesta empresa serão excluídas quando não houver vínculos nem autoria a preservar em outros registros.',
-      'A auditoria operacional do tenant será apagada; a trilha global da plataforma preserva apenas o registro saneado da exclusão.',
+      'O histórico interno da empresa será apagado. A plataforma guardará o registro da exclusão.',
     ],
   });
   if (!confirmado.confirmed) return;

@@ -87,7 +87,7 @@ export function montarEstrutura({ onSignOut: aoSair }) {
         'details',
         {
           class: 'nav-section',
-          open: preferenciasGrupos[secao.label] !== false,
+          open: preferenciasGrupos[secao.label] ?? ['Dia a dia', 'Conta'].includes(secao.label),
           onToggle: (evento2) => {
             preferenciasGrupos[secao.label] = evento2.currentTarget.open;
             localStorage.setItem('pnf.desktop.nav-groups', JSON.stringify(preferenciasGrupos));
@@ -125,20 +125,14 @@ export function montarEstrutura({ onSignOut: aoSair }) {
     let buscaAtual = '';
     const resultados = criarElemento('div', { class: 'command-results' });
     let correspondenciaItem;
+    const semAcentos = (texto) =>
+      texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     const desenhar = () => {
-      const termoBusca = buscaAtual
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .trim();
+      const termoBusca = semAcentos(buscaAtual);
       const correspondencias = itensVisiveisNavegacao.filter(
         (item) =>
           !termoBusca ||
-          item.label
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .includes(termoBusca),
+          [item.label, ...(item.termos ?? [])].some((rotulo) => semAcentos(rotulo).includes(termoBusca)),
       );
       resultados.replaceChildren(
         ...correspondencias.map((item) =>

@@ -258,7 +258,7 @@ app.whenReady().then(async () => {
     await evalIn('location.hash = "#/provisionamentos"');
     await wait(1400);
     const opsScreen = await evalIn('document.querySelector(".topbar-title")?.textContent || ""');
-    check('16_tela_provisionamentos', /Provisionamentos/i.test(opsScreen), opsScreen);
+    check('16_tela_provisionamentos', /Acompanhar cadastros/i.test(opsScreen), opsScreen);
     await shot('08-provisionamentos');
 
     await evalIn('location.hash = "#/auditoria"');

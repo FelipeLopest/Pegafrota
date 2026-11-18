@@ -39,7 +39,6 @@ export async function telaAdministradores({
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
     title: 'Administradores das empresas',
-    subtitle: 'Pesquise pessoas sem confundir acesso a uma empresa com o estado global da conta.',
   });
   const carregar = async () => {
     const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
@@ -59,7 +58,6 @@ export async function telaAdministradores({
           campo({
             id: 'adm-access',
             label: 'Acesso à empresa',
-            hint: 'Aplicado a toda a base de administradores.',
             control: criarElemento(
               'select',
               {
@@ -86,7 +84,6 @@ export async function telaAdministradores({
           campo({
             id: 'adm-account',
             label: 'Conta global',
-            hint: 'Aplicado a toda a base de administradores.',
             control: criarElemento(
               'select',
               {
@@ -123,7 +120,7 @@ export async function telaAdministradores({
       }),
       criarElemento('p', {
         class: 'muted',
-        text: 'Acesso à empresa e conta na plataforma são escopos independentes. Suspender o acesso afeta apenas uma empresa; bloquear a conta afeta todas.',
+        text: 'Suspender o acesso vale para uma empresa. Bloquear a conta impede o acesso a todas.',
       }),
       areaLista,
     );
@@ -146,7 +143,7 @@ export async function telaAdministradores({
             description:
               estado.search || estado.access || estado.account || estado.companyId
                 ? 'Revise ou limpe os filtros da lista.'
-                : 'Provisione uma empresa para criar o primeiro administrador.',
+                : 'Cadastre uma empresa para adicionar o primeiro administrador.',
           });
         const manipuladores = {
           onSuspendCompany: (evento) => executarSuspensaoEmpresa(evento, servicos, carregar),

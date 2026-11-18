@@ -14,14 +14,16 @@ export function abrirFormularioMovimentacao({
   vehicle: veiculo,
   vehicles: veiculos = [],
   locations: locais = [],
+  locationId: localInicial,
   initial: inicial = false,
   onDone: aoConcluir,
+  onCancel: aoCancelar,
 }) {
   const lista = veiculo ? [veiculo] : veiculosAtivos(veiculos);
   const ativos = locais.filter((item) => item.active && !item.archived_at);
   const formulario = {
     vehicleId: veiculo?.id || '',
-    locationId: veiculo?.locationId || (ativos.length === 1 ? ativos[0]?.id || '' : ''),
+    locationId: localInicial || veiculo?.locationId || (ativos.length === 1 ? ativos[0].id : ''),
     notes: '',
     reason: '',
     direction: veiculo?.presence === 'inside' ? 'exit' : 'entry',
@@ -212,7 +214,7 @@ export function abrirFormularioMovimentacao({
         const resultado = inicial
           ? await dados.movements.initialize(formulario)
           : await dados.movements.register(formulario);
-        janela.close();
+        janela.close(true);
         notificacao(
           resultado?.deduplicated
             ? 'Esta solicitação já estava registrada.'
@@ -223,7 +225,7 @@ export function abrirFormularioMovimentacao({
                 : 'Entrada registrada.',
           { tone: 'success' },
         );
-        aoConcluir?.();
+        aoConcluir?.(resultado);
       } catch (erro) {
         notificacao(erro.message, { tone: 'danger' });
       } finally {
@@ -235,6 +237,9 @@ export function abrirFormularioMovimentacao({
   janela = modal({
     title: inicial ? 'Conferir presença inicial' : 'Registrar entrada/saída',
     body: corpo,
+    onClose: (salvo) => {
+      if (!salvo) aoCancelar?.();
+    },
     footer: criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Cancelar', onClick: () => janela.close() }),
       salvar,

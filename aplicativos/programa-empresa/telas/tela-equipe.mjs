@@ -36,7 +36,6 @@ export function telaUsuarios({ outlet: conteudoTela, setTitle: definirTitulo }) 
         resposta?.members ?? resposta?.items ?? (Array.isArray(resposta) ? resposta : []);
       const cabecalho = cabecalhoPagina({
         title: 'Equipe',
-        subtitle: 'Busque pessoas por nome ou e-mail e filtre por cargo ou situação de acesso.',
         actions: [
           botao({
             label: 'Importar planilha',

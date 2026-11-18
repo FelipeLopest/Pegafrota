@@ -10,15 +10,15 @@ import { api as servicos } from '../comunicacao/comunicacao-com-servidor.mjs';
 
 import { navegar } from '../navegacao/trocar-tela.mjs';
 
-import { icone } from '../componentes/icones.mjs';
-
 import { formatarCnpj } from '@peganafrota/validation';
 
 import {
   ROTULO_STATUS_EMPRESA as ROTULO_SITUACAO_EMPRESA,
-  ROTULO_STATUS_OPERACAO as ROTULO_SITUACAO_OPERACAO,
 } from '@peganafrota/contracts';
 import {
+  cabecalhoPagina,
+  ROTULO_SITUACAO_CADASTRO,
+  rotuloAcao,
   withState as carregarComEstado,
   contagensResultadoAtividade,
   pulsoAdministrador,
@@ -52,15 +52,9 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
         contagensAtividade.find((itemComparado) => itemComparado.label === 'Falhas')?.value || 0;
 
       return criarElemento('div', {}, [
-        criarElemento('div', { class: 'page-head' }, [
-          criarElemento('div', {}, [
-            criarElemento('h2', { class: 'page-title', text: 'Visão geral da plataforma' }),
-            criarElemento('p', {
-              class: 'page-subtitle',
-              text: 'Resumo do ciclo de vida das empresas, convites e saúde das operações administrativas.',
-            }),
-          ]),
-          criarElemento('div', { class: 'page-actions' }, [
+        cabecalhoPagina({
+          title: 'Visão geral',
+          actions: [
             botao({ label: 'Empresas', icon: 'company', onClick: () => navegar('/empresas') }),
             botao({
               label: 'Nova empresa',
@@ -68,8 +62,8 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
               icon: 'plus',
               onClick: () => navegar('/empresas/nova'),
             }),
-          ]),
-        ]),
+          ],
+        }),
 
         criarElemento('div', { class: 'admin-pulse' }, [
           pulsoAdministrador(
@@ -79,105 +73,28 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
             'company',
             'neutral',
           ),
-          pulsoAdministrador('Ativas', String(ativo), 'operando normalmente', 'check', 'success'),
+          pulsoAdministrador('Ativas', String(ativo), '', 'check', 'success'),
           pulsoAdministrador(
             'Suspensas',
             String(suspenso),
-            suspenso ? 'exigem acompanhamento' : 'nenhuma suspensa',
+            '',
             'warning',
             suspenso ? 'warning' : 'success',
           ),
           pulsoAdministrador(
-            'Convites',
+            'Convites pendentes',
             String(convites),
-            'pendentes',
+            '',
             'invite',
             convites ? 'info' : 'neutral',
           ),
           pulsoAdministrador(
             'Falhas',
             String(falhou.length),
-            falhou.length ? 'operações pendentes' : 'nenhuma crítica',
+            falhou.length ? 'no cadastro de empresas' : '',
             'warning',
             falhou.length ? 'danger' : 'success',
           ),
-        ]),
-
-        criarElemento('div', { class: 'admin-dashboard-grid' }, [
-          criarElemento('section', { class: 'card admin-dashboard-wide' }, [
-            criarElemento('div', { class: 'card-head' }, [
-              criarElemento('div', {}, [
-                criarElemento('p', { class: 'card-label', text: 'CICLO DE VIDA DAS CONTAS' }),
-                criarElemento('h2', { class: 'card-title', text: 'Saúde da base de clientes' }),
-              ]),
-              convites
-                ? criarElemento('span', { class: 'chip-violet' }, [
-                    icone('invite', { size: 'sm' }),
-                    criarElemento('span', { text: `${convites} convite(s)` }),
-                  ])
-                : null,
-            ]),
-            criarElemento('div', { class: 'lifecycle-summary' }, [
-              criarElemento('div', { class: 'lifecycle-big' }, [
-                criarElemento('strong', { text: String(total) }),
-                criarElemento('span', { text: 'empresas' }),
-              ]),
-              criarElemento('div', { class: 'lifecycle-body' }, [
-                total
-                  ? criarElemento(
-                      'div',
-                      { class: 'lifecycle' },
-                      [
-                        segmentoCicloVida('active', 'Ativas', ativo, total),
-                        segmentoCicloVida('suspended', 'Suspensas', suspenso, total),
-                        segmentoCicloVida('archived', 'Arquivadas', arquivado, total),
-                      ].filter(Boolean),
-                    )
-                  : criarElemento('p', {
-                      class: 'muted',
-                      text: 'Nenhuma empresa provisionada ainda.',
-                    }),
-                criarElemento('div', { class: 'lifecycle-legend' }, [
-                  legendaGrafico('Ativas', ativo, 'var(--tema-sucesso)'),
-                  legendaGrafico('Suspensas', suspenso, 'var(--tema-aviso)'),
-                  legendaGrafico('Arquivadas', arquivado, 'var(--tema-neutro)'),
-                ]),
-              ]),
-            ]),
-          ]),
-
-          criarElemento('section', { class: 'card' }, [
-            criarElemento('p', { class: 'card-label', text: 'STATUS DAS EMPRESAS' }),
-            criarElemento('h2', { class: 'card-title', text: 'Comparativo atual' }),
-            colunasAdministrador([
-              { label: 'Ativas', value: ativo, color: 'var(--tema-sucesso)' },
-              { label: 'Suspensas', value: suspenso, color: 'var(--tema-aviso)' },
-              { label: 'Arquivadas', value: arquivado, color: 'var(--tema-neutro)' },
-            ]),
-          ]),
-
-          criarElemento('section', { class: 'card admin-dashboard-wide' }, [
-            criarElemento('div', { class: 'card-head' }, [
-              criarElemento('div', {}, [
-                criarElemento('p', { class: 'card-label', text: 'ATIVIDADE RECENTE' }),
-                criarElemento('h2', { class: 'card-title', text: 'Resultado das últimas ações' }),
-              ]),
-              negados || falhas
-                ? criarElemento('span', {
-                    class: 'chart-badge chart-badge-warning',
-                    text: `${negados + falhas} atenção`,
-                  })
-                : criarElemento('span', {
-                    class: 'chart-badge chart-badge-success',
-                    text: 'Fluxo saudável',
-                  }),
-            ]),
-            barrasAdministrador(contagensAtividade),
-            criarElemento('p', {
-              class: 'chart-caption',
-              text: 'A distribuição usa somente as ações recentes retornadas pelo painel; não simula série histórica.',
-            }),
-          ]),
         ]),
 
         falhou.length
@@ -185,13 +102,13 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
               criarElemento('div', { class: 'card-head' }, [
                 criarElemento('h2', {
                   class: 'card-title',
-                  text: `Operações que exigem atenção · ${falhou.length}`,
+                  text: `Cadastros que precisam de atenção · ${falhou.length}`,
                 }),
                 botao({
                   label: 'Ver todas',
                   size: 'sm',
                   icon: 'right',
-                  onClick: () => navegar('/provisionamentos'),
+                  onClick: () => navegar('/provisionamentos?status=failed'),
                 }),
               ]),
               criarElemento('div', { class: 'table-wrap' }, [
@@ -218,7 +135,7 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                         criarElemento('td', {}, [
                           criarElemento('status-pill', {
                             status: objetoItem.status,
-                            label: ROTULO_SITUACAO_OPERACAO[objetoItem.status] || objetoItem.status,
+                            label: ROTULO_SITUACAO_CADASTRO[objetoItem.status] || objetoItem.status,
                           }),
                         ]),
                         criarElemento('td', {}, [
@@ -303,7 +220,7 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
               : estadoVazio({
                   icon: 'company',
                   title: 'Nenhuma empresa cadastrada',
-                  description: 'Comece provisionando a primeira empresa da plataforma.',
+                  description: 'Cadastre sua primeira empresa.',
                   action: botao({
                     label: 'Nova empresa',
                     variant: 'primary',
@@ -325,8 +242,8 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                       marcadorAtividade(evento.result),
                       criarElemento('div', { class: 'feed-body' }, [
                         criarElemento('p', { class: 'feed-text' }, [
-                          criarElemento('code', { text: evento.action }),
-                          criarElemento('span', { text: ` ${rotuloResultado(evento.result)}` }),
+                          criarElemento('strong', { text: rotuloAcao(evento.action) }),
+                          criarElemento('span', { text: ` · ${rotuloResultado(evento.result)}` }),
                         ]),
                         criarElemento('p', {
                           class: 'feed-meta',
@@ -341,6 +258,69 @@ export async function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo
                   title: 'Sem atividade',
                   description: 'Nenhuma ação registrada ainda.',
                 }),
+          ]),
+        ]),
+        criarElemento('details', { class: 'card admin-detalhes' }, [
+          criarElemento('summary', { text: 'Gráficos e totais' }),
+          criarElemento('div', { class: 'admin-dashboard-grid' }, [
+            criarElemento('section', { class: 'card admin-dashboard-wide' }, [
+              criarElemento('h2', { class: 'card-title', text: 'Situação das empresas' }),
+              criarElemento('div', { class: 'lifecycle-summary' }, [
+                criarElemento('div', { class: 'lifecycle-big' }, [
+                  criarElemento('strong', { text: String(total) }),
+                  criarElemento('span', { text: 'empresas' }),
+                ]),
+                criarElemento('div', { class: 'lifecycle-body' }, [
+                  total
+                    ? criarElemento(
+                        'div',
+                        { class: 'lifecycle' },
+                        [
+                          segmentoCicloVida('active', 'Ativas', ativo, total),
+                          segmentoCicloVida('suspended', 'Suspensas', suspenso, total),
+                          segmentoCicloVida('archived', 'Arquivadas', arquivado, total),
+                        ].filter(Boolean),
+                      )
+                    : criarElemento('p', {
+                        class: 'muted',
+                        text: 'Nenhuma empresa cadastrada.',
+                      }),
+                  criarElemento('div', { class: 'lifecycle-legend' }, [
+                    legendaGrafico('Ativas', ativo, 'var(--tema-sucesso)'),
+                    legendaGrafico('Suspensas', suspenso, 'var(--tema-aviso)'),
+                    legendaGrafico('Arquivadas', arquivado, 'var(--tema-neutro)'),
+                  ]),
+                ]),
+              ]),
+            ]),
+
+            criarElemento('section', { class: 'card' }, [
+              criarElemento('h2', { class: 'card-title', text: 'Empresas por situação' }),
+              colunasAdministrador([
+                { label: 'Ativas', value: ativo, color: 'var(--tema-sucesso)' },
+                { label: 'Suspensas', value: suspenso, color: 'var(--tema-aviso)' },
+                { label: 'Arquivadas', value: arquivado, color: 'var(--tema-neutro)' },
+              ]),
+            ]),
+
+            criarElemento('section', { class: 'card admin-dashboard-wide' }, [
+              criarElemento('div', { class: 'card-head' }, [
+                criarElemento('div', {}, [
+                  criarElemento('h2', { class: 'card-title', text: 'Resultado das últimas ações' }),
+                ]),
+                negados || falhas
+                  ? criarElemento('span', {
+                      class: 'chart-badge chart-badge-warning',
+                      text: `${negados + falhas} com falha ou bloqueadas`,
+                    })
+                  : null,
+              ]),
+              barrasAdministrador(contagensAtividade),
+              criarElemento('p', {
+                class: 'chart-caption',
+                text: 'Os totais são das ações recentes exibidas nesta tela.',
+              }),
+            ]),
           ]),
         ]),
       ]);

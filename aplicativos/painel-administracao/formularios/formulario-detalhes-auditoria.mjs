@@ -7,25 +7,26 @@ import {
 
 import { api as servicos } from '../comunicacao/comunicacao-com-servidor.mjs';
 
-import { detalhe } from '../componentes/listas-resumos-e-detalhes.mjs';
+import { detalhe, rotuloAcao, ROTULO_RESULTADO_ACAO } from '../componentes/listas-resumos-e-detalhes.mjs';
 
 export async function abrirDetalheAuditoria(identificador) {
   try {
     const evento = await servicos.audit.get(identificador);
     modal({
-      title: 'Evento de auditoria',
+      title: 'Detalhes da ação',
       size: 'lg',
       body: criarElemento('div', { class: 'detail-grid' }, [
         detalhe('Quando', formatarDadosHora(evento.occurredAt)),
-        detalhe('Ação', evento.action),
-        detalhe('Resultado', evento.result),
+        detalhe('Ação', rotuloAcao(evento.action)),
+        detalhe('Resultado', ROTULO_RESULTADO_ACAO[evento.result] || evento.result),
         detalhe('Alvo', `${evento.targetType || '—'} ${evento.targetId || ''}`),
         detalhe('Empresa', evento.companyId || '—'),
         detalhe('Operação', evento.operationId || '—'),
         detalhe('Requisição', evento.requestId || '—'),
         detalhe('IP', evento.ipAddress || '—'),
-        criarElemento('div', { class: 'detail-item' }, [
-          criarElemento('p', { class: 'detail-label', text: 'Metadados' }),
+        criarElemento('details', { class: 'detail-item' }, [
+          criarElemento('summary', { text: 'Dados técnicos' }),
+          detalhe('Código da ação', evento.action),
           criarElemento('pre', {}, [
             criarElemento('code', { text: JSON.stringify(evento.metadata, null, 2) }),
           ]),

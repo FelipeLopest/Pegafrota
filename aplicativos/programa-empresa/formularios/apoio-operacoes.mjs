@@ -36,6 +36,27 @@ export function numeroInformado(valor, rotulo, minimo = 0) {
 export function unidadeProduto(produto) {
   return produto === 'cng' ? 'm³' : 'L';
 }
+
+export function abrirModalComVolta(janela, abrirEditor, reabrir, aoSalvar) {
+  janela.close();
+  let voltou = false;
+  const voltar = () => {
+    if (voltou) return;
+    voltou = true;
+    reabrir();
+  };
+  abrirEditor({
+    onCancel: voltar,
+    onDone: (...resultado) => {
+      try {
+        aoSalvar(...resultado);
+      } finally {
+        voltar();
+      }
+    },
+  });
+}
+
 export function consumirAtalho(acao) {
   const [rota, consulta = ''] = location.hash.slice(1).split('?');
   const parametros = new URLSearchParams(consulta);

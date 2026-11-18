@@ -8,7 +8,7 @@ export function mostrarProgressoCadastroEmpresa() {
     'div',
     { class: 'progress-steps' },
     ETAPAS_PROVISIONAMENTO.map((textoItem) => {
-      const noDetalhe = criarElemento('p', { class: 'progress-step-detail', text: 'Aguardando' });
+      const noDetalhe = criarElemento('p', { class: 'progress-step-detail', text: '' });
       const etiquetaSituacao = criarElemento('status-pill', {
         status: 'pending',
         label: 'Aguardando',
@@ -30,7 +30,7 @@ export function mostrarProgressoCadastroEmpresa() {
   );
 
   const correspondenciaItem = modal({
-    title: 'Provisionando empresa',
+    title: 'Cadastrando empresa',
     body: lista,
     dismissible: false,
   });
@@ -50,7 +50,7 @@ export function mostrarProgressoCadastroEmpresa() {
             succeeded: 'Concluída',
             failed: 'Falhou',
             skipped: 'Ignorada',
-            compensated: 'Revertida',
+            compensated: 'Desfeita',
           }[textoItem.status] || textoItem.status,
         );
         resultadoItem.detailNode.textContent = textoItem.detail || textoItem.errorCode || '';

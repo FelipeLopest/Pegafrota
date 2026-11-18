@@ -13,18 +13,20 @@ import {
   withState as carregarComEstado,
   resumoAdministrador,
   barraPaginacao,
+  ROTULO_RESULTADO_ACAO,
+  rotuloAcao,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirDetalheAuditoria } from '../formularios/formulario-detalhes-auditoria.mjs';
 
 export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTitulo }) {
-  definirTitulo('Auditoria global');
+  definirTitulo('Histórico de ações');
   const estado = { search: '', action: '', result: '', from: '', to: '', page: 1 };
   const fusoHorario = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo';
   const conteiner = criarElemento('div', {});
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
-    title: 'Auditoria global',
-    subtitle: 'Busque em todo o histórico e abra o evento para conferir seus detalhes.',
+    title: 'Histórico de ações',
+    subtitle: 'Consulte quem fez cada alteração e o resultado.',
   });
   const carregar = async () => {
     const filtrosAbertos = conteiner.querySelector('.filter-drawer')?.open;
@@ -33,7 +35,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
       cabecalho,
       barraFiltros({
         searchValue: estado.search,
-        searchPlaceholder: 'Buscar por ator, empresa ou ação',
+        searchPlaceholder: 'Buscar por pessoa, empresa ou ação',
         filtersOpen: filtrosAbertos,
         onSearch: (veiculoItem) => {
           estado.search = veiculoItem;
@@ -73,7 +75,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                 ['success', 'Sucesso'],
                 ['failure', 'Falha'],
                 ['denied', 'Negado'],
-                ['compensated', 'Compensado'],
+                ['compensated', 'Desfeito'],
               ].map(([veiculoItem, linhaItem]) =>
                 criarElemento('option', {
                   value: veiculoItem,
@@ -119,7 +121,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
       }),
       criarElemento('p', {
         class: 'muted',
-        text: `Registro das ações da plataforma. Período e horários no fuso ${fusoHorario}.`,
+        text: `Horários e filtros no fuso ${fusoHorario}.`,
       }),
       areaLista,
     );
@@ -140,7 +142,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
         const itens = resposta.items || [];
         if (resposta.total === 0)
           return estadoVazio({
-            title: 'Nenhum evento encontrado',
+            title: 'Nenhuma ação encontrada',
             description: 'Ajuste ou limpe os filtros.',
           });
         return criarElemento('div', {}, [
@@ -175,7 +177,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                   criarElemento('thead', {}, [
                     criarElemento('tr', {}, [
                       criarElemento('th', { text: 'Quando' }),
-                      criarElemento('th', { text: 'Ator' }),
+                      criarElemento('th', { text: 'Pessoa' }),
                       criarElemento('th', { text: 'Ação' }),
                       criarElemento('th', { text: 'Resultado' }),
                       criarElemento('th', { text: 'Empresa' }),
@@ -191,11 +193,22 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                           text: formatarDadosHora(evento.occurredAt),
                         }),
                         criarElemento('td', { text: evento.actorName || '—' }),
-                        criarElemento('td', {}, [criarElemento('code', { text: evento.action })]),
+                        criarElemento('td', {}, [
+                          criarElemento('button', {
+                            class: 'row-link',
+                            type: 'button',
+                            title: evento.action,
+                            text: rotuloAcao(evento.action),
+                            onClick: (clique) => {
+                              clique.stopPropagation();
+                              abrirDetalheAuditoria(evento.id);
+                            },
+                          }),
+                        ]),
                         criarElemento('td', {}, [
                           criarElemento('status-pill', {
                             status: evento.result,
-                            label: evento.result,
+                            label: ROTULO_RESULTADO_ACAO[evento.result] || evento.result,
                           }),
                         ]),
                         criarElemento('td', { text: evento.companyTradeName || '—' }),
@@ -205,7 +218,7 @@ export async function telaAuditoria({ outlet: conteudoTela, setTitle: definirTit
                 ]),
               ])
             : estadoVazio({
-                title: 'Sem eventos nesta página',
+                title: 'Nenhuma ação nesta página',
                 description: 'Use a paginação para ver os demais resultados.',
               }),
           barraPaginacao({

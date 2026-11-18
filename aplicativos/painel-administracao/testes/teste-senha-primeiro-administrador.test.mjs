@@ -25,7 +25,7 @@ const migracaoAtomica = lerArquivoSincrono(
 testar('primeiro administrador usa senha direta, sem convite', () => {
   verificarCondicao.match(tela, /adminPassword/);
   verificarCondicao.match(tela, /password:\s*formulario\.adminPassword/);
-  verificarCondicao.match(tela, /Nenhum link de convite será necessário/);
+  verificarCondicao.match(tela, /entrar no aplicativo com e-mail e senha/);
   verificarCondicao.match(funcaoServidor, /auth\.admin\.createUser\(\{/);
   verificarCondicao.match(funcaoServidor, /password:\s*senha/);
   verificarCondicao.match(funcaoServidor, /email_confirm:\s*true/);

@@ -141,8 +141,6 @@ export async function telaDetalhesEmpresa({
         return criarElemento('div', {}, [
           cabecalhoPagina({
             title: registro.tradeName,
-            subtitle:
-              'Cadastro da conta cliente e gestão administrativa de usuários. A operação da frota continua isolada no sistema da empresa.',
             actions: [
               botao({
                 label: 'Editar cadastro',
@@ -191,7 +189,7 @@ export async function telaDetalhesEmpresa({
             ]),
           ]),
 
-          secao('Ciclo de vida', [
+          secao('Situação da empresa', [
             criarElemento('div', { class: 'detail-grid' }, [
               criarElemento('div', { class: 'detail-item' }, [
                 criarElemento('p', { class: 'detail-label', text: 'Estado atual' }),
@@ -216,7 +214,7 @@ export async function telaDetalhesEmpresa({
               ? criarElemento('div', { class: 'danger-zone' }, [
                   criarElemento('p', {
                     class: 'danger-description',
-                    text: 'A empresa está arquivada. Agora é possível excluí-la fisicamente do sistema. A exclusão definitiva apaga os dados do tenant e não pode ser revertida.',
+                    text: 'A empresa está arquivada. Excluir definitivamente apaga os dados dela de forma irreversível.',
                   }),
                   cicloVida,
                 ])
@@ -226,7 +224,7 @@ export async function telaDetalhesEmpresa({
           secao('Usuários da empresa', [
             criarElemento('p', {
               class: 'muted',
-              text: 'O administrador da plataforma pode redefinir a senha de usuários ativos ou removê-los da empresa. Senhas nunca são armazenadas no painel.',
+              text: 'Altere a senha de usuários ativos ou retire o acesso à empresa.',
             }),
             filtroEquipe,
             listaMembros,

@@ -85,7 +85,7 @@ export function montarEstrutura({ actor: ator, onSignOut: aoSair, onToggleTheme:
     const entrada = criarElemento('input', {
       class: 'input',
       type: 'search',
-      placeholder: 'Empresas, administradores, auditoria…',
+      placeholder: 'Empresas, administradores, cadastros…',
       onInput: (evento2) => {
         consulta = evento2.target.value;
         desenhar();

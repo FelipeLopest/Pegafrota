@@ -88,8 +88,6 @@ export function telaAbastecimentos({ outlet: conteudoTela, setTitle: definirTitu
       };
       const cabecalho = cabecalhoPagina({
         title: 'Abastecimentos',
-        subtitle:
-          'Localize lançamentos por placa, posto ou produto e restrinja o histórico por período.',
         actions: [
           botao({
             label: 'Importar planilha',

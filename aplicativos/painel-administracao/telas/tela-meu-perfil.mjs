@@ -17,22 +17,17 @@ export async function telaPerfil({
     criarElemento('div', {}, [
       cabecalhoPagina({
         title: 'Meu perfil',
-        subtitle: 'Sua conta de administrador global e a aparência do painel.',
       }),
       secao('Conta', [
         criarElemento('div', { class: 'detail-grid' }, [
           detalhe('E-mail', ator?.email),
           detalhe('Papel', 'Administrador da plataforma'),
         ]),
-        criarElemento('p', {
-          class: 'muted',
-          text: 'Este perfil é global e não pertence a nenhuma empresa cliente.',
-        }),
       ]),
       secao('Aplicativo Windows', [
         criarElemento('p', {
           class: 'muted',
-          text: 'Consulte as versões publicadas e as notas de atualização do aplicativo das empresas.',
+          text: 'Veja as versões e novidades do aplicativo das empresas.',
         }),
         criarElemento('a', {
           class: 'btn btn-secondary',
@@ -43,16 +38,14 @@ export async function telaPerfil({
         }),
       ]),
       secao('Segurança', [
-        botao({ label: 'Alterar minha senha', onClick: abrirTrocaSenha }),
-        criarElemento('p', {
-          class: 'muted',
-          text: 'O acesso usa e-mail e senha. Ações críticas exigem confirmação explícita e são auditadas no servidor.',
-        }),
-        botao({
-          label: 'Transferir administração da plataforma',
-          variant: 'danger',
-          onClick: () => abrirTransferenciaAdministradorPlataforma(ator),
-        }),
+        criarElemento('div', { class: 'form-row' }, [
+          botao({ label: 'Alterar minha senha', onClick: abrirTrocaSenha }),
+          botao({
+            label: 'Transferir administração da plataforma',
+            variant: 'danger',
+            onClick: () => abrirTransferenciaAdministradorPlataforma(ator),
+          }),
+        ]),
       ]),
       secao('Aparência', [
         criarElemento('fieldset', { class: 'reason-picker' }, [

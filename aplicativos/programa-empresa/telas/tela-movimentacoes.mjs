@@ -20,7 +20,7 @@ import {
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 
 export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitulo }) {
-  definirTitulo('Histórico de movimentações');
+  definirTitulo('Entradas e saídas');
   return tela(
     conteudoTela,
     PERMISSAO.MOVEMENTS_READ,
@@ -137,12 +137,10 @@ export function telaMovimentacoes({ outlet: conteudoTela, setTitle: definirTitul
       ]);
       return criarElemento('div', {}, [
         cabecalhoPagina({
-          title: 'Histórico de movimentações',
-          subtitle:
-            'Filtre entradas e saídas por período, veículo e local. Para registrar um movimento, use a tela Pátio.',
+          title: 'Entradas e saídas',
           actions: [
             botao({
-              label: 'Ir para o Pátio',
+              label: 'Abrir pátio',
               variant: 'primary',
               icon: 'yard',
               onClick: () => navegar('/patio'),

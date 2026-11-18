@@ -64,8 +64,6 @@ export function telaManutencao({ outlet: conteudoTela, setTitle: definirTitulo, 
       if (contexto.can(PERMISSAO.MAINTENANCE_SCHEDULE)) consumirAtalho(agendar);
       const cabecalho = cabecalhoPagina({
         title: 'Manutenções',
-        subtitle:
-          'Separe pendências do histórico, filtre por veículo, tipo e período e encontre serviços por descrição ou fornecedor.',
         actions: [
           botao({
             label: 'Importar planilha',

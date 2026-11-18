@@ -39,7 +39,6 @@ export function telaPerfil({ outlet: conteudoTela, setTitle: definirTitulo, them
     criarElemento('div', {}, [
       cabecalhoPagina({
         title: 'Meu perfil',
-        subtitle: 'Sua conta e como o seu cargo se traduz no dia a dia.',
       }),
       faixaResumo([
         {

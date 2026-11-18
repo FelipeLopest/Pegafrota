@@ -11,7 +11,12 @@ import { dados } from '../dados/dados-do-programa.mjs';
 
 import { contexto } from '../acesso/sessao-e-permissoes.mjs';
 
-export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
+export function abrirEditorLocal({
+  location: local,
+  title: titulo,
+  onDone: aoConcluir,
+  onCancel: aoCancelar,
+}) {
   const editar = !!local;
   const formulario = {
     name: local?.name || '',
@@ -172,17 +177,21 @@ export function abrirEditorLocal({ location: local, onDone: aoConcluir }) {
       return;
     }
     try {
-      if (editar) await dados.locations.update(local.id, formulario);
-      else await dados.locations.create(formulario);
-      correspondenciaItem.close();
-      aoConcluir();
+      const resultado = editar
+        ? await dados.locations.update(local.id, formulario)
+        : await dados.locations.create(formulario);
+      correspondenciaItem.close(true);
+      aoConcluir?.(resultado);
     } catch (erroCapturado) {
       notificacao(erroCapturado.message, { tone: 'danger' });
     }
   };
   correspondenciaItem = modal({
-    title: editar ? 'Editar local' : 'Novo local',
+    title: titulo || (editar ? 'Editar local' : 'Novo local'),
     body: corpo,
+    onClose: (salvo) => {
+      if (!salvo) aoCancelar?.();
+    },
     footer: criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Cancelar', onClick: () => correspondenciaItem.close() }),
       botao({ label: 'Salvar', variant: 'primary', onClick: salvar }),

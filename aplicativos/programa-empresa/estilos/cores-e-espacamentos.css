@@ -94,8 +94,8 @@
   --pnf-janela-minimo-altura: 720px;
   --pnf-conteudo-maximo: 1560px;
 
-  --pnf-sombra-pequeno: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --pnf-sombra-medio: 0 4px 14px rgba(15, 23, 42, 0.08);
+  --pnf-sombra-pequeno: none;
+  --pnf-sombra-medio: none;
   --pnf-sombra-grande: 0 18px 44px rgba(15, 23, 42, 0.14);
 
   --pnf-foco-anel: 2px solid var(--pnf-destaque);
@@ -160,8 +160,6 @@
 
   --pnf-fundo-sobreposto: rgba(0, 0, 0, 0.58);
   --pnf-fundo-sobreposto-forte: rgba(0, 0, 0, 0.7);
-  --pnf-sombra-pequeno: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --pnf-sombra-medio: 0 4px 14px rgba(0, 0, 0, 0.46);
   --pnf-sombra-grande: 0 18px 44px rgba(0, 0, 0, 0.55);
 }
 
@@ -212,8 +210,6 @@
 
     --pnf-fundo-sobreposto: rgba(0, 0, 0, 0.58);
     --pnf-fundo-sobreposto-forte: rgba(0, 0, 0, 0.7);
-    --pnf-sombra-pequeno: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --pnf-sombra-medio: 0 4px 14px rgba(0, 0, 0, 0.46);
     --pnf-sombra-grande: 0 18px 44px rgba(0, 0, 0, 0.55);
   }
 }

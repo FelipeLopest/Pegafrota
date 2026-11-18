@@ -13,16 +13,18 @@ import {
 } from '../formularios/confirmacoes-de-bloqueio-e-exclusao.mjs';
 
 import { api as servicos } from '../comunicacao/comunicacao-com-servidor.mjs';
+import { navegar } from '../navegacao/trocar-tela.mjs';
 
 import {
-  ROTULO_STATUS_OPERACAO as ROTULO_SITUACAO_OPERACAO,
   ETAPAS_PROVISIONAMENTO,
 } from '@peganafrota/contracts';
 import { validarSenha } from '@peganafrota/validation';
 import {
+  cabecalhoPagina,
   withState as carregarComEstado,
   secao,
   detalhe,
+  ROTULO_SITUACAO_CADASTRO,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 
 function solicitarSenhaInicial(aoConfirmar) {
@@ -35,7 +37,7 @@ function solicitarSenhaInicial(aoConfirmar) {
   });
   const erro = criarElemento('p', { class: 'field-error', role: 'alert' });
   const continuar = botao({
-    label: 'Retentar cadastro',
+    label: 'Tentar novamente',
     variant: 'primary',
     onClick: async () => {
       const validacao = validarSenha(senha.value);
@@ -56,7 +58,7 @@ function solicitarSenhaInicial(aoConfirmar) {
     },
   });
   janela = modal({
-    title: 'Retentar cadastro',
+    title: 'Tentar novamente',
     body: criarElemento('div', {}, [
       campo({
         id: 'senha-retomar-cadastro',
@@ -79,7 +81,7 @@ export async function telaDetalhesProvisionamento({
   setTitle: definirTitulo,
   params: parametros,
 }) {
-  definirTitulo('Provisionamento');
+  definirTitulo('Detalhes do cadastro');
 
   const renderizar = async () => {
     await carregarComEstado(
@@ -92,21 +94,21 @@ export async function telaDetalhesProvisionamento({
         async function retentar(senha) {
           const resultado = await servicos.operations.retry(operacao.operationId, senha);
           notificacao(
-            resultado.status === 'succeeded' ? 'Cadastro concluído.' : 'Operação retomada.',
+            resultado.status === 'succeeded' ? 'Cadastro concluído.' : 'Cadastro retomado.',
             { tone: 'success' },
           );
           await renderizar();
         }
         const acoes = criarElemento('div', { class: 'modal-actions' }, [
           botao({
-            label: 'Retentar',
+            label: 'Tentar novamente',
             variant: 'primary',
             disabled: !podeRetentar,
             title: podeRetentar
-              ? 'Retoma a operação a partir da etapa que falhou.'
+              ? 'Retoma o cadastro a partir da etapa que falhou.'
               : cadastroAnteriorIncompleto
                 ? 'Cadastro anterior com empresa já gravada. Revise o caso antes de retomar.'
-                : 'O servidor não marcou esta operação como repetível.',
+                : 'Este cadastro não pode ser retomado.',
             onClick: async () => {
               if (usaSenha) {
                 solicitarSenhaInicial(retentar);
@@ -121,34 +123,34 @@ export async function telaDetalhesProvisionamento({
             },
           }),
           botao({
-            label: 'Compensar',
+            label: 'Desfazer cadastro',
             variant: 'danger',
             icon: 'warning',
             disabled: ['succeeded', 'compensated'].includes(operacao.status),
             title: 'Arquiva a empresa criada pela metade. Nenhum dado é apagado.',
             onClick: async () => {
               const registro = await confirmarAcaoDestrutiva({
-                title: 'Compensar provisionamento',
+                title: 'Desfazer cadastro incompleto',
                 description:
-                  'A empresa criada pela metade será arquivada e os convites revogados. Nenhum dado é apagado.',
-                expectedName: 'COMPENSAR',
-                confirmLabel: 'Compensar',
+                  'A empresa será arquivada, os convites serão cancelados e os dados serão preservados.',
+                expectedName: 'DESFAZER',
+                confirmLabel: 'Desfazer cadastro',
                 consequences: [
                   'A empresa é arquivada, não excluída.',
                   'A trilha de auditoria é preservada.',
-                  'A operação pode ser retentada depois.',
+                  'Você poderá tentar o cadastro novamente.',
                 ],
               });
               if (!registro.confirmed) return;
               try {
                 const resultadoItem = await servicos.operations.compensate(
                   operacao.operationId,
-                  'compensação manual',
+                  'Cadastro desfeito pelo administrador',
                 );
                 notificacao(
                   resultadoItem.status === 'needs_manual'
-                    ? 'A empresa já possui dados. Reversão automática recusada.'
-                    : 'Provisionamento compensado.',
+                    ? 'A empresa já tem dados. Revise o cadastro antes de desfazer.'
+                    : 'Cadastro desfeito.',
                   { tone: resultadoItem.status === 'needs_manual' ? 'warning' : 'success' },
                 );
                 renderizar();
@@ -160,14 +162,20 @@ export async function telaDetalhesProvisionamento({
         ]);
 
         return criarElemento('div', {}, [
-          secao('Operação', [
+          cabecalhoPagina({
+            title: operacao.companyTradeName || 'Detalhes do cadastro',
+            actions: [
+              botao({ label: 'Voltar aos cadastros', onClick: () => navegar('/provisionamentos') }),
+            ],
+          }),
+          secao('Detalhes do cadastro', [
             criarElemento('div', { class: 'detail-grid' }, [
               detalhe('Identificador', operacao.operationId),
               criarElemento('div', { class: 'detail-item' }, [
                 criarElemento('p', { class: 'detail-label', text: 'Estado' }),
                 criarElemento('status-pill', {
                   status: operacao.status,
-                  label: ROTULO_SITUACAO_OPERACAO[operacao.status],
+                  label: ROTULO_SITUACAO_CADASTRO[operacao.status],
                 }),
               ]),
               detalhe('Tentativas', operacao.attemptCount),
@@ -185,7 +193,7 @@ export async function telaDetalhesProvisionamento({
             acoes,
           ]),
 
-          secao('Sub-operações', [
+          secao('Etapas do cadastro', [
             criarElemento(
               'div',
               { class: 'progress-steps' },
@@ -196,7 +204,8 @@ export async function telaDetalhesProvisionamento({
                   [
                     criarElemento('status-pill', {
                       status: textoItem.status,
-                      label: textoItem.status,
+                      label: ROTULO_SITUACAO_CADASTRO[textoItem.status] ||
+                        (textoItem.status === 'skipped' ? 'Ignorada' : textoItem.status),
                     }),
                     criarElemento('div', { class: 'progress-step-body' }, [
                       criarElemento('p', {

@@ -32,8 +32,6 @@ export function telaMotoristas({ outlet: conteudoTela, setTitle: definirTitulo }
     (motoristas) => {
       const cabecalho = cabecalhoPagina({
         title: 'Motoristas',
-        subtitle:
-          'Encontre motoristas por nome, documento ou CNH e filtre rapidamente quem está apto para operar.',
         actions: [
           botao({
             label: 'Importar planilha',

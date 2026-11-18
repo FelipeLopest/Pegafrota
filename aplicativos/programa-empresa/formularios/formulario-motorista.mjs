@@ -8,7 +8,11 @@ import {
 
 import { dados } from '../dados/dados-do-programa.mjs';
 
-export function abrirEditorMotorista({ driver: motorista, onDone: aoConcluir }) {
+export function abrirEditorMotorista({
+  driver: motorista,
+  onDone: aoConcluir,
+  onCancel: aoCancelar,
+}) {
   const editar = !!motorista;
   const formulario = {
     fullName: motorista?.full_name || '',
@@ -91,11 +95,12 @@ export function abrirEditorMotorista({ driver: motorista, onDone: aoConcluir }) 
       return;
     }
     try {
-      if (editar) await dados.drivers.update(motorista.id, formulario);
-      else await dados.drivers.create(formulario);
-      correspondenciaItem.close();
+      const resultado = editar
+        ? await dados.drivers.update(motorista.id, formulario)
+        : await dados.drivers.create(formulario);
+      correspondenciaItem.close(true);
       notificacao(editar ? 'Motorista atualizado.' : 'Motorista cadastrado.', { tone: 'success' });
-      aoConcluir?.();
+      aoConcluir?.(resultado);
     } catch (erroCapturado) {
       notificacao(erroCapturado.message, { tone: 'danger' });
     }
@@ -103,6 +108,9 @@ export function abrirEditorMotorista({ driver: motorista, onDone: aoConcluir }) 
   correspondenciaItem = modal({
     title: editar ? 'Editar motorista' : 'Novo motorista',
     body: corpo,
+    onClose: (salvo) => {
+      if (!salvo) aoCancelar?.();
+    },
     footer: criarElemento('div', { class: 'modal-actions' }, [
       botao({ label: 'Cancelar', onClick: () => correspondenciaItem.close() }),
       botao({ label: 'Salvar', variant: 'primary', onClick: salvar }),

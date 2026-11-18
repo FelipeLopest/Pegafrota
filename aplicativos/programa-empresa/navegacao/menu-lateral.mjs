@@ -9,11 +9,12 @@ export const MENU = [
     permission: PERMISSAO.DASHBOARD_READ,
   },
 
-  { group: 'OPERAÇÃO', roles: ['company_admin', 'fleet_manager', 'operator'] },
+  { group: 'Dia a dia' },
   {
     path: '/patio',
     pattern: '/patio',
     label: 'Pátio',
+    termos: ['portaria', 'entrada', 'saída'],
     icon: 'yard',
     permission: PERMISSAO.MOVEMENTS_READ,
     roles: ['company_admin', 'fleet_manager', 'operator'],
@@ -43,7 +44,7 @@ export const MENU = [
     roles: ['company_admin', 'fleet_manager', 'operator'],
   },
 
-  { group: 'FROTA' },
+  { group: 'Cadastros' },
   {
     path: '/veiculos',
     pattern: '/veiculos',
@@ -60,11 +61,11 @@ export const MENU = [
     roles: ['company_admin', 'fleet_manager'],
   },
 
-  { group: 'GESTÃO', roles: ['company_admin', 'fleet_manager'] },
   {
     path: '/locais',
     pattern: '/locais',
-    label: 'Locais',
+    label: 'Locais e pátios',
+    termos: ['base', 'garagem', 'portaria'],
     icon: 'pin',
     permission: PERMISSAO.LOCATIONS_READ,
     roles: ['company_admin', 'fleet_manager'],
@@ -94,7 +95,7 @@ export const MENU = [
     roles: ['company_admin'],
   },
 
-  { group: 'ANÁLISE', roles: ['company_admin', 'fleet_manager', 'viewer'] },
+  { group: 'Consultas' },
   {
     path: '/relatorios',
     pattern: '/relatorios',
@@ -104,11 +105,11 @@ export const MENU = [
     roles: ['company_admin', 'fleet_manager', 'viewer'],
   },
 
-  { group: 'AVANÇADO', roles: ['company_admin', 'fleet_manager'] },
   {
     path: '/movimentacoes',
     pattern: '/movimentacoes',
-    label: 'Histórico de movimentações',
+    label: 'Entradas e saídas',
+    termos: ['histórico de movimentações', 'portaria'],
     icon: 'movements',
     permission: PERMISSAO.MOVEMENTS_READ,
     roles: ['company_admin', 'fleet_manager'],
@@ -116,13 +117,14 @@ export const MENU = [
   {
     path: '/odometro',
     pattern: '/odometro',
-    label: 'Livro de odômetro',
+    label: 'Quilometragem',
+    termos: ['odômetro', 'leitura', 'histórico de quilometragem'],
     icon: 'gauge',
     permission: PERMISSAO.ODOMETER_READ,
     roles: ['company_admin', 'fleet_manager'],
   },
 
-  { group: 'CONTA' },
+  { group: 'Conta' },
   { path: '/perfil', pattern: '/perfil', label: 'Meu perfil', icon: 'user', permission: null },
 ];
 

@@ -24,7 +24,7 @@ export function telaOdometro({
   params: parametros,
   query: consulta,
 }) {
-  definirTitulo('Histórico de quilometragem');
+  definirTitulo('Quilometragem');
   const recarregar = () =>
     telaOdometro({
       outlet: conteudoTela,
@@ -68,10 +68,8 @@ export function telaOdometro({
       );
 
       const cabecalho = cabecalhoPagina({
-        title: 'Histórico de quilometragem',
-        subtitle:
-          'Histórico de leituras por veículo. Cada registro guarda a origem — viagem, ' +
-          'abastecimento ou ajuste manual — para a quilometragem ser auditável.',
+        title: 'Quilometragem',
+        subtitle: 'Veja os quilômetros anotados em viagens, abastecimentos e ajustes.',
       });
 
       const barraFerramentas = criarElemento('div', { class: 'toolbar' }, [

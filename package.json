@@ -1,6 +1,6 @@
 {
   "name": "peganafrota",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "description": "PegaNaFrota — monorepo de produção (Desktop das empresas + Admin Web da plataforma)",
   "engines": {

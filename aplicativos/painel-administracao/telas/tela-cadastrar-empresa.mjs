@@ -78,7 +78,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
   let ultimoCnpj = '';
   let telaEncerrada = false;
 
-  const conteiner = criarElemento('div', {});
+  const conteiner = criarElemento('div', { class: 'cadastro-empresa' });
   conteudoTela.replaceChildren(conteiner);
 
   const entrada = (nome, rotulo, opcoes = {}) => {
@@ -205,6 +205,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
           'li',
           {
             class: 'wizard-step',
+            'aria-current': etapa === indiceItem + 1 ? 'step' : null,
             dataset: {
               state:
                 etapa === indiceItem + 1 ? 'current' : etapa > indiceItem + 1 ? 'done' : 'todo',
@@ -284,7 +285,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
           : criarElemento('div', {}, [
               criarElemento('p', {
                 class: 'muted',
-                text: 'Defina a senha inicial do primeiro administrador. Assim que a empresa for provisionada, ele poderá entrar diretamente no PegaNaFrota Desktop com e-mail e senha. Nenhum link de convite será necessário.',
+                text: 'Defina a senha inicial. Assim que o cadastro terminar, o administrador poderá entrar no aplicativo com e-mail e senha.',
               }),
               entrada('fullName', 'Nome completo', { required: true }),
               entrada('adminEmail', 'E-mail', {
@@ -320,7 +321,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
       etapa < 3
         ? botao({ label: 'Continuar', variant: 'primary', onClick: proximo })
         : botao({
-            label: 'Provisionar empresa',
+            label: 'Cadastrar empresa',
             variant: 'primary',
             onClick: enviar,
           }),
@@ -412,7 +413,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
 
       if (operacao.status === 'succeeded') {
         notificacao(
-          'Empresa provisionada. O administrador já pode entrar no Electron com e-mail e senha.',
+          'Empresa cadastrada. O administrador já pode entrar no aplicativo.',
           {
             tone: 'success',
             duration: 8000,
@@ -448,7 +449,7 @@ export async function telaCadastrarEmpresa({ outlet: conteudoTela, setTitle: def
         etapa = 1;
         renderizar();
       } else {
-        notificacao(erro?.message || 'Falha no provisionamento.', {
+        notificacao(erro?.message || 'Não foi possível cadastrar a empresa.', {
           tone: 'danger',
         });
       }

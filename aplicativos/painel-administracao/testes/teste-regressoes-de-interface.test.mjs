@@ -43,8 +43,8 @@ testar('overview usa gráficos variados sem donut e resumo compacto', () => {
     verificarCondicao.match(telas, new RegExp(rotulo));
 });
 
-testar('UI administrativa mantém page head, summary rail e contraste', () => {
-  verificarCondicao.match(telas, /ADMIN_PAGE_META/);
+testar('painel mantém título, resumo e ações com contraste', () => {
+  verificarCondicao.match(telas, /class: 'page-title'/);
   verificarCondicao.match(telas, /resumoAdministrador/);
   verificarCondicao.match(estilosCss, /summary-rail/);
   verificarCondicao.match(estilosCss, /\.btn-secondary \{/);

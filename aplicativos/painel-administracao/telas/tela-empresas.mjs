@@ -37,8 +37,6 @@ export async function telaEmpresas({
   conteudoTela.replaceChildren(conteiner);
   const cabecalho = cabecalhoPagina({
     title: 'Empresas',
-    subtitle:
-      'Busque por nome, CNPJ ou e-mail. Filtros de estado e UF ficam recolhidos para manter a tela limpa.',
     actions: [
       botao({
         label: 'Nova empresa',
@@ -132,7 +130,7 @@ export async function telaEmpresas({
             description:
               estado.search || estado.status || estado.state
                 ? 'Ajuste ou limpe os filtros.'
-                : 'Provisione a primeira empresa da plataforma.',
+                : 'Cadastre sua primeira empresa.',
             action: botao({
               label: 'Nova empresa',
               variant: 'primary',

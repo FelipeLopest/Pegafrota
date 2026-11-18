@@ -6,14 +6,24 @@ import {
   modal,
   notificacao,
 } from '../componentes/componentes-do-programa.mjs';
+import { PERMISSAO } from '@peganafrota/contracts';
+import { contexto } from '../acesso/sessao-e-permissoes.mjs';
 import { dados } from '../dados/dados-do-programa.mjs';
-import { dataHoraEmpresa, instanteEmpresa, numeroInformado } from './apoio-operacoes.mjs';
+import {
+  abrirModalComVolta,
+  dataHoraEmpresa,
+  instanteEmpresa,
+  numeroInformado,
+} from './apoio-operacoes.mjs';
+import { abrirEditorLocal } from './formulario-local.mjs';
+import { abrirFormularioMovimentacao } from './formulario-movimentacao.mjs';
 
 export function abrirOperacaoViagem({
   trip: viagem,
   vehicle: veiculo,
   action: acao,
   locations: locais = [],
+  onLocationsChanged: aoAtualizarLocais,
   onDone: aoConcluir,
 }) {
   const inicio = acao === 'start',
@@ -23,8 +33,12 @@ export function abrirOperacaoViagem({
     : interromper
       ? 'Encerrar viagem interrompida'
       : 'Concluir viagem';
-  const basesAtivas = locais.filter((item) => item.active && !item.archived_at);
-  const baseSugerida = basesAtivas.length === 1 ? basesAtivas[0].id : '';
+  const podeRegistrarPassagem = contexto.can(PERMISSAO.MOVEMENTS_WRITE);
+  const podeCadastrarPatio = contexto.can(PERMISSAO.LOCATIONS_WRITE);
+  let basesAtivas = locais?.filter((item) => item.active && !item.archived_at) ?? null;
+  let presenca;
+  let consultaPresenca = 0;
+  let consultandoPresenca = false;
   const formulario = {
     tripId: viagem.id,
     action: acao,
@@ -47,23 +61,11 @@ export function abrirOperacaoViagem({
     type: 'datetime-local',
     value: dataHoraEmpresa(),
   });
-  const local = criarElemento(
-    'select',
-    { class: 'select' },
-    [
-      criarElemento('option', { value: '', text: 'Selecione a base' }),
-      ...basesAtivas.map((item) =>
-        criarElemento('option', {
-          value: item.id,
-          text: item.name,
-          selected: item.id === baseSugerida,
-        }),
-      ),
-    ],
-  );
+  const local = criarElemento('select', { class: 'select' });
+  const avisoPresenca = criarElemento('div', { 'aria-live': 'polite' });
   const areaLocal = campo({
     id: 'tv-op-local',
-    label: 'Base da portaria',
+    label: 'Pátio da passagem',
     control: local,
   });
   areaLocal.hidden = true;
@@ -71,12 +73,132 @@ export function abrirOperacaoViagem({
     type: 'checkbox',
     onChange: (evento) => {
       areaLocal.hidden = !evento.target.checked;
+      conferirPresenca();
     },
   });
+  const areaPortaria = criarElemento('div', { class: 'field' });
+  const dica = (text) => criarElemento('p', { class: 'field-hint', text });
+
+  async function buscarPatios(evento) {
+    const retentar = evento.currentTarget;
+    if (retentar.disabled || ocupado) return;
+    retentar.disabled = true;
+    retentar.setAttribute('aria-busy', 'true');
+    try {
+      basesAtivas = (await dados.locations.eligible())
+        .filter((item) => item.active && !item.archived_at);
+      aoAtualizarLocais?.(basesAtivas);
+      atualizarPortaria();
+    } catch (erro) {
+      notificacao(erro.message, { tone: 'danger' });
+    } finally {
+      retentar.disabled = false;
+      retentar.removeAttribute('aria-busy');
+    }
+  }
+  function cadastrarPatio() {
+    abrirModalComVolta(
+      janela,
+      (opcoes) => abrirEditorLocal({ title: 'Cadastrar pátio', ...opcoes }),
+      montarJanela,
+      (resultado) => {
+        if (!resultado?.locationId) return;
+        basesAtivas = [{ id: resultado.locationId, name: resultado.name, active: true }];
+        aoAtualizarLocais?.(basesAtivas);
+        atualizarPortaria(resultado.locationId);
+      },
+    );
+  }
+  function atualizarPortaria(escolhido = '') {
+    if (!basesAtivas) {
+      areaPortaria.replaceChildren(
+        dica('A lista de pátios está indisponível. Você pode registrar só a viagem.'),
+        botao({ label: 'Tentar buscar pátios', size: 'sm', onClick: buscarPatios }),
+      );
+      return;
+    }
+    if (!basesAtivas.length) {
+      areaPortaria.replaceChildren(
+        dica('Você pode registrar só a viagem.'),
+        podeCadastrarPatio
+          ? criarElemento('div', {}, [
+              botao({ label: 'Cadastrar pátio', size: 'sm', onClick: cadastrarPatio }),
+            ])
+          : dica('Para registrar a passagem, peça a quem administra a empresa para cadastrar um pátio.'),
+      );
+      return;
+    }
+    local.replaceChildren(
+      criarElemento('option', { value: '', text: 'Selecione o pátio' }),
+      ...basesAtivas.map((item) => criarElemento('option', { value: item.id, text: item.name })),
+    );
+    local.value = escolhido || (basesAtivas.length === 1 ? basesAtivas[0].id : '');
+    areaPortaria.replaceChildren(
+      criarElemento('label', { class: 'auth-remember' }, [
+        integrar,
+        `Registrar também ${inicio ? 'saída' : 'entrada'} na portaria`,
+      ]),
+      areaLocal,
+      avisoPresenca,
+      dica('Marque a opção se o veículo passou pelo pátio.'),
+    );
+  }
+
+  async function conferirPresenca() {
+    const atual = ++consultaPresenca;
+    presenca = undefined;
+    consultandoPresenca = inicio && integrar.checked;
+    atualizarConfirmacao();
+    avisoPresenca.replaceChildren();
+    if (!consultandoPresenca) return;
+    avisoPresenca.textContent = 'Conferindo a presença no pátio…';
+    try {
+      const resultado = await dados.movements.presence(viagem.vehicle_id);
+      if (atual !== consultaPresenca) return;
+      avisoPresenca.replaceChildren();
+      presenca = resultado?.presence || resultado?.currentPresence;
+      if (presenca === 'unknown') {
+        avisoPresenca.replaceChildren(
+          dica('Para registrar a primeira saída do pátio, confira onde o veículo está.'),
+          botao({
+            label: 'Conferir presença inicial',
+            size: 'sm',
+            onClick: () => abrirModalComVolta(
+              janela,
+              (opcoes) => abrirFormularioMovimentacao({
+                vehicle: { ...veiculo, id: viagem.vehicle_id },
+                locations: basesAtivas,
+                locationId: local.value,
+                initial: true,
+                ...opcoes,
+              }),
+              montarJanela,
+              (confirmada) => {
+                if (confirmada?.locationId) local.value = confirmada.locationId;
+                conferirPresenca();
+              },
+            ),
+          }),
+        );
+      } else if (presenca === 'outside') {
+        avisoPresenca.textContent = 'O veículo está fora do pátio. Para registrar só a viagem, desmarque a saída na portaria.';
+      }
+    } catch {
+      if (atual === consultaPresenca)
+        avisoPresenca.textContent = 'Não foi possível consultar a presença atual. Confira a passagem antes de confirmar.';
+    } finally {
+      if (atual === consultaPresenca) {
+        consultandoPresenca = false;
+        atualizarConfirmacao();
+      }
+    }
+  }
+
+  if (podeRegistrarPassagem) atualizarPortaria();
   const corpo = criarElemento('div', {}, [
     criarElemento('p', {
       class: 'muted',
-      text: `${veiculo?.plate || ''} · ${viagem.origin_label} → ${viagem.destination_label}`,
+      text: [veiculo?.plate, `${viagem.origin_label} → ${viagem.destination_label}`].filter(Boolean).join(' · '),
     }),
     criarElemento('p', {
       class: 'field-hint',
@@ -84,7 +206,7 @@ export function abrirOperacaoViagem({
     }),
     campo({
       id: 'odo-action',
-      label: inicio ? 'Odômetro de saída' : 'Odômetro de retorno',
+      label: inicio ? 'Quilometragem na saída' : 'Quilometragem no retorno',
       required: true,
       control: km,
     }),
@@ -107,38 +229,31 @@ export function abrirOperacaoViagem({
           }),
         })
       : null,
-    basesAtivas.length
-      ? criarElemento('label', { class: 'auth-remember' }, [
-          integrar,
-          `Registrar também ${inicio ? 'saída' : 'entrada'} na portaria`,
-        ])
-      : null,
-    areaLocal,
-    criarElemento('p', {
-      class: 'field-hint',
-      text: 'A movimentação de portaria é opcional. Use somente se o veículo realmente passou por essa base.',
-    }),
+    podeRegistrarPassagem ? areaPortaria : null,
   ]);
   const salvar = botao({
     label: 'Confirmar',
     variant: 'primary',
     onClick: async () => {
-      if (ocupado) return;
+      if (ocupado || consultandoPresenca) return;
       try {
-        numeroInformado(formulario.odometerKm, 'odômetro');
+        numeroInformado(formulario.odometerKm, 'um número de quilômetros');
         formulario.occurredAt = instanteEmpresa(data.value);
         if (interromper && formulario.reason.trim().length < 10)
           throw new Error('Informe um motivo com pelo menos 10 caracteres.');
-        formulario.locationId = integrar.checked ? local.value : '';
-        if (integrar.checked && !formulario.locationId)
-          throw new Error('Selecione a base para registrar a passagem.');
+        const registrarPassagem = podeRegistrarPassagem && integrar.checked;
+        formulario.locationId = registrarPassagem ? local.value : '';
+        if (registrarPassagem && !formulario.locationId)
+          throw new Error('Selecione o pátio para registrar a passagem.');
+        if (registrarPassagem && presenca === 'unknown')
+          throw new Error('Confira a presença inicial para registrar a primeira saída.');
         if (
           Number(formulario.odometerKm) <
           Number(inicio ? veiculo?.current_odometer_km : viagem.start_odometer_km)
         )
           throw new Error('A leitura é menor que a referência da operação. Confira o valor.');
         ocupado = true;
-        salvar.disabled = true;
+        atualizarConfirmacao();
         await dados.trips.operate(formulario);
         janela.close();
         notificacao(`${titulo}: operação registrada.`, { tone: 'success' });
@@ -147,16 +262,23 @@ export function abrirOperacaoViagem({
         notificacao(erro.message, { tone: 'danger' });
       } finally {
         ocupado = false;
-        salvar.disabled = false;
+        atualizarConfirmacao();
       }
     },
   });
-  janela = modal({
-    title: titulo,
-    body: corpo,
-    footer: criarElemento('div', { class: 'modal-actions' }, [
-      botao({ label: 'Cancelar', onClick: () => janela.close() }),
-      salvar,
-    ]),
-  });
+  function atualizarConfirmacao() {
+    salvar.disabled = ocupado || consultandoPresenca;
+    areaPortaria.inert = ocupado;
+  }
+  function montarJanela() {
+    janela = modal({
+      title: titulo,
+      body: corpo,
+      footer: criarElemento('div', { class: 'modal-actions' }, [
+        botao({ label: 'Cancelar', onClick: () => janela.close() }),
+        salvar,
+      ]),
+    });
+  }
+  montarJanela();
 }
