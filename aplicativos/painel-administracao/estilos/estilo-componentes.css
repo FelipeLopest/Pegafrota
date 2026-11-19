@@ -31,6 +31,7 @@
   border: 1px solid var(--tema-borda);
   border-radius: var(--tema-raio-extra-grande);
   padding: var(--tema-espaco-5);
+  box-shadow: var(--tema-sombra-pequeno);
   margin-bottom: var(--tema-espaco-4);
 }
 .card-title {
@@ -145,6 +146,7 @@
   border: 1px solid var(--tema-borda);
   border-radius: var(--tema-raio-extra-grande);
   padding: var(--tema-espaco-5);
+  box-shadow: var(--tema-sombra-pequeno);
 }
 .kpi-label {
   font: var(--tema-texto-rotulo);
@@ -391,6 +393,7 @@
   background: var(--tema-superficie);
   border: 1px solid var(--tema-borda);
   border-radius: var(--tema-raio-extra-grande);
+  box-shadow: var(--tema-sombra-pequeno);
 }
 .card .table-wrap,
 .card-flush .table-wrap {
@@ -564,7 +567,22 @@ status-pill[data-tone="violet"] {
   height: 14px;
   flex: 1;
   border-radius: var(--tema-raio-pequeno);
-  background: var(--tema-carregamento-2);
+  background: linear-gradient(
+    90deg,
+    var(--tema-carregamento-1),
+    var(--tema-carregamento-2),
+    var(--tema-carregamento-1)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .detail-grid {

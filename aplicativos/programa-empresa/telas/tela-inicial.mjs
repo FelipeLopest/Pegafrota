@@ -5,6 +5,7 @@ import {
   botao,
   navegar,
   cabecalhoPagina,
+  rotuloCartao,
   barraProporcao,
 } from '../componentes/componentes-do-programa.mjs';
 
@@ -16,6 +17,7 @@ import { dados } from '../dados/dados-do-programa.mjs';
 import { abrirEditorVeiculo } from '../formularios/formulario-veiculo.mjs';
 import { abrirEditorMotorista } from '../formularios/formulario-motorista.mjs';
 import { abrirEditorLocal } from '../formularios/formulario-local.mjs';
+
 
 import { PERMISSAO } from '@peganafrota/contracts';
 import {
@@ -49,7 +51,7 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
     } catch {
       /* opcional */
     }
-    voltarAoResumo();
+    navegar('/?periodo=' + modo);
   };
 
   return tela(
@@ -144,70 +146,61 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
           ].filter(({ permissao }) => contexto.can(permissao))
         : [];
       const proximoPasso = passos.find(({ pronto }) => !pronto);
-      const acoesRapidas = [
-        botao({
-          label: 'Registrar abastecimento',
-          icon: 'fuel',
-          permission: PERMISSAO.FUELINGS_WRITE,
-          onClick: () => navegar('/abastecimentos?novo=1'),
-        }),
-        botao({
-          label: 'Agendar manutenção',
-          icon: 'tool',
-          permission: PERMISSAO.MAINTENANCE_SCHEDULE,
-          onClick: () => navegar('/manutencoes?novo=1'),
-        }),
-      ].filter(Boolean);
-      const seletorPeriodo = criarElemento('div', { class: 'toolbar' }, [
-        criarElemento('span', {
-          class: 'muted',
-          text: periodo.from ? dataBr(periodo.from) + ' a ' + dataBr(periodo.to) : 'Período',
-        }),
-        ...[
-          ['hoje', 'Hoje'],
-          ['mes', 'Mês atual'],
-          ['30dias', 'Últimos 30 dias'],
-        ].map(([valor, rotulo]) =>
-          botao({
-            label: rotulo,
-            variant: modo === valor ? 'primary' : 'secondary',
-            size: 'sm',
-            onClick: () => navegar('/?periodo=' + valor + '&indicadores=1'),
-          }),
-        ),
-        botao({
-          label: 'Relatório do período',
-          size: 'sm',
-          permission: PERMISSAO.REPORTS_READ,
-          onClick: () =>
-            navegar(
-              '/relatorios?tipo=monthlyCosts&de=' +
-                (periodo.from || '') +
-                '&ate=' +
-                (periodo.to || ''),
-            ),
-        }),
-      ]);
       return criarElemento('div', { dataset: { screen: 'dashboard' } }, [
         cabecalhoPagina({
+          iconName: 'dashboard',
           title: `Olá, ${(contexto.fullName || '').split(' ')[0] || 'bem-vindo'}`,
+          subtitle:
+            'Resumo operacional da frota, custos, pátio e pendências — tudo em uma única leitura.',
           actions: [
             botao({
-              label: 'Registrar entrada ou saída',
+              label: 'Abrir pátio',
               icon: 'yard',
-              permission: PERMISSAO.MOVEMENTS_WRITE,
-              onClick: () => navegar('/patio?novo=1'),
+              permission: PERMISSAO.VEHICLES_READ,
+              onClick: () => navegar('/patio'),
             }),
             botao({
-              label: 'Nova viagem',
+              label: 'Registrar movimentação',
               variant: 'primary',
               icon: 'plus',
-              permission: PERMISSAO.TRIPS_WRITE,
-              onClick: () => navegar('/viagens?novo=1'),
+              permission: PERMISSAO.MOVEMENTS_WRITE,
+              onClick: () => navegar('/patio?novo=1'),
             }),
           ],
         }),
 
+        criarElemento('div', { class: 'toolbar' }, [
+          criarElemento('span', {
+            class: 'muted',
+            text: periodo.from
+              ? dataBr(periodo.from) + ' a ' + dataBr(periodo.to) + ' · ' + periodo.timezone
+              : 'Período da empresa',
+          }),
+          ...[
+            ['hoje', 'Hoje'],
+            ['mes', 'Mês atual'],
+            ['30dias', 'Últimos 30 dias'],
+          ].map(([valor, rotulo]) =>
+            botao({
+              label: rotulo,
+              variant: modo === valor ? 'primary' : 'secondary',
+              size: 'sm',
+              onClick: () => navegar('/?periodo=' + valor),
+            }),
+          ),
+          botao({
+            label: 'Relatório do período',
+            size: 'sm',
+            permission: PERMISSAO.REPORTS_READ,
+            onClick: () =>
+              navegar(
+                '/relatorios?tipo=monthlyCosts&de=' +
+                  (periodo.from || '') +
+                  '&ate=' +
+                  (periodo.to || ''),
+              ),
+          }),
+        ]),
         proximoPasso
           ? oculto
             ? botao({
@@ -250,38 +243,33 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
                 ]),
               ])
           : null,
-        totalFrota > 0 || !proximoPasso
-          ? criarElemento('div', { class: 'dashboard-brief', dataset: { tone: tomResumo } }, [
-              criarElemento('div', { class: 'dashboard-brief-icon', 'aria-hidden': 'true' }, [
-                icone(vencido ? 'warning' : 'dashboard'),
-              ]),
-              criarElemento('div', { class: 'dashboard-brief-copy' }, [
-                criarElemento('b', {
-                  text:
-                    totalFrota === 0
-                      ? 'Comece sua frota'
-                      : vencido
-                        ? 'Manutenção vencida'
-                        : totalAtencoes
-                          ? 'Pendências'
-                          : 'Situação da frota',
-                }),
-                criarElemento('span', { text: textoResumo }),
-              ]),
-              vencido
-                ? botao({
-                    label: 'Ver manutenções',
-                    size: 'sm',
-                    permission: PERMISSAO.MAINTENANCE_READ,
-                    onClick: () => navegar('/manutencoes?vencidas=1'),
-                  })
-                : null,
-            ])
-          : null,
-
-        acoesRapidas.length ? criarElemento('div', { class: 'form-row dashboard-atalhos' }, acoesRapidas) : null,
+        criarElemento('div', { class: 'dashboard-brief', dataset: { tone: tomResumo } }, [
+          criarElemento('div', { class: 'dashboard-brief-icon', 'aria-hidden': 'true' }, [
+            icone(vencido ? 'warning' : 'dashboard'),
+          ]),
+          criarElemento('div', { class: 'dashboard-brief-copy' }, [
+            criarElemento('b', {
+              text:
+                totalFrota === 0
+                  ? 'Comece sua frota'
+                  : vencido
+                    ? 'Prioridade operacional'
+                    : totalAtencoes
+                      ? 'Acompanhe estes pontos'
+                      : 'Tudo sob controle',
+            }),
+            criarElemento('span', { text: textoResumo }),
+          ]),
+        ]),
 
         criarElemento('div', { class: 'dashboard-pulse' }, [
+          cartaoPulso(
+            'Frota ativa',
+            String(totalFrota),
+            `${arquivado} arquivado(s)`,
+            'truck',
+            'neutral',
+          ),
           cartaoPulso(
             'Disponíveis',
             String(disponivel),
@@ -290,21 +278,28 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
             'success',
           ),
           cartaoPulso(
-            'Viagens em andamento',
+            'Viagens agora',
             String(operacoes.tripsInProgress ?? 0),
             `${operacoes.tripsCompleted ?? 0} concluída(s)`,
             'route',
             'info',
           ),
           cartaoPulso(
-            'No pátio',
+            'Dentro do pátio',
             String(dentro),
-            totalPresenca ? `de ${totalPresenca} veículos` : 'sem registros',
+            totalPresenca ? `de ${totalPresenca} monitorados` : 'sem leitura',
             'yard',
             'accent',
           ),
           cartaoPulso(
-            'Pendências',
+            'Custo no período',
+            formatar.money(custoTotal),
+            formatar.km(operacoes.distanceKm),
+            'chart',
+            'accent',
+          ),
+          cartaoPulso(
+            'Atenções',
             String(totalAtencoes),
             vencido ? `${vencido} vencida(s)` : 'sem vencidas',
             'warning',
@@ -312,231 +307,283 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
           ),
         ]),
 
-        criarElemento('details', {
-          class: 'collapsible-section dashboard-detalhes',
-          open: consulta?.get('indicadores') === '1',
-        }, [
-          criarElemento('summary', { text: 'Ver indicadores da frota' }),
-          seletorPeriodo,
-          criarElemento('div', { class: 'dashboard-grid' }, [
-            criarElemento('section', { class: 'card dashboard-wide', dataset: { block: 'fleet' } }, [
-              criarElemento('div', { class: 'card-head' }, [
-                criarElemento('h2', { class: 'card-title', text: 'Veículos por situação' }),
-                criarElemento('span', {
-                  class: 'chart-badge',
-                  text: `${percentualDisponivel}% disponível`,
+        criarElemento('div', { class: 'dashboard-grid' }, [
+          criarElemento('section', { class: 'card dashboard-wide', dataset: { block: 'fleet' } }, [
+            criarElemento('div', { class: 'card-head' }, [
+              criarElemento('div', {}, [
+                rotuloCartao('COMPOSIÇÃO DA FROTA', 'truck'),
+                criarElemento('h2', {
+                  class: 'card-title',
+                  text: 'Disponibilidade operacional',
                 }),
               ]),
-              criarElemento('div', { class: 'fleet-overview' }, [
-                criarElemento('div', { class: 'fleet-big-number' }, [
-                  criarElemento('strong', { text: String(totalFrota) }),
-                  criarElemento('span', { text: 'veículos ativos' }),
-                  criarElemento('span', { text: `${arquivado} arquivados` }),
-                ]),
-                criarElemento('div', { class: 'fleet-band-wrap' }, [
-                  barraProporcao([
-                    { value: disponivel, color: 'var(--pnf-sucesso)' },
-                    { value: emUso, color: 'var(--pnf-informacao)' },
-                    { value: emManutencao, color: 'var(--pnf-aviso)' },
-                    { value: inativo, color: 'var(--pnf-neutro)' },
-                  ]),
-                  criarElemento(
-                    'div',
-                    { class: 'fleet-segment-labels' },
-                    [
-                      rotuloSegmento('Disponíveis', disponivel, 'var(--pnf-sucesso)', totalFrota),
-                      rotuloSegmento('Em uso', emUso, 'var(--pnf-informacao)', totalFrota),
-                      rotuloSegmento('Manutenção', emManutencao, 'var(--pnf-aviso)', totalFrota),
-                      inativo
-                        ? rotuloSegmento('Inativos', inativo, 'var(--pnf-neutro)', totalFrota)
-                        : null,
-                    ].filter(Boolean),
-                  ),
-                ]),
-              ]),
-            ]),
-
-            criarElemento('section', { class: 'card', dataset: { block: 'costs' } }, [
-              criarElemento('h2', { class: 'card-title', text: 'Custo no período' }),
-              criarElemento('p', {
-                class: 'muted',
-                text: dadosRegistro?.coverage || 'Combustível e manutenção registrados.',
+              criarElemento('span', {
+                class: 'chart-badge',
+                text: `${percentualDisponivel}% disponível`,
               }),
-              criarElemento('div', { class: 'metric-row metric-row-tight' }, [
-                criarElemento('span', {
-                  class: 'metric metric-money',
-                  text: formatar.money(custoTotal),
-                }),
+            ]),
+            criarElemento('div', { class: 'fleet-overview' }, [
+              criarElemento('div', { class: 'fleet-big-number' }, [
+                criarElemento('strong', { text: String(totalFrota) }),
+                criarElemento('span', { text: 'veículos ativos' }),
               ]),
-              colunasCusto([
-                {
-                  label: 'Combustível',
-                  value: custoCombustivel,
-                  color: 'var(--pnf-grafico-1)',
-                },
-                {
-                  label: 'Manutenção',
-                  value: custoManutencao,
-                  color: 'var(--pnf-aviso)',
-                },
+              criarElemento('div', { class: 'fleet-band-wrap' }, [
+                barraProporcao([
+                  { value: disponivel, color: 'var(--pnf-sucesso)' },
+                  { value: emUso, color: 'var(--pnf-informacao)' },
+                  { value: emManutencao, color: 'var(--pnf-aviso)' },
+                  { value: inativo, color: 'var(--pnf-neutro)' },
+                ]),
+                criarElemento(
+                  'div',
+                  { class: 'fleet-segment-labels' },
+                  [
+                    rotuloSegmento('Disponíveis', disponivel, 'var(--pnf-sucesso)', totalFrota),
+                    rotuloSegmento('Em uso', emUso, 'var(--pnf-informacao)', totalFrota),
+                    rotuloSegmento('Manutenção', emManutencao, 'var(--pnf-aviso)', totalFrota),
+                    inativo
+                      ? rotuloSegmento('Inativos', inativo, 'var(--pnf-neutro)', totalFrota)
+                      : null,
+                  ].filter(Boolean),
+                ),
               ]),
             ]),
+          ]),
 
-            temAlertas
-              ? criarElemento(
-                  'section',
-                  {
-                    class: 'card dashboard-attention',
-                    dataset: { block: 'alerts' },
-                  },
-                  [
-                    criarElemento('div', { class: 'card-head' }, [
-                      criarElemento('h2', { class: 'card-title', text: 'Pendências da frota' }),
-                      botao({
-                        label: 'Abrir manutenção',
-                        size: 'sm',
-                        icon: 'right',
-                        permission: PERMISSAO.MAINTENANCE_READ,
-                        onClick: () => navegar('/manutencoes?vencidas=1'),
-                      }),
-                    ]),
-                    ...(dadosRegistro?.attention || []).slice(0, 6).map((item) =>
-                      criarElemento('div', { class: 'toolbar' }, [
-                        criarElemento('span', {
-                          text: item.label + ' — ' + item.detail,
-                        }),
-                        botao({
-                          label: 'Ver pendência',
-                          size: 'sm',
-                          permission: PERMISSAO.MAINTENANCE_READ,
-                          onClick: () => navegar('/manutencoes?vencidas=1&veiculo=' + item.vehicleId),
-                        }),
-                      ]),
-                    ),
-                    vencido
-                      ? linhaAtencao(
-                          vencido,
-                          'Manutenção vencida',
-                          'var(--pnf-perigo-texto)',
-                          'prioridade imediata',
-                          'alerts-overdue',
-                        )
-                      : null,
-                    proximos30
-                      ? linhaAtencao(
-                          proximos30,
-                          'Vencem em 30 dias',
-                          'var(--pnf-aviso-texto)',
-                          'revisões programadas',
-                          'alerts-next30',
-                        )
-                      : null,
-                    habilitacao
-                      ? linhaAtencao(
-                          habilitacao,
-                          'CNH vencida ou a vencer',
-                          'var(--pnf-aviso-texto)',
-                          'habilitações próximas do fim',
-                          'alerts-license',
-                        )
-                      : null,
-                    placaDesconhecida
-                      ? linhaAtencao(
-                          placaDesconhecida,
-                          'Leituras de placa desconhecidas',
-                          'var(--pnf-informacao-texto)',
-                          'verifique os eventos recentes',
-                        )
-                      : null,
-                    placaBaixaConfianca
-                      ? linhaAtencao(
-                          placaBaixaConfianca,
-                          'Leituras com baixa confiança',
-                          'var(--pnf-informacao-texto)',
-                          'podem precisar de revisão',
-                        )
-                      : null,
-                  ],
-                )
-              : criarElemento('section', { class: 'card dashboard-attention dashboard-ok' }, [
-                  criarElemento('div', { class: 'all-clear' }, [
-                    criarElemento('div', { class: 'all-clear-icon' }, [
-                      icone('check', { size: 'lg' }),
-                    ]),
+          criarElemento('section', { class: 'card', dataset: { block: 'costs' } }, [
+            rotuloCartao('CUSTO NO PERÍODO', 'chart'),
+            criarElemento('p', {
+              class: 'muted',
+              text: dadosRegistro?.coverage || 'Combustível e manutenção registrados.',
+            }),
+            criarElemento('div', { class: 'metric-row metric-row-tight' }, [
+              criarElemento('span', {
+                class: 'metric metric-money',
+                text: formatar.money(custoTotal),
+              }),
+            ]),
+            colunasCusto([
+              {
+                label: 'Combustível',
+                value: custoCombustivel,
+                color: 'var(--pnf-grafico-1)',
+              },
+              {
+                label: 'Manutenção',
+                value: custoManutencao,
+                color: 'var(--pnf-aviso)',
+              },
+            ]),
+          ]),
+
+          temAlertas
+            ? criarElemento(
+                'section',
+                {
+                  class: 'card dashboard-attention',
+                  dataset: { block: 'alerts' },
+                },
+                [
+                  criarElemento('div', { class: 'card-head' }, [
                     criarElemento('div', {}, [
+                      rotuloCartao('REQUER ATENÇÃO', 'warning'),
                       criarElemento('h2', {
                         class: 'card-title',
-                        text: 'Nenhuma pendência crítica',
-                      }),
-                      criarElemento('p', {
-                        class: 'muted',
-                        text: 'Manutenções, CNHs e alertas monitorados estão dentro do esperado.',
+                        text: `${totalAtencoes} ponto(s) para acompanhar`,
                       }),
                     ]),
+                    botao({
+                      label: 'Abrir manutenção',
+                      size: 'sm',
+                      icon: 'right',
+                      permission: PERMISSAO.MAINTENANCE_READ,
+                      onClick: () => navegar('/manutencoes?vencidas=1'),
+                    }),
+                  ]),
+                  ...(dadosRegistro?.attention || []).slice(0, 6).map((item) =>
+                    criarElemento('div', { class: 'toolbar' }, [
+                      criarElemento('span', {
+                        text: item.label + ' — ' + item.detail,
+                      }),
+                      botao({
+                        label: 'Ver pendência',
+                        size: 'sm',
+                        permission: PERMISSAO.MAINTENANCE_READ,
+                        onClick: () => navegar('/manutencoes?vencidas=1&veiculo=' + item.vehicleId),
+                      }),
+                    ]),
+                  ),
+                  vencido
+                    ? linhaAtencao(
+                        vencido,
+                        'Manutenção vencida',
+                        'var(--pnf-perigo-texto)',
+                        'prioridade imediata',
+                        'alerts-overdue',
+                      )
+                    : null,
+                  proximos30
+                    ? linhaAtencao(
+                        proximos30,
+                        'Vencem em 30 dias',
+                        'var(--pnf-aviso-texto)',
+                        'revisões programadas',
+                        'alerts-next30',
+                      )
+                    : null,
+                  habilitacao
+                    ? linhaAtencao(
+                        habilitacao,
+                        'CNH vencida ou a vencer',
+                        'var(--pnf-aviso-texto)',
+                        'habilitações próximas do fim',
+                        'alerts-license',
+                      )
+                    : null,
+                  placaDesconhecida
+                    ? linhaAtencao(
+                        placaDesconhecida,
+                        'Leituras de placa desconhecidas',
+                        'var(--pnf-informacao-texto)',
+                        'verifique os eventos recentes',
+                      )
+                    : null,
+                  placaBaixaConfianca
+                    ? linhaAtencao(
+                        placaBaixaConfianca,
+                        'Leituras com baixa confiança',
+                        'var(--pnf-informacao-texto)',
+                        'podem precisar de revisão',
+                      )
+                    : null,
+                ],
+              )
+            : criarElemento('section', { class: 'card dashboard-attention dashboard-ok' }, [
+                rotuloCartao('REQUER ATENÇÃO', 'check'),
+                criarElemento('div', { class: 'all-clear' }, [
+                  criarElemento('div', { class: 'all-clear-icon' }, [
+                    icone('check', { size: 'lg' }),
+                  ]),
+                  criarElemento('div', {}, [
+                    criarElemento('h2', {
+                      class: 'card-title',
+                      text: 'Nenhuma pendência crítica',
+                    }),
+                    criarElemento('p', {
+                      class: 'muted',
+                      text: 'Manutenções, CNHs e alertas monitorados estão dentro do esperado.',
+                    }),
                   ]),
                 ]),
+              ]),
 
-            criarElemento('section', { class: 'card dashboard-wide', dataset: { block: 'ops' } }, [
-              criarElemento('div', { class: 'card-head' }, [
-                criarElemento('h2', { class: 'card-title', text: 'Viagens e passagens' }),
-                criarElemento('strong', {
-                  class: 'operation-distance',
-                  text: formatar.km(operacoes.distanceKm),
+          criarElemento('section', { class: 'card dashboard-wide', dataset: { block: 'ops' } }, [
+            criarElemento('div', { class: 'card-head' }, [
+              criarElemento('div', {}, [
+                rotuloCartao('OPERAÇÃO NO PERÍODO', 'route'),
+                criarElemento('h2', {
+                  class: 'card-title',
+                  text: 'Ritmo operacional',
                 }),
               ]),
-              barrasHorizontais([
-                {
-                  label: 'Movimentações de pátio',
-                  value: operacoes.movements ?? 0,
-                  color: 'var(--pnf-destaque)',
-                },
-                {
-                  label: 'Viagens concluídas',
-                  value: operacoes.tripsCompleted ?? 0,
-                  color: 'var(--pnf-sucesso)',
-                },
-                {
-                  label: 'Viagens em andamento',
-                  value: operacoes.tripsInProgress ?? 0,
-                  color: 'var(--pnf-informacao)',
-                },
-              ]),
-              criarElemento('div', { class: 'operation-foot' }, [
-                estatistica(String(operacoes.movements ?? 0), 'Movimentações', 'ops-movements'),
-                estatistica(
-                  String(operacoes.tripsCompleted ?? 0),
-                  'Concluídas',
-                  'ops-trips-completed',
-                ),
-                estatistica(
-                  String(operacoes.tripsInProgress ?? 0),
-                  'Em andamento',
-                  'ops-trips-in-progress',
-                ),
-              ]),
-            ]),
-
-            criarElemento('section', { class: 'card', dataset: { block: 'presence' } }, [
-              criarElemento('div', { class: 'card-head' }, [
-                criarElemento('h2', { class: 'card-title', text: 'Veículos no pátio' }),
-                botao({
-                  label: 'Abrir',
-                  size: 'sm',
-                  icon: 'right',
-                  permission: PERMISSAO.VEHICLES_READ,
-                  onClick: () => navegar('/patio'),
-                }),
-              ]),
-              medidorOcupacao({
-                inside: dentro,
-                outside: fora,
-                neverMoved: nuncaMovidos,
+              criarElemento('strong', {
+                class: 'operation-distance',
+                text: formatar.km(operacoes.distanceKm),
               }),
-              criarElemento('div', { class: 'presence-mini-grid' }, [
-                miniEstatistica('Dentro', dentro, 'success'),
-                miniEstatistica('Fora', fora, 'accent'),
-                miniEstatistica('Sem movimento', nuncaMovidos, 'neutral'),
+            ]),
+            barrasHorizontais([
+              {
+                label: 'Movimentações de pátio',
+                value: operacoes.movements ?? 0,
+                color: 'var(--pnf-destaque)',
+              },
+              {
+                label: 'Viagens concluídas',
+                value: operacoes.tripsCompleted ?? 0,
+                color: 'var(--pnf-sucesso)',
+              },
+              {
+                label: 'Viagens em andamento',
+                value: operacoes.tripsInProgress ?? 0,
+                color: 'var(--pnf-informacao)',
+              },
+            ]),
+            criarElemento('div', { class: 'operation-foot' }, [
+              estatistica(String(operacoes.movements ?? 0), 'Movimentações', 'ops-movements'),
+              estatistica(
+                String(operacoes.tripsCompleted ?? 0),
+                'Concluídas',
+                'ops-trips-completed',
+              ),
+              estatistica(
+                String(operacoes.tripsInProgress ?? 0),
+                'Em andamento',
+                'ops-trips-in-progress',
+              ),
+            ]),
+          ]),
+
+          criarElemento('section', { class: 'card', dataset: { block: 'presence' } }, [
+            criarElemento('div', { class: 'card-head' }, [
+              criarElemento('div', {}, [
+                rotuloCartao('PÁTIO AGORA', 'yard'),
+                criarElemento('h2', {
+                  class: 'card-title',
+                  text: 'Presença dos veículos',
+                }),
               ]),
+              botao({
+                label: 'Abrir',
+                size: 'sm',
+                icon: 'right',
+                permission: PERMISSAO.VEHICLES_READ,
+                onClick: () => navegar('/patio'),
+              }),
+            ]),
+            medidorOcupacao({
+              inside: dentro,
+              outside: fora,
+              neverMoved: nuncaMovidos,
+            }),
+            criarElemento('div', { class: 'presence-mini-grid' }, [
+              miniEstatistica('Dentro', dentro, 'success'),
+              miniEstatistica('Fora', fora, 'accent'),
+              miniEstatistica('Sem movimento', nuncaMovidos, 'neutral'),
+            ]),
+          ]),
+
+          criarElemento('section', { class: 'card', dataset: { block: 'quick-actions' } }, [
+            rotuloCartao('ATALHOS OPERACIONAIS', 'plus'),
+            criarElemento('p', {
+              class: 'muted dashboard-action-note',
+              text: 'Ações mais frequentes, sem precisar percorrer o menu.',
+            }),
+            criarElemento('div', { class: 'action-grid action-grid-dashboard' }, [
+              botao({
+                label: 'Registrar entrada ou saída',
+                variant: 'primary',
+                icon: 'movements',
+                permission: PERMISSAO.MOVEMENTS_WRITE,
+                onClick: () => navegar('/patio?novo=1'),
+              }),
+              botao({
+                label: 'Abastecimento',
+                icon: 'fuel',
+                permission: PERMISSAO.FUELINGS_WRITE,
+                onClick: () => navegar('/abastecimentos?novo=1'),
+              }),
+              botao({
+                label: 'Nova viagem',
+                icon: 'route',
+                permission: PERMISSAO.TRIPS_WRITE,
+                onClick: () => navegar('/viagens?novo=1'),
+              }),
+              botao({
+                label: 'Agendar manutenção',
+                icon: 'tool',
+                permission: PERMISSAO.MAINTENANCE_SCHEDULE,
+                onClick: () => navegar('/manutencoes?novo=1'),
+              }),
             ]),
           ]),
         ]),

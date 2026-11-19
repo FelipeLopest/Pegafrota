@@ -14,10 +14,10 @@ export const METADADOS_PAGINAS = {
   Empresa: ['building', 'GESTÃO'],
   Equipe: ['shield', 'GESTÃO'],
   'Histórico de movimentações': ['movements', 'AVANÇADO'],
-  'Entradas e saídas': ['movements', 'AVANÇADO'],
   'Histórico de alterações': ['audit', 'AVANÇADO'],
   Odômetro: ['gauge', 'AVANÇADO'],
   Quilometragem: ['gauge', 'AVANÇADO'],
+  'Entradas e saídas': ['movements', 'AVANÇADO'],
   Relatórios: ['chart', 'ANÁLISE'],
   'Meu perfil': ['user', 'CONTA'],
 };
@@ -27,19 +27,25 @@ export function cabecalhoPagina({
   subtitle: subtitulo,
   actions: acoes = [],
   iconName: nomeIcone,
+  eyebrow: sobreTitulo,
 }) {
-  const acoesVisiveis = acoes.filter(Boolean);
+  const metadados = METADADOS_PAGINAS[titulo] || ['info', sobreTitulo || 'PEGANAFROTA'];
+  const resolvidoIcon = nomeIcone || metadados[0];
+  const categoriaResolvida = sobreTitulo || metadados[1];
   return criarElemento('div', { class: 'page-head' }, [
     criarElemento('div', { class: 'page-head-main' }, [
-      nomeIcone
-        ? criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [icone(nomeIcone)])
-        : null,
+      criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [
+        icone(resolvidoIcon),
+      ]),
       criarElemento('div', { class: 'page-head-copy' }, [
+        categoriaResolvida
+          ? criarElemento('p', { class: 'page-eyebrow', text: categoriaResolvida })
+          : null,
         criarElemento('h1', { class: 'page-title', text: titulo }),
         subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
       ]),
     ]),
-    acoesVisiveis.length ? criarElemento('div', { class: 'page-actions' }, acoesVisiveis) : null,
+    acoes.length ? criarElemento('div', { class: 'page-actions' }, acoes.filter(Boolean)) : null,
   ]);
 }
 

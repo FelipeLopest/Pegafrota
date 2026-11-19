@@ -17,11 +17,11 @@ testar('dashboard usa modelos variados e não depende de rosca', () => {
 });
 testar('dashboard tem resumo compacto das áreas essenciais', () => {
   for (const textoItem of [
+    'Frota ativa',
     'Disponíveis',
-    'Viagens em andamento',
-    'No pátio',
-    'Pendências',
-    'Ver indicadores da frota',
+    'Viagens agora',
+    'Dentro do pátio',
+    'Atenções',
     'Custo no período',
   ])
     verificarCondicao.match(telas, new RegExp(textoItem));

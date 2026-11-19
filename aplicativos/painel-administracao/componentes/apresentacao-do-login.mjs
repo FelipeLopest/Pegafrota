@@ -3,8 +3,8 @@ import { icone } from './icones.mjs';
 
 export function apresentacaoLogin() {
   const recursos = [
-    ['company', 'Empresas', 'Cadastre empresas e gerencie os acessos.'],
-    ['audit', 'Histórico de ações', 'Consulte alterações e confira seus resultados.'],
+    ['company', 'Empresas organizadas', 'Cadastros e acessos em um só ambiente.'],
+    ['audit', 'Histórico rastreável', 'Operações e auditoria para acompanhar cada etapa.'],
   ];
   return criarElemento(
     'aside',
@@ -25,16 +25,27 @@ export function apresentacaoLogin() {
         criarElemento('span', { class: 'auth-product-tag', text: 'ADMIN' }),
       ]),
       criarElemento('div', { class: 'auth-hero-body' }, [
+        criarElemento('p', {
+          class: 'auth-hero-kicker',
+          text: 'VISÃO GERAL. CONTROLE EM CADA ETAPA.',
+        }),
         criarElemento('h2', {
           class: 'auth-hero-title',
-          text: 'Painel da plataforma',
+          text: 'Sua plataforma, bem administrada.',
+        }),
+        criarElemento('p', {
+          class: 'auth-hero-text',
+          text: 'Organize empresas, gerencie acessos e acompanhe o histórico das operações em um único painel.',
         }),
         criarElemento('figure', { class: 'auth-illustration' }, [
           criarElemento('img', {
             src: './recursos/ilustracao-plataforma.svg',
-            alt: '',
+            alt: 'Ilustração de empresas conectadas ao painel central de administração.',
             width: '560',
             height: '232',
+          }),
+          criarElemento('figcaption', {
+            text: 'Empresas, acessos e operações com responsabilidades claras.',
           }),
         ]),
         criarElemento(
@@ -50,6 +61,10 @@ export function apresentacaoLogin() {
             ]),
           ),
         ),
+      ]),
+      criarElemento('p', { class: 'auth-hero-foot' }, [
+        icone('admin', { size: 'sm' }),
+        criarElemento('span', { text: 'Ambiente exclusivo da administração da plataforma.' }),
       ]),
     ],
   );

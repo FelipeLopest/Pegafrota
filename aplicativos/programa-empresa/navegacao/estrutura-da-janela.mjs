@@ -87,7 +87,7 @@ export function montarEstrutura({ onSignOut: aoSair }) {
         'details',
         {
           class: 'nav-section',
-          open: preferenciasGrupos[secao.label] ?? ['Dia a dia', 'Conta'].includes(secao.label),
+          open: preferenciasGrupos[secao.label] !== false,
           onToggle: (evento2) => {
             preferenciasGrupos[secao.label] = evento2.currentTarget.open;
             localStorage.setItem('pnf.desktop.nav-groups', JSON.stringify(preferenciasGrupos));

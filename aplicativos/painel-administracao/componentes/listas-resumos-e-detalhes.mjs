@@ -91,15 +91,23 @@ export function cabecalhoPagina({
   title: titulo,
   subtitle: subtitulo,
   actions: acoes = [],
+  iconName: nomeIcone,
+  eyebrow: sobreTitulo,
 }) {
-  const acoesDisponiveis = acoes.filter(Boolean);
+  const metadados = METADADOS_PAGINAS_ADMINISTRACAO[titulo] || ['info', 'PLATAFORMA'];
   return criarElemento('div', { class: 'page-head' }, [
-    criarElemento('div', { class: 'page-head-copy' }, [
-      criarElemento('h2', { class: 'page-title', text: titulo }),
-      subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
+    criarElemento('div', { class: 'page-head-main' }, [
+      criarElemento('div', { class: 'page-head-mark', 'aria-hidden': 'true' }, [
+        icone(nomeIcone || metadados[0]),
+      ]),
+      criarElemento('div', { class: 'page-head-copy' }, [
+        criarElemento('p', { class: 'page-eyebrow', text: sobreTitulo || metadados[1] }),
+        criarElemento('h2', { class: 'page-title', text: titulo }),
+        subtitulo ? criarElemento('p', { class: 'page-subtitle', text: subtitulo }) : null,
+      ]),
     ]),
-    acoesDisponiveis.length
-      ? criarElemento('div', { class: 'page-actions' }, acoesDisponiveis)
+    acoes.filter(Boolean).length
+      ? criarElemento('div', { class: 'page-actions' }, acoes.filter(Boolean))
       : null,
   ]);
 }
