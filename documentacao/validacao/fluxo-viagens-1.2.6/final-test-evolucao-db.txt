@@ -1,0 +1,31 @@
+
+> peganafrota@1.2.6 test:evolucao:db
+> node ferramentas/testes/evolucao/testar-banco.cjs
+
+OK Cancelar o planejamento não libera veículo em outra viagem
+OK Motorista ocupado ou com validade vencida não inicia
+OK Interrupção preserva saída e registra o percurso
+OK Planejamento editável com repetição segura
+OK Presença inicial sem passagem inventada e viagem/pátio atômicos
+OK Passagens legítimas rápidas são distintas; repetição é deduplicada
+OK Reenviar o mesmo abastecimento não duplica custo
+OK Retroativo encaixa entre leituras; ciclo inclui parciais
+OK Relatório inclui o dia Até inteiro no fuso da empresa
+OK Substituição e correção preservam originais, com leitura efetiva
+OK Vencimento por km consistente, garantia sem custo e próxima preventiva
+OK Autoteste aceita garantia justificada e detecta custo zero sem justificativa válida
+OK Pausar recorrência preserva serviço atual sem agendar outro
+OK Paginação, pesquisa e linha do tempo incluem histórico autorizado
+OK Retentativa de cadastro em lote preserva a linha já concluída
+OK Mesma placa em empresas distintas não compartilha histórico
+OK Filtro global antecede a paginação e exige autorização da plataforma
+OK Partida define limite e correções da viagem preservam as leituras originais
+OK Odômetro corrigido recalcula preventiva pendente e preserva a revisão iniciada
+OK Preferência de garagem é opcional, persistente e isolada por empresa
+OK Criar e iniciar sem garagem ocupa o veículo e a repetição não duplica a viagem
+OK Motorista ocupado bloqueia a saída sem deixar planejamento solto; encerramento libera recursos
+OK Saída e retorno com garagem são atômicos e não aceitam local de outra empresa
+OK Veículo presente em uma garagem não pode registrar saída de outra
+OK Operador consulta a rotina e somente administrador autorizado altera a preferência
+OK Saída valida quilometragem, horário, acesso e isolamento no servidor
+26 cenários operacionais aprovados com 65 migrations em PostgreSQL descartável.

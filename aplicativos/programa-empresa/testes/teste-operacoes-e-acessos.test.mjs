@@ -143,7 +143,7 @@ testar('v10 detecta backend remoto desatualizado e força refresh do PostgREST',
     resolverCaminho(repositorio, 'ferramentas/administracao/verificar-backend.mjs'),
     'utf8',
   );
-  verificarCondicao.match(verificar, /20260808000200/);
+  verificarCondicao.match(verificar, /20261118000100/);
   verificarCondicao.match(verificar, /yard_snapshot/);
   const migracao = lerArquivoSincrono(
     resolverCaminho(

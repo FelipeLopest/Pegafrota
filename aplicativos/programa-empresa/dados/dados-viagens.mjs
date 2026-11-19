@@ -9,6 +9,16 @@ import {
 import { rpc as executarFuncaoBanco } from '../acesso/sessao-e-permissoes.mjs';
 import { comandoPara } from './identificar-comando.mjs';
 export const dadosViagens = {
+  createAndStart: (planejamento, operacao) => executarMutacao(
+    () => executarFuncaoBanco('create_and_start_trip', {
+      p_trip: planejamento,
+      p_odometer_km: Number(operacao.odometerKm),
+      p_occurred_at: operacao.occurredAt,
+      p_location_id: operacao.locationId || null,
+      p_command_id: comandoPara(operacao),
+    }),
+    'trips', 'vehicles', 'drivers', 'dashboard', 'yard', 'movements', 'odometer', 'company:workflow',
+  ),
   list: (filtros) =>
     comCache(
       `trips:${chaveFiltros(filtros)}`,
@@ -51,6 +61,7 @@ export const dadosViagens = {
       'vehicles',
       'drivers',
       'dashboard',
+      'company:workflow',
     ),
   operate: (formulario) =>
     executarMutacao(
@@ -70,6 +81,7 @@ export const dadosViagens = {
       'dashboard',
       'yard',
       'movements',
+      'odometer',
     ),
   start: (identificador, odometroKm) =>
     executarMutacao(

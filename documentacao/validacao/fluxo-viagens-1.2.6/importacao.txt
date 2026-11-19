@@ -1,0 +1,6 @@
+(node:28220) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASSOU preparação compacta, modelo Excel e CSV, prévia com colunas da planilha, recuperação de erro, validação e gravação
+PASSOU retomada após recarregar e troca para dados colados
+PASSOU reenvio somente das pendências com o mesmo comando e layout sem transbordamento a 1024 px
+PASSOU seleção de Excel pelo teclado, leitura da primeira aba e troca por CSV arrastado

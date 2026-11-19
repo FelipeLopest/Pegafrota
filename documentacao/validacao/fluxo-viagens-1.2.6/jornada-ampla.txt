@@ -1,0 +1,7 @@
+OK Atalho pela placa, leitura obrigatória, valor calculado e data no fuso da empresa
+OK CEP sugere cidade/UF sem substituir logradouro digitado
+OK Relatório mostra 50 por página e exporta 2.500 em três chamadas, com período fixo e fórmulas neutralizadas
+OK Navegação manual sem leitor de placas e sem erros de JavaScript nas telas percorridas
+OK Painel administrativo inicializa com a listagem da plataforma simulada
+OK Link de recuperação é removido da URL e a senha é alterada sem guardar o token
+OK Sessão lembrada permanece durante falha do servidor e permite reconectar

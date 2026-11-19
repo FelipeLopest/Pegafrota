@@ -1,4 +1,12 @@
-# Revisão visual — versão 1.1.1
+# Revisão atual — versão 1.2.6
+
+A rotina de viagens agora permite criação e início na mesma sequência, com controle de garagem opcional por empresa. O visual completo da 1.2.5, os modelos de importação e a câmera oculta foram preservados.
+
+Os resultados, correções e etapas pendentes estão no [relatório da versão 1.2.6](documentacao/validacao/fluxo-viagens-1.2.6/RELATORIO.md). O [guia de uso](FLUXO_DE_USO.md) explica a rotina e o [guia de atualização](ATUALIZAR_PEGANAFROTA_1_2_6.md) explica a migration necessária.
+
+Os relatórios abaixo são históricos e não representam o escopo ou o resultado da rodada atual.
+
+# Histórico — revisão visual 1.1.1
 
 Data: 10 de novembro de 2026. Esta entrega acrescenta acabamento visual à integração de câmeras da versão 1.1.0, preservada no pacote.
 

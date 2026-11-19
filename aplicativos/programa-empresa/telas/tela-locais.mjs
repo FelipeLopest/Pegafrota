@@ -18,6 +18,8 @@ import {
   contarOnde,
 } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirEditorLocal } from '../formularios/formulario-local.mjs';
+import { consumirAtalho } from '../formularios/apoio-operacoes.mjs';
+import { contexto } from '../acesso/sessao-e-permissoes.mjs';
 
 export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
   definirTitulo('Locais e pátios');
@@ -27,6 +29,7 @@ export function telaLocais({ outlet: conteudoTela, setTitle: definirTitulo }) {
     PERMISSAO.LOCATIONS_READ,
     () => dados.locations.page(),
     (locais) => {
+      if (contexto.can(PERMISSAO.LOCATIONS_WRITE)) consumirAtalho(() => abrirEditorLocal({ onDone: recarregar }));
       const cabecalho = cabecalhoPagina({
         title: 'Locais e pátios',
         subtitle: 'Cadastre os locais usados para registrar entradas e saídas.',

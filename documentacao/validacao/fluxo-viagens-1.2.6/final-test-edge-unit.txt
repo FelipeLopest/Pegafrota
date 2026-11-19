@@ -1,0 +1,72 @@
+
+> peganafrota@1.2.6 test:edge:unit
+> node --experimental-strip-types --test supabase/tests/edge/admin-users.test.mjs
+
+PegaNaFrota — Edge Function admin-users (unitário)
+
+ok   1 - DB-AUD-001 interpretarContexto lê role no nível principal
+ok   2 - DB-AUD-001 formato antigo (membership.role) é recusado com erro tratado
+ok   3 - DB-AUD-001 admin ativo lista usuários (200)
+ok   4 - DB-AUD-001 resposta usa envelope data
+ok   5 - DB-AUD2-001 company_members é chamada no cliente do USUÁRIO
+ok   6 - DB-AUD2-001 company_members NUNCA é chamada no cliente service role
+ok   7 - DB-AUD2-001 list sequer cria o cliente service role
+ok   8 - DB-AUD2-001 viewer sem users.read recebe 403
+ok   9 - DB-AUD2-001 gestor de frota (users.read) pode listar
+ok   10 - DB-AUD2-001 gestor de frota sem users.manage não muta
+ok   11 - DB-AUD2-001 list exige users.read e mutações exigem users.manage
+ok   12 - DB-AUD-001 usuário inativo recebe 403 NO_ACTIVE_MEMBERSHIP
+ok   13 - DB-AUD-001 requisição sem token recebe 401
+ok   14 - schema recusa ação desconhecida
+ok   15 - schema recusa e-mail inválido
+ok   16 - schema recusa senha curta
+ok   17 - schema recusa userId que não é uuid
+ok   18 - schema aceita create válido
+ok   19 - convite novo usa redirect público de ativação
+ok   20 - convite novo informa inviteSent=true
+ok   21 - conta Auth existente não recebe segundo convite
+ok   22 - conta Auth existente informa authUserExisted=true
+ok   23 - convite novo falha de forma explícita sem URL de ativação
+ok   24 - DB-AUD-016 busca o e-mail em uma só chamada com mais de vinte mil contas
+ok   25 - DB-AUD-016 usuário é reaproveitado pelo e-mail, não recriado
+ok   26 - DB-AUD-016 provisionamento recebe o UUID da conta encontrada
+ok   27 - DB-AUD2-003 provisionamento usa uma única RPC transacional
+ok   28 - DB-AUD2-003 a Edge Function não escreve mais em profiles nem memberships
+ok   29 - DB-AUD2-003 falha da RPC devolve erro
+ok   30 - DB-AUD2-003 conta criada nesta requisição é removida
+ok   31 - DB-AUD2-003 conta preexistente NUNCA é apagada na compensação
+ok   32 - DB-AUD2-002 profile suspenso vira 409 PROFILE_GLOBALLY_INACTIVE
+ok   33 - DB-AUD-015 LAST_ADMIN_PROTECTED vira 409 LAST_COMPANY_ADMIN
+ok   34 - DB-AUD-015 contrato antigo LAST_COMPANY_ADMIN continua reconhecido
+ok   35 - NOT_FOUND vira 404
+ok   36 - CANNOT_DEACTIVATE_SELF vira 409
+ok   37 - PERMISSION_DENIED vira 403
+ok   38 - erro sem contrato conhecido não é traduzido
+ok   39 - DB-AUD-015 último admin vira 409 e não 500
+ok   40 - autodesativação vira 409 CANNOT_DEACTIVATE_SELF
+ok   41 - DB-AUD2-005 mesmo payload gera a mesma impressão digital
+ok   42 - DB-AUD2-005 payload diferente gera impressão diferente
+ok   43 - DB-AUD2-005 ação diferente gera impressão diferente
+ok   44 - DB-AUD2-005 empresa diferente gera impressão diferente
+ok   45 - DB-AUD2-005 a senha não entra na impressão digital
+ok   46 - DB-AUD2-005 a consulta de idempotência envia a impressão digital
+ok   47 - DB-AUD2-005 a gravação envia a MESMA impressão digital
+ok   48 - DB-AUD2-005 chave reutilizada em outra operação vira 409
+ok   49 - DB-AUD-011 reenvio com a mesma chave devolve o resultado anterior
+ok   50 - DB-AUD-011 reenvio não cria nada
+ok   51 - DB-AUD-017 origem permitida recebe eco da própria origem
+ok   52 - DB-AUD-017 nenhuma resposta usa curinga
+ok   53 - DB-AUD-017 cabeçalho Vary: Origin presente
+ok   54 - DB-AUD-017 origem fora da allowlist recebe 403
+ok   55 - DB-AUD-017 preflight de origem permitida responde 204
+
+55 passaram, 0 falharam
+✔ supabase\tests\edge\admin-users.test.mjs (154.2167ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 162.591

@@ -10,6 +10,7 @@ import { dados } from '../dados/dados-do-programa.mjs';
 import { PERMISSAO } from '@peganafrota/contracts';
 import { tela, faixaResumo, detalhe } from '../componentes/listas-resumos-e-detalhes.mjs';
 import { abrirEditorEmpresa } from '../formularios/formulario-empresa.mjs';
+import { controleDeGaragem } from '../componentes/controle-de-garagem.mjs';
 
 export function telaEmpresa({ outlet: conteudoTela, setTitle: definirTitulo }) {
   definirTitulo('Empresa');
@@ -17,8 +18,11 @@ export function telaEmpresa({ outlet: conteudoTela, setTitle: definirTitulo }) {
   return tela(
     conteudoTela,
     PERMISSAO.COMPANY_READ,
-    () => dados.company.get(),
-    (registro) =>
+    async () => {
+      const [registro, fluxo] = await Promise.all([dados.company.get(), dados.company.workflow().catch(() => null)]);
+      return { registro, fluxo };
+    },
+    ({ registro, fluxo }) =>
       criarElemento('div', {}, [
         cabecalhoPagina({
           title: 'Empresa',
@@ -41,6 +45,7 @@ export function telaEmpresa({ outlet: conteudoTela, setTitle: definirTitulo }) {
           },
           { label: 'Fuso horário', value: registro.timezone || '—', icon: 'clock' },
         ]),
+        controleDeGaragem(fluxo, recarregar),
         cartao({
           title: 'Identificação',
           children: [

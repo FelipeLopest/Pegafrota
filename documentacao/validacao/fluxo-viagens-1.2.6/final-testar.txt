@@ -1,0 +1,1804 @@
+
+> peganafrota@1.2.6 testar
+> node ferramentas/testes/testar-unidades.mjs
+
+TAP version 13
+# Subtest: v11 Admin possui sidebar compactável persistida
+ok 1 - v11 Admin possui sidebar compactável persistida
+  ---
+  duration_ms: 1.5122
+  type: 'test'
+  ...
+# Subtest: v11 Admin possui gráficos no overview sem biblioteca externa
+ok 2 - v11 Admin possui gráficos no overview sem biblioteca externa
+  ---
+  duration_ms: 0.5409
+  type: 'test'
+  ...
+# Subtest: Configuração distribuída contém somente URL e chave pública
+ok 3 - Configuração distribuída contém somente URL e chave pública
+  ---
+  duration_ms: 2.1042
+  type: 'test'
+  ...
+# Subtest: Configuração pública rejeita chave privilegiada e formato desconhecido
+ok 4 - Configuração pública rejeita chave privilegiada e formato desconhecido
+  ---
+  duration_ms: 1.9577
+  type: 'test'
+  ...
+# Subtest: Configuração pública exige HTTPS fora de localhost
+ok 5 - Configuração pública exige HTTPS fora de localhost
+  ---
+  duration_ms: 0.5011
+  type: 'test'
+  ...
+# Subtest: Compilação sem .env usa configuração pública; ambiente e .env podem substituí-la
+ok 6 - Compilação sem .env usa configuração pública; ambiente e .env podem substituí-la
+  ---
+  duration_ms: 10.7909
+  type: 'test'
+  ...
+# Subtest: CNPJ: aceita formatação e rejeita dígitos incorretos, letras e vazio
+ok 7 - CNPJ: aceita formatação e rejeita dígitos incorretos, letras e vazio
+  ---
+  duration_ms: 7.011
+  type: 'test'
+  ...
+# Subtest: CNPJ: converte somente campos de cadastro, sem importar sócios ou situação
+ok 8 - CNPJ: converte somente campos de cadastro, sem importar sócios ou situação
+  ---
+  duration_ms: 1.451
+  type: 'test'
+  ...
+# Subtest: CNPJ: lida com campos opcionais ausentes e não duplica tipo de logradouro
+ok 9 - CNPJ: lida com campos opcionais ausentes e não duplica tipo de logradouro
+  ---
+  duration_ms: 0.5297
+  type: 'test'
+  ...
+# Subtest: CNPJ: rejeita retorno de outra empresa e resposta incompleta
+ok 10 - CNPJ: rejeita retorno de outra empresa e resposta incompleta
+  ---
+  duration_ms: 0.7265
+  type: 'test'
+  ...
+# Subtest: CNPJ: consulta pública sem credenciais e reutiliza cache enquanto válido
+ok 11 - CNPJ: consulta pública sem credenciais e reutiliza cache enquanto válido
+  ---
+  duration_ms: 6.7336
+  type: 'test'
+  ...
+# Subtest: CNPJ: número inválido nunca inicia uma requisição
+ok 12 - CNPJ: número inválido nunca inicia uma requisição
+  ---
+  duration_ms: 0.8533
+  type: 'test'
+  ...
+# Subtest: CNPJ: erro HTTP 404 permite cadastro manual e nova tentativa
+ok 13 - CNPJ: erro HTTP 404 permite cadastro manual e nova tentativa
+  ---
+  duration_ms: 0.5946
+  type: 'test'
+  ...
+# Subtest: CNPJ: erro HTTP 429 permite cadastro manual e nova tentativa
+ok 14 - CNPJ: erro HTTP 429 permite cadastro manual e nova tentativa
+  ---
+  duration_ms: 1.3728
+  type: 'test'
+  ...
+# Subtest: CNPJ: erro HTTP 500 permite cadastro manual e nova tentativa
+ok 15 - CNPJ: erro HTTP 500 permite cadastro manual e nova tentativa
+  ---
+  duration_ms: 0.7544
+  type: 'test'
+  ...
+# Subtest: CNPJ: falha de rede ou JSON inválido gera erro compreensível
+ok 16 - CNPJ: falha de rede ou JSON inválido gera erro compreensível
+  ---
+  duration_ms: 1.1512
+  type: 'test'
+  ...
+# Subtest: CNPJ: tempo limite encerra consulta sem bloquear formulário
+ok 17 - CNPJ: tempo limite encerra consulta sem bloquear formulário
+  ---
+  duration_ms: 15.2792
+  type: 'test'
+  ...
+# Subtest: CNPJ: cancelamento interrompe a requisição e não guarda resposta tardia
+ok 18 - CNPJ: cancelamento interrompe a requisição e não guarda resposta tardia
+  ---
+  duration_ms: 1.5358
+  type: 'test'
+  ...
+# Subtest: CNPJ: sinal já cancelado não inicia consulta
+ok 19 - CNPJ: sinal já cancelado não inicia consulta
+  ---
+  duration_ms: 3.0882
+  type: 'test'
+  ...
+# Subtest: CNPJ: preserva campos digitados, inclusive os apagados durante a consulta
+ok 20 - CNPJ: preserva campos digitados, inclusive os apagados durante a consulta
+  ---
+  duration_ms: 3.5064
+  type: 'test'
+  ...
+# Subtest: CNPJ: troca de empresa apaga somente dados automáticos e mantém correções manuais
+ok 21 - CNPJ: troca de empresa apaga somente dados automáticos e mantém correções manuais
+  ---
+  duration_ms: 1.3471
+  type: 'test'
+  ...
+# Subtest: dashboard inicial é deduplicado entre verificação de acesso e primeira tela
+ok 22 - dashboard inicial é deduplicado entre verificação de acesso e primeira tela
+  ---
+  duration_ms: 1.1564
+  type: 'test'
+  ...
+# Subtest: navegação invalida carregamentos antigos
+ok 23 - navegação invalida carregamentos antigos
+  ---
+  duration_ms: 0.4263
+  type: 'test'
+  ...
+# v16.8 boot direto: PASS
+# Subtest: aplicativos\\painel-administracao\\testes\\teste-entrada-direta.test.mjs
+ok 5 - aplicativos\\painel-administracao\\testes\\teste-entrada-direta.test.mjs
+  ---
+  duration_ms: 144.0278
+  type: 'test'
+  ...
+# Subtest: painel não usa navigator.onLine como fonte de verdade
+ok 25 - painel não usa navigator.onLine como fonte de verdade
+  ---
+  duration_ms: 1.9879
+  type: 'test'
+  ...
+# Subtest: banner responde ao estado de requisições reais
+ok 26 - banner responde ao estado de requisições reais
+  ---
+  duration_ms: 0.3145
+  type: 'test'
+  ...
+# Subtest: respostas HTTP contam como servidor acessível e abort não marca offline
+ok 27 - respostas HTTP contam como servidor acessível e abort não marca offline
+  ---
+  duration_ms: 0.364
+  type: 'test'
+  ...
+# Subtest: mensagem não afirma que as ações foram bloqueadas
+ok 28 - mensagem não afirma que as ações foram bloqueadas
+  ---
+  duration_ms: 0.3277
+  type: 'test'
+  ...
+# boot direto: PASS
+# Subtest: aplicativos\\painel-administracao\\testes\\teste-inicializacao.test.mjs
+ok 7 - aplicativos\\painel-administracao\\testes\\teste-inicializacao.test.mjs
+  ---
+  duration_ms: 174.9223
+  type: 'test'
+  ...
+# Subtest: Admin possui sidebar compactável persistida
+ok 30 - Admin possui sidebar compactável persistida
+  ---
+  duration_ms: 1.3535
+  type: 'test'
+  ...
+# Subtest: Admin possui gráficos no overview sem biblioteca externa
+ok 31 - Admin possui gráficos no overview sem biblioteca externa
+  ---
+  duration_ms: 0.4226
+  type: 'test'
+  ...
+# Subtest: admin possui filtros recolhíveis nas listagens críticas
+ok 32 - admin possui filtros recolhíveis nas listagens críticas
+  ---
+  duration_ms: 1.4931
+  type: 'test'
+  ...
+# Subtest: admin possui busca global e atalho Ctrl+K
+ok 33 - admin possui busca global e atalho Ctrl+K
+  ---
+  duration_ms: 0.2749
+  type: 'test'
+  ...
+# Subtest: listagens críticas mantêm filtros e busca global
+ok 34 - listagens críticas mantêm filtros e busca global
+  ---
+  duration_ms: 1.7483
+  type: 'test'
+  ...
+# Subtest: sidebar continua compactável e persistida
+ok 35 - sidebar continua compactável e persistida
+  ---
+  duration_ms: 0.4177
+  type: 'test'
+  ...
+# Subtest: overview usa gráficos variados sem donut e resumo compacto
+ok 36 - overview usa gráficos variados sem donut e resumo compacto
+  ---
+  duration_ms: 0.4386
+  type: 'test'
+  ...
+# Subtest: painel mantém título, resumo e ações com contraste
+ok 37 - painel mantém título, resumo e ações com contraste
+  ---
+  duration_ms: 0.2272
+  type: 'test'
+  ...
+# Subtest: Admin Web não deixa imports nomeados quebrados chegarem ao navegador
+ok 38 - Admin Web não deixa imports nomeados quebrados chegarem ao navegador
+  ---
+  duration_ms: 0.9546
+  type: 'test'
+  ...
+# Subtest: fluxo TOTP antigo não faz parte do Admin Web
+ok 39 - fluxo TOTP antigo não faz parte do Admin Web
+  ---
+  duration_ms: 1.9671
+  type: 'test'
+  ...
+# Subtest: chamadas paralelas compartilham a renovação e não recuperam sessão encerrada
+ok 40 - chamadas paralelas compartilham a renovação e não recuperam sessão encerrada
+  ---
+  duration_ms: 46.2071
+  type: 'test'
+  ...
+# Subtest: sessão encerrada em 403 retorna ao login e falha temporária preserva o acesso
+ok 41 - sessão encerrada em 403 retorna ao login e falha temporária preserva o acesso
+  ---
+  duration_ms: 4.1722
+  type: 'test'
+  ...
+# Subtest: Admin não depende de navigator.onLine
+ok 42 - Admin não depende de navigator.onLine
+  ---
+  duration_ms: 1.2117
+  type: 'test'
+  ...
+# Subtest: Admin confirma indisponibilidade pelo endpoint de saúde
+ok 43 - Admin confirma indisponibilidade pelo endpoint de saúde
+  ---
+  duration_ms: 0.2542
+  type: 'test'
+  ...
+# Subtest: qualquer resposta HTTP restaura estado disponível
+ok 44 - qualquer resposta HTTP restaura estado disponível
+  ---
+  duration_ms: 0.2653
+  type: 'test'
+  ...
+# Subtest: primeiro administrador usa senha direta, sem convite
+ok 45 - primeiro administrador usa senha direta, sem convite
+  ---
+  duration_ms: 1.7574
+  type: 'test'
+  ...
+# Subtest: senha não é persistida no payload auditável da operação
+ok 46 - senha não é persistida no payload auditável da operação
+  ---
+  duration_ms: 0.4344
+  type: 'test'
+  ...
+# Subtest: vínculo nasce ativo e convite é ignorado
+ok 47 - vínculo nasce ativo e convite é ignorado
+  ---
+  duration_ms: 0.3019
+  type: 'test'
+  ...
+# Subtest: admin usa barras segmentadas, colunas e barras horizontais
+ok 48 - admin usa barras segmentadas, colunas e barras horizontais
+  ---
+  duration_ms: 4.8028
+  type: 'test'
+  ...
+# Subtest: admin tem resumo compacto
+ok 49 - admin tem resumo compacto
+  ---
+  duration_ms: 2.0934
+  type: 'test'
+  ...
+# Subtest: botões admin têm contraste reforçado
+ok 50 - botões admin têm contraste reforçado
+  ---
+  duration_ms: 0.7424
+  type: 'test'
+  ...
+# Subtest: graficos do admin usam modelos sem donut segmentado
+ok 51 - graficos do admin usam modelos sem donut segmentado
+  ---
+  duration_ms: 1.6546
+  type: 'test'
+  ...
+# Subtest: admin possui page head contextual e summary rail
+ok 52 - admin possui page head contextual e summary rail
+  ---
+  duration_ms: 0.3159
+  type: 'test'
+  ...
+# Subtest: painel oferece gestão de todos os usuários da empresa
+ok 53 - painel oferece gestão de todos os usuários da empresa
+  ---
+  duration_ms: 2.8318
+  type: 'test'
+  ...
+# Subtest: redefinição de senha fica exclusivamente no backend com Auth Admin
+ok 54 - redefinição de senha fica exclusivamente no backend com Auth Admin
+  ---
+  duration_ms: 0.5497
+  type: 'test'
+  ...
+# Subtest: exclusão individual protege o último administrador
+ok 55 - exclusão individual protege o último administrador
+  ---
+  duration_ms: 0.3261
+  type: 'test'
+  ...
+# Subtest: empresa só pode ser apagada fisicamente depois de arquivada
+ok 56 - empresa só pode ser apagada fisicamente depois de arquivada
+  ---
+  duration_ms: 0.2686
+  type: 'test'
+  ...
+# Subtest: purge remove dados operacionais e preserva trilha global saneada
+ok 57 - purge remove dados operacionais e preserva trilha global saneada
+  ---
+  duration_ms: 0.6817
+  type: 'test'
+  ...
+# Subtest: v11 Desktop possui menu lateral compactável e atalho Ctrl+B
+ok 58 - v11 Desktop possui menu lateral compactável e atalho Ctrl+B
+  ---
+  duration_ms: 1.3454
+  type: 'test'
+  ...
+# Subtest: v11 Desktop possui gráficos leves e animações respeitando o design
+ok 59 - v11 Desktop possui gráficos leves e animações respeitando o design
+  ---
+  duration_ms: 0.3707
+  type: 'test'
+  ...
+# Subtest: v11 Electron reduz gravações do estado da janela durante resize
+ok 60 - v11 Electron reduz gravações do estado da janela durante resize
+  ---
+  duration_ms: 0.2237
+  type: 'test'
+  ...
+# Subtest: central aceita XLSX, CSV e colagem e possui os sete fluxos de alto volume
+ok 61 - central aceita XLSX, CSV e colagem e possui os sete fluxos de alto volume
+  ---
+  duration_ms: 2.6748
+  type: 'test'
+  ...
+# Subtest: modelos Excel oficiais estão empacotados e não são placeholders vazios
+ok 62 - modelos Excel oficiais estão empacotados e não são placeholders vazios
+  ---
+  duration_ms: 4.3305
+  type: 'test'
+  ...
+# Subtest: telas volumosas oferecem atalho contextual para a importação correta
+ok 63 - telas volumosas oferecem atalho contextual para a importação correta
+  ---
+  duration_ms: 8.6714
+  type: 'test'
+  ...
+# Subtest: operador pode abrir a central, mas cada modelo continua filtrado por permissão
+ok 64 - operador pode abrir a central, mas cada modelo continua filtrado por permissão
+  ---
+  duration_ms: 2.6538
+  type: 'test'
+  ...
+# Subtest: salvar modelo XLSX usa IPC dedicado e whitelist
+ok 65 - salvar modelo XLSX usa IPC dedicado e whitelist
+  ---
+  duration_ms: 1.1556
+  type: 'test'
+  ...
+# Subtest: build leva o parser XLSX e os templates, sem adicionar biblioteca de planilha
+ok 66 - build leva o parser XLSX e os templates, sem adicionar biblioteca de planilha
+  ---
+  duration_ms: 1.8318
+  type: 'test'
+  ...
+# Subtest: abastecimentos preservam sequência por veículo e importação tem concorrência controlada
+ok 67 - abastecimentos preservam sequência por veículo e importação tem concorrência controlada
+  ---
+  duration_ms: 0.7803
+  type: 'test'
+  ...
+# Subtest: listas de referência usam cache curto e deduplicam requisições em andamento
+ok 68 - listas de referência usam cache curto e deduplicam requisições em andamento
+  ---
+  duration_ms: 1.3617
+  type: 'test'
+  ...
+# Subtest: paginação de históricos grandes busca lotes em paralelo
+ok 69 - paginação de históricos grandes busca lotes em paralelo
+  ---
+  duration_ms: 0.3063
+  type: 'test'
+  ...
+# Subtest: telas com múltiplas dependências usam Promise.all
+ok 70 - telas com múltiplas dependências usam Promise.all
+  ---
+  duration_ms: 0.5164
+  type: 'test'
+  ...
+# Subtest: Pátio não baixa o histórico inteiro só para mostrar movimentos recentes
+ok 71 - Pátio não baixa o histórico inteiro só para mostrar movimentos recentes
+  ---
+  duration_ms: 0.1748
+  type: 'test'
+  ...
+# Subtest: build não empacota implementação v8 não importada
+ok 72 - build não empacota implementação v8 não importada
+  ---
+  duration_ms: 0.226
+  type: 'test'
+  ...
+# Subtest: Desktop não usa navigator.onLine nem eventos online/offline
+ok 73 - Desktop não usa navigator.onLine nem eventos online/offline
+  ---
+  duration_ms: 1.3905
+  type: 'test'
+  ...
+# Subtest: Desktop confirma indisponibilidade pelo health real do Supabase
+ok 74 - Desktop confirma indisponibilidade pelo health real do Supabase
+  ---
+  duration_ms: 0.3536
+  type: 'test'
+  ...
+# Subtest: falha de rota específica não declara servidor offline antes da sondagem
+ok 75 - falha de rota específica não declara servidor offline antes da sondagem
+  ---
+  duration_ms: 0.2192
+  type: 'test'
+  ...
+# Subtest: contrato de dados: dashboard
+ok 76 - contrato de dados: dashboard
+  ---
+  duration_ms: 55.4244
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.list
+ok 77 - contrato de dados: vehicles.list
+  ---
+  duration_ms: 1.4395
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.create
+ok 78 - contrato de dados: vehicles.create
+  ---
+  duration_ms: 8.8817
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.get
+ok 79 - contrato de dados: vehicles.get
+  ---
+  duration_ms: 1.1
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.update
+ok 80 - contrato de dados: vehicles.update
+  ---
+  duration_ms: 7.4094
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.setStatus
+ok 81 - contrato de dados: vehicles.setStatus
+  ---
+  duration_ms: 2.0543
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.archive
+ok 82 - contrato de dados: vehicles.archive
+  ---
+  duration_ms: 0.7151
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.unarchive
+ok 83 - contrato de dados: vehicles.unarchive
+  ---
+  duration_ms: 0.7588
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.list
+ok 84 - contrato de dados: drivers.list
+  ---
+  duration_ms: 0.9901
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.get
+ok 85 - contrato de dados: drivers.get
+  ---
+  duration_ms: 0.9914
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.create
+ok 86 - contrato de dados: drivers.create
+  ---
+  duration_ms: 0.52
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.update
+ok 87 - contrato de dados: drivers.update
+  ---
+  duration_ms: 0.3249
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.eligible
+ok 88 - contrato de dados: drivers.eligible
+  ---
+  duration_ms: 0.4321
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.setActive
+ok 89 - contrato de dados: drivers.setActive
+  ---
+  duration_ms: 0.3126
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.archive
+ok 90 - contrato de dados: drivers.archive
+  ---
+  duration_ms: 0.254
+  type: 'test'
+  ...
+# Subtest: contrato de dados: drivers.unarchive
+ok 91 - contrato de dados: drivers.unarchive
+  ---
+  duration_ms: 0.2906
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.list
+ok 92 - contrato de dados: locations.list
+  ---
+  duration_ms: 0.3325
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.eligible
+ok 93 - contrato de dados: locations.eligible
+  ---
+  duration_ms: 0.3154
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.create
+ok 94 - contrato de dados: locations.create
+  ---
+  duration_ms: 0.3828
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.update
+ok 95 - contrato de dados: locations.update
+  ---
+  duration_ms: 0.2461
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.setActive
+ok 96 - contrato de dados: locations.setActive
+  ---
+  duration_ms: 0.2043
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.archive
+ok 97 - contrato de dados: locations.archive
+  ---
+  duration_ms: 0.2012
+  type: 'test'
+  ...
+# Subtest: contrato de dados: locations.unarchive
+ok 98 - contrato de dados: locations.unarchive
+  ---
+  duration_ms: 0.19
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.list
+ok 99 - contrato de dados: trips.list
+  ---
+  duration_ms: 0.3425
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.recent
+ok 100 - contrato de dados: trips.recent
+  ---
+  duration_ms: 0.2447
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.count
+ok 101 - contrato de dados: trips.count
+  ---
+  duration_ms: 0.6302
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.create
+ok 102 - contrato de dados: trips.create
+  ---
+  duration_ms: 0.3882
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.start
+ok 103 - contrato de dados: trips.start
+  ---
+  duration_ms: 0.2242
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.complete
+ok 104 - contrato de dados: trips.complete
+  ---
+  duration_ms: 0.2788
+  type: 'test'
+  ...
+# Subtest: contrato de dados: trips.cancel
+ok 105 - contrato de dados: trips.cancel
+  ---
+  duration_ms: 0.2374
+  type: 'test'
+  ...
+# Subtest: contrato de dados: fuelings.list
+ok 106 - contrato de dados: fuelings.list
+  ---
+  duration_ms: 0.317
+  type: 'test'
+  ...
+# Subtest: contrato de dados: fuelings.recent
+ok 107 - contrato de dados: fuelings.recent
+  ---
+  duration_ms: 0.2371
+  type: 'test'
+  ...
+# Subtest: contrato de dados: fuelings.count
+ok 108 - contrato de dados: fuelings.count
+  ---
+  duration_ms: 0.283
+  type: 'test'
+  ...
+# Subtest: contrato de dados: fuelings.create
+ok 109 - contrato de dados: fuelings.create
+  ---
+  duration_ms: 0.3662
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.list
+ok 110 - contrato de dados: maintenance.list
+  ---
+  duration_ms: 0.4787
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.recent
+ok 111 - contrato de dados: maintenance.recent
+  ---
+  duration_ms: 0.2655
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.count
+ok 112 - contrato de dados: maintenance.count
+  ---
+  duration_ms: 0.2669
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.schedule
+ok 113 - contrato de dados: maintenance.schedule
+  ---
+  duration_ms: 0.3211
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.start
+ok 114 - contrato de dados: maintenance.start
+  ---
+  duration_ms: 0.2175
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.complete
+ok 115 - contrato de dados: maintenance.complete
+  ---
+  duration_ms: 0.2871
+  type: 'test'
+  ...
+# Subtest: contrato de dados: maintenance.cancel
+ok 116 - contrato de dados: maintenance.cancel
+  ---
+  duration_ms: 0.2043
+  type: 'test'
+  ...
+# Subtest: contrato de dados: yard
+ok 117 - contrato de dados: yard
+  ---
+  duration_ms: 0.2692
+  type: 'test'
+  ...
+# Subtest: contrato de dados: movements.list
+ok 118 - contrato de dados: movements.list
+  ---
+  duration_ms: 0.2703
+  type: 'test'
+  ...
+# Subtest: contrato de dados: movements.recent
+ok 119 - contrato de dados: movements.recent
+  ---
+  duration_ms: 0.2549
+  type: 'test'
+  ...
+# Subtest: contrato de dados: movements.count
+ok 120 - contrato de dados: movements.count
+  ---
+  duration_ms: 1.6328
+  type: 'test'
+  ...
+# Subtest: contrato de dados: movements.register
+ok 121 - contrato de dados: movements.register
+  ---
+  duration_ms: 0.3838
+  type: 'test'
+  ...
+# Subtest: contrato de dados: movements.presence
+ok 122 - contrato de dados: movements.presence
+  ---
+  duration_ms: 0.2232
+  type: 'test'
+  ...
+# Subtest: contrato de dados: odometer.history
+ok 123 - contrato de dados: odometer.history
+  ---
+  duration_ms: 0.2016
+  type: 'test'
+  ...
+# Subtest: contrato de dados: odometer.ledger
+ok 124 - contrato de dados: odometer.ledger
+  ---
+  duration_ms: 0.1793
+  type: 'test'
+  ...
+# Subtest: contrato de dados: odometer.adjust
+ok 125 - contrato de dados: odometer.adjust
+  ---
+  duration_ms: 0.3062
+  type: 'test'
+  ...
+# Subtest: contrato de dados: company.get
+ok 126 - contrato de dados: company.get
+  ---
+  duration_ms: 0.2936
+  type: 'test'
+  ...
+# Subtest: contrato de dados: company.update
+ok 127 - contrato de dados: company.update
+  ---
+  duration_ms: 0.2203
+  type: 'test'
+  ...
+# Subtest: contrato de dados: company.members
+ok 128 - contrato de dados: company.members
+  ---
+  duration_ms: 0.198
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.list
+ok 129 - contrato de dados: users.list
+  ---
+  duration_ms: 1.055
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.invite
+ok 130 - contrato de dados: users.invite
+  ---
+  duration_ms: 0.3291
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.create
+ok 131 - contrato de dados: users.create
+  ---
+  duration_ms: 0.2439
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.deactivate
+ok 132 - contrato de dados: users.deactivate
+  ---
+  duration_ms: 0.223
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.reactivate
+ok 133 - contrato de dados: users.reactivate
+  ---
+  duration_ms: 0.2139
+  type: 'test'
+  ...
+# Subtest: contrato de dados: users.changeRole
+ok 134 - contrato de dados: users.changeRole
+  ---
+  duration_ms: 0.2301
+  type: 'test'
+  ...
+# Subtest: contrato de dados: reports.monthlyCosts
+ok 135 - contrato de dados: reports.monthlyCosts
+  ---
+  duration_ms: 0.2397
+  type: 'test'
+  ...
+# Subtest: contrato de dados: reports.vehicleCosts
+ok 136 - contrato de dados: reports.vehicleCosts
+  ---
+  duration_ms: 0.2323
+  type: 'test'
+  ...
+# Subtest: contrato de dados: reports.maintenanceDue
+ok 137 - contrato de dados: reports.maintenanceDue
+  ---
+  duration_ms: 0.19
+  type: 'test'
+  ...
+# Subtest: contrato de dados: reports.recentMovements
+ok 138 - contrato de dados: reports.recentMovements
+  ---
+  duration_ms: 0.2065
+  type: 'test'
+  ...
+# Subtest: contrato de dados: audit.list
+ok 139 - contrato de dados: audit.list
+  ---
+  duration_ms: 0.2925
+  type: 'test'
+  ...
+# Subtest: contrato de dados: touchLastSeen
+ok 140 - contrato de dados: touchLastSeen
+  ---
+  duration_ms: 0.2237
+  type: 'test'
+  ...
+# Subtest: contrato de dados: reports.fuelEfficiency
+ok 141 - contrato de dados: reports.fuelEfficiency
+  ---
+  duration_ms: 0.2072
+  type: 'test'
+  ...
+# Subtest: contrato de dados: vehicles.page
+ok 142 - contrato de dados: vehicles.page
+  ---
+  duration_ms: 0.4082
+  type: 'test'
+  ...
+# Subtest: listas de referência usam cache curto e deduplicam requisições em andamento
+ok 143 - listas de referência usam cache curto e deduplicam requisições em andamento
+  ---
+  duration_ms: 1.3229
+  type: 'test'
+  ...
+# Subtest: paginação de históricos grandes busca lotes em paralelo
+ok 144 - paginação de históricos grandes busca lotes em paralelo
+  ---
+  duration_ms: 0.2836
+  type: 'test'
+  ...
+# Subtest: telas com múltiplas dependências usam Promise.all
+ok 145 - telas com múltiplas dependências usam Promise.all
+  ---
+  duration_ms: 0.7044
+  type: 'test'
+  ...
+# Subtest: Pátio não baixa o histórico inteiro só para mostrar movimentos recentes
+ok 146 - Pátio não baixa o histórico inteiro só para mostrar movimentos recentes
+  ---
+  duration_ms: 0.3251
+  type: 'test'
+  ...
+# Subtest: não existe cópia paralela das telas no repositório
+ok 147 - não existe cópia paralela das telas no repositório
+  ---
+  duration_ms: 0.607
+  type: 'test'
+  ...
+# Subtest: listas operacionais usam explorador com busca, filtros e paginação
+ok 148 - listas operacionais usam explorador com busca, filtros e paginação
+  ---
+  duration_ms: 1.9004
+  type: 'test'
+  ...
+# Subtest: arquivados podem ficar ocultos sem perder acesso ao histórico
+ok 149 - arquivados podem ficar ocultos sem perder acesso ao histórico
+  ---
+  duration_ms: 0.3188
+  type: 'test'
+  ...
+# Subtest: menu tem grupos recolhíveis, busca global e atalhos de teclado
+ok 150 - menu tem grupos recolhíveis, busca global e atalhos de teclado
+  ---
+  duration_ms: 0.3298
+  type: 'test'
+  ...
+# Subtest: confirmAction entrega o resultado pelo close do modal
+ok 151 - confirmAction entrega o resultado pelo close do modal
+  ---
+  duration_ms: 5.2886
+  type: 'test'
+  ...
+# Subtest: as telas possuem detalhes e gestão das principais entidades
+ok 152 - as telas possuem detalhes e gestão das principais entidades
+  ---
+  duration_ms: 23.5629
+  type: 'test'
+  ...
+# Subtest: a tela de histórico de alterações não é oferecida na interface
+ok 153 - a tela de histórico de alterações não é oferecida na interface
+  ---
+  duration_ms: 3.1457
+  type: 'test'
+  ...
+# Subtest: a importação por planilha está disponível
+ok 154 - a importação por planilha está disponível
+  ---
+  duration_ms: 2.1449
+  type: 'test'
+  ...
+# Subtest: rotas de veículo e motorista apontam para detalhes reais
+ok 155 - rotas de veículo e motorista apontam para detalhes reais
+  ---
+  duration_ms: 2.4413
+  type: 'test'
+  ...
+# Subtest: ações destrutivas pedem motivo sem browser prompt
+ok 156 - ações destrutivas pedem motivo sem browser prompt
+  ---
+  duration_ms: 8.6997
+  type: 'test'
+  ...
+# Subtest: equipe usa admin-users e protege o próprio acesso na interface
+ok 157 - equipe usa admin-users e protege o próprio acesso na interface
+  ---
+  duration_ms: 12.4823
+  type: 'test'
+  ...
+# Subtest: pátio usa snapshot server-side e linguagem operacional clara
+ok 158 - pátio usa snapshot server-side e linguagem operacional clara
+  ---
+  duration_ms: 16.7741
+  type: 'test'
+  ...
+# Subtest: listas não possuem o antigo limite silencioso de 200
+ok 159 - listas não possuem o antigo limite silencioso de 200
+  ---
+  duration_ms: 10.0761
+  type: 'test'
+  ...
+# Subtest: builds exigem configuração remota e não usam fallback localhost
+ok 160 - builds exigem configuração remota e não usam fallback localhost
+  ---
+  duration_ms: 1.9104
+  type: 'test'
+  ...
+# Subtest: repositório protege .env e inclui migration de completude
+ok 161 - repositório protege .env e inclui migration de completude
+  ---
+  duration_ms: 1.1774
+  type: 'test'
+  ...
+# Subtest: convite de equipe tem ativação pública de senha sem MFA
+ok 162 - convite de equipe tem ativação pública de senha sem MFA
+  ---
+  duration_ms: 16.1878
+  type: 'test'
+  ...
+# Subtest: o cliente detecta backend remoto desatualizado e força refresh do PostgREST
+ok 163 - o cliente detecta backend remoto desatualizado e força refresh do PostgREST
+  ---
+  duration_ms: 3.1408
+  type: 'test'
+  ...
+# Subtest: Desktop possui menu lateral compactável e atalho Ctrl+B
+ok 164 - Desktop possui menu lateral compactável e atalho Ctrl+B
+  ---
+  duration_ms: 1.299
+  type: 'test'
+  ...
+# Subtest: Desktop possui gráficos leves e animações respeitando o design
+ok 165 - Desktop possui gráficos leves e animações respeitando o design
+  ---
+  duration_ms: 0.3529
+  type: 'test'
+  ...
+# Subtest: Electron reduz gravações do estado da janela durante resize
+ok 166 - Electron reduz gravações do estado da janela durante resize
+  ---
+  duration_ms: 0.1956
+  type: 'test'
+  ...
+# Subtest: listas operacionais usam explorador com busca, filtros e paginação
+ok 167 - listas operacionais usam explorador com busca, filtros e paginação
+  ---
+  duration_ms: 1.9561
+  type: 'test'
+  ...
+# Subtest: arquivados podem ficar ocultos sem perder acesso ao histórico
+ok 168 - arquivados podem ficar ocultos sem perder acesso ao histórico
+  ---
+  duration_ms: 0.347
+  type: 'test'
+  ...
+# Subtest: menu tem grupos recolhíveis, busca global e atalhos de teclado
+ok 169 - menu tem grupos recolhíveis, busca global e atalhos de teclado
+  ---
+  duration_ms: 0.2811
+  type: 'test'
+  ...
+# Subtest: confirmAction entrega o resultado pelo close do modal
+ok 170 - confirmAction entrega o resultado pelo close do modal
+  ---
+  duration_ms: 4.7534
+  type: 'test'
+  ...
+# Subtest: v8 possui detalhes e gestão das principais entidades
+ok 171 - v8 possui detalhes e gestão das principais entidades
+  ---
+  duration_ms: 10.4126
+  type: 'test'
+  ...
+# Subtest: rotas de veículo e motorista apontam para detalhes reais
+ok 172 - rotas de veículo e motorista apontam para detalhes reais
+  ---
+  duration_ms: 2.4535
+  type: 'test'
+  ...
+# Subtest: ações destrutivas pedem motivo sem browser prompt
+ok 173 - ações destrutivas pedem motivo sem browser prompt
+  ---
+  duration_ms: 6.4975
+  type: 'test'
+  ...
+# Subtest: equipe usa admin-users e protege o próprio acesso na interface
+ok 174 - equipe usa admin-users e protege o próprio acesso na interface
+  ---
+  duration_ms: 15.9977
+  type: 'test'
+  ...
+# Subtest: pátio usa snapshot server-side e linguagem operacional clara
+ok 175 - pátio usa snapshot server-side e linguagem operacional clara
+  ---
+  duration_ms: 16.5247
+  type: 'test'
+  ...
+# Subtest: listas não possuem o antigo limite silencioso de 200
+ok 176 - listas não possuem o antigo limite silencioso de 200
+  ---
+  duration_ms: 14.1386
+  type: 'test'
+  ...
+# Subtest: builds exigem configuração remota e não usam fallback localhost
+ok 177 - builds exigem configuração remota e não usam fallback localhost
+  ---
+  duration_ms: 2.0663
+  type: 'test'
+  ...
+# Subtest: repositório protege .env e inclui migration de completude
+ok 178 - repositório protege .env e inclui migration de completude
+  ---
+  duration_ms: 1.2823
+  type: 'test'
+  ...
+# Subtest: convite de equipe tem ativação pública de senha sem MFA
+ok 179 - convite de equipe tem ativação pública de senha sem MFA
+  ---
+  duration_ms: 13.9248
+  type: 'test'
+  ...
+# Subtest: v10 detecta backend remoto desatualizado e força refresh do PostgREST
+ok 180 - v10 detecta backend remoto desatualizado e força refresh do PostgREST
+  ---
+  duration_ms: 3.1997
+  type: 'test'
+  ...
+# Subtest: Verificador entende JSON, precisão numérica e aspas SQL em valores padrão
+ok 181 - Verificador entende JSON, precisão numérica e aspas SQL em valores padrão
+  ---
+  duration_ms: 1.878
+  type: 'test'
+  ...
+# Subtest: can() responde por permissão atômica
+ok 182 - can() responde por permissão atômica
+  ---
+  duration_ms: 1.5462
+  type: 'test'
+  ...
+# Subtest: a decisão NÃO vem do nome do papel
+ok 183 - a decisão NÃO vem do nome do papel
+  ---
+  duration_ms: 0.4464
+  type: 'test'
+  ...
+# Subtest: o inverso também: um viewer com permissão extra a recebe
+ok 184 - o inverso também: um viewer com permissão extra a recebe
+  ---
+  duration_ms: 0.2447
+  type: 'test'
+  ...
+# Subtest: controle negado fica desabilitado e explicado, não escondido
+ok 185 - controle negado fica desabilitado e explicado, não escondido
+  ---
+  duration_ms: 0.4444
+  type: 'test'
+  ...
+# Subtest: hideWhenDenied esconde apenas quando pedido explicitamente
+ok 186 - hideWhenDenied esconde apenas quando pedido explicitamente
+  ---
+  duration_ms: 0.2507
+  type: 'test'
+  ...
+# Subtest: permissão concedida limpa o estado negado anterior
+ok 187 - permissão concedida limpa o estado negado anterior
+  ---
+  duration_ms: 0.2658
+  type: 'test'
+  ...
+# Subtest: canAny e canAll
+ok 188 - canAny e canAll
+  ---
+  duration_ms: 0.2898
+  type: 'test'
+  ...
+# Subtest: guardRoute nega sem vínculo ativo, com motivo próprio
+ok 189 - guardRoute nega sem vínculo ativo, com motivo próprio
+  ---
+  duration_ms: 0.2147
+  type: 'test'
+  ...
+# Subtest: guardRoute nega por permissão, informando qual falta
+ok 190 - guardRoute nega por permissão, informando qual falta
+  ---
+  duration_ms: 0.2104
+  type: 'test'
+  ...
+# Subtest: guardRoute distingue "carregando" de "negado"
+ok 191 - guardRoute distingue "carregando" de "negado"
+  ---
+  duration_ms: 0.368
+  type: 'test'
+  ...
+# Subtest: guardRoute permite rota sem permissão exigida quando há vínculo
+ok 192 - guardRoute permite rota sem permissão exigida quando há vínculo
+  ---
+  duration_ms: 0.155
+  type: 'test'
+  ...
+# Subtest: settings.manage não existe no vocabulário de permissões
+ok 193 - settings.manage não existe no vocabulário de permissões
+  ---
+  duration_ms: 2.2571
+  type: 'test'
+  ...
+# Subtest: Processador usa binário fixo, sem shell, e retorna apenas resultado validado
+ok 194 - Processador usa binário fixo, sem shell, e retorna apenas resultado validado
+  ---
+  duration_ms: 3.9006
+  type: 'test'
+  ...
+# Subtest: Processador rejeita imagem, área inválida e chamada concorrente
+ok 195 - Processador rejeita imagem, área inválida e chamada concorrente
+  ---
+  duration_ms: 2.4457
+  type: 'test'
+  ...
+# Subtest: Resposta inválida do executável não vira leitura de placa
+ok 196 - Resposta inválida do executável não vira leitura de placa
+  ---
+  duration_ms: 0.467
+  type: 'test'
+  ...
+# Subtest: viagem pode iniciar sem cadastro de pátio ou passagem inicial
+ok 197 - viagem pode iniciar sem cadastro de pátio ou passagem inicial
+  ---
+  duration_ms: 1.2199
+  type: 'test'
+  ...
+# Subtest: indica como resolver a falta de veículo ou motorista
+ok 198 - indica como resolver a falta de veículo ou motorista
+  ---
+  duration_ms: 0.3297
+  type: 'test'
+  ...
+# Subtest: bloqueios operacionais mostram motivo sem impedir o planejamento
+ok 199 - bloqueios operacionais mostram motivo sem impedir o planejamento
+  ---
+  duration_ms: 0.2154
+  type: 'test'
+  ...
+# Subtest: consulta todas as viagens abertas e distingue concluídas
+ok 200 - consulta todas as viagens abertas e distingue concluídas
+  ---
+  duration_ms: 1.8233
+  type: 'test'
+  ...
+# Subtest: CNH é comparada com o dia da empresa e continua válida no vencimento
+ok 201 - CNH é comparada com o dia da empresa e continua válida no vencimento
+  ---
+  duration_ms: 0.305
+  type: 'test'
+  ...
+# Subtest: listas mantêm busca, filtros, paginação e ocultação de arquivados
+ok 202 - listas mantêm busca, filtros, paginação e ocultação de arquivados
+  ---
+  duration_ms: 1.9616
+  type: 'test'
+  ...
+# Subtest: navegação mantém grupos, busca global e atalhos
+ok 203 - navegação mantém grupos, busca global e atalhos
+  ---
+  duration_ms: 0.4304
+  type: 'test'
+  ...
+# Subtest: dashboard usa gráficos leves variados e resumo compacto
+ok 204 - dashboard usa gráficos leves variados e resumo compacto
+  ---
+  duration_ms: 0.5107
+  type: 'test'
+  ...
+# Subtest: coleções mantêm resumos e cabeçalho contextual
+ok 205 - coleções mantêm resumos e cabeçalho contextual
+  ---
+  duration_ms: 0.5165
+  type: 'test'
+  ...
+# Subtest: UI evita regressões visuais conhecidas
+ok 206 - UI evita regressões visuais conhecidas
+  ---
+  duration_ms: 0.4194
+  type: 'test'
+  ...
+# Subtest: Electron limita gravações da geometria durante resize
+ok 207 - Electron limita gravações da geometria durante resize
+  ---
+  duration_ms: 0.2108
+  type: 'test'
+  ...
+# Subtest: graficos do desktop nao dependem de donut/SVG vulneravel a artefatos
+ok 208 - graficos do desktop nao dependem de donut/SVG vulneravel a artefatos
+  ---
+  duration_ms: 1.3321
+  type: 'test'
+  ...
+# Subtest: telas de colecao recebem resumo visual
+ok 209 - telas de colecao recebem resumo visual
+  ---
+  duration_ms: 0.7004
+  type: 'test'
+  ...
+# Subtest: page head contextual vale para todas as rotas
+ok 210 - page head contextual vale para todas as rotas
+  ---
+  duration_ms: 0.4217
+  type: 'test'
+  ...
+# Subtest: cards nao usam content-visibility que quebrava elementos animados
+ok 211 - cards nao usam content-visibility que quebrava elementos animados
+  ---
+  duration_ms: 0.3108
+  type: 'test'
+  ...
+# Subtest: cache não reaproveita dados entre usuários no mesmo processo
+ok 212 - cache não reaproveita dados entre usuários no mesmo processo
+  ---
+  duration_ms: 3.0159
+  type: 'test'
+  ...
+# Subtest: resposta pendente da sessão anterior não repovoa o cache
+ok 213 - resposta pendente da sessão anterior não repovoa o cache
+  ---
+  duration_ms: 0.6908
+  type: 'test'
+  ...
+# Subtest: invalidação não permite que consulta pendente recoloque dados antigos
+ok 214 - invalidação não permite que consulta pendente recoloque dados antigos
+  ---
+  duration_ms: 0.6308
+  type: 'test'
+  ...
+# Subtest: erro 401 persistente faz uma renovação e uma repetição
+ok 215 - erro 401 persistente faz uma renovação e uma repetição
+  ---
+  duration_ms: 55.8355
+  type: 'test'
+  ...
+# Subtest: repetição após renovar mantém a resposta com cabeçalhos de contagem
+ok 216 - repetição após renovar mantém a resposta com cabeçalhos de contagem
+  ---
+  duration_ms: 2.4827
+  type: 'test'
+  ...
+# Subtest: sessão sem manter conectado não é gravada nem na renovação
+ok 217 - sessão sem manter conectado não é gravada nem na renovação
+  ---
+  duration_ms: 0.8029
+  type: 'test'
+  ...
+# Subtest: renovação atrasada não substitui o usuário que entrou depois
+ok 218 - renovação atrasada não substitui o usuário que entrou depois
+  ---
+  duration_ms: 0.784
+  type: 'test'
+  ...
+# Subtest: a importação mantém o modelo Excel visível e inclui instruções, exemplos e CSV
+ok 219 - a importação mantém o modelo Excel visível e inclui instruções, exemplos e CSV
+  ---
+  duration_ms: 1.2936
+  type: 'test'
+  ...
+# Subtest: a planilha pode ser arrastada ou escolhida por um botão nativo
+ok 220 - a planilha pode ser arrastada ou escolhida por um botão nativo
+  ---
+  duration_ms: 0.3106
+  type: 'test'
+  ...
+# Subtest: ações de importação nas telas usam variante visual própria
+ok 221 - ações de importação nas telas usam variante visual própria
+  ---
+  duration_ms: 0.7585
+  type: 'test'
+  ...
+# Subtest: conferência exibe prévia, erros e progresso e só oferece importação de linhas pendentes
+ok 222 - conferência exibe prévia, erros e progresso e só oferece importação de linhas pendentes
+  ---
+  duration_ms: 0.2933
+  type: 'test'
+  ...
+# Subtest: dashboard usa modelos variados e não depende de rosca
+ok 223 - dashboard usa modelos variados e não depende de rosca
+  ---
+  duration_ms: 2.0366
+  type: 'test'
+  ...
+# Subtest: dashboard tem resumo compacto das áreas essenciais
+ok 224 - dashboard tem resumo compacto das áreas essenciais
+  ---
+  duration_ms: 0.3879
+  type: 'test'
+  ...
+# Subtest: botões têm contraste reforçado
+ok 225 - botões têm contraste reforçado
+  ---
+  duration_ms: 0.3083
+  type: 'test'
+  ...
+# Subtest: graficos do desktop nao dependem de donut/SVG vulneravel a artefatos
+ok 226 - graficos do desktop nao dependem de donut/SVG vulneravel a artefatos
+  ---
+  duration_ms: 1.5644
+  type: 'test'
+  ...
+# Subtest: telas de colecao recebem resumo visual
+ok 227 - telas de colecao recebem resumo visual
+  ---
+  duration_ms: 0.6185
+  type: 'test'
+  ...
+# Subtest: page head contextual vale para todas as rotas
+ok 228 - page head contextual vale para todas as rotas
+  ---
+  duration_ms: 0.3121
+  type: 'test'
+  ...
+# Subtest: cards nao usam content-visibility que quebrava elementos animados
+ok 229 - cards nao usam content-visibility que quebrava elementos animados
+  ---
+  duration_ms: 0.2804
+  type: 'test'
+  ...
+# Subtest: verificador encontra os contratos reorganizados sem conexão ou credenciais
+ok 230 - verificador encontra os contratos reorganizados sem conexão ou credenciais
+  ---
+  duration_ms: 162.8236
+  type: 'test'
+  ...
+# Subtest: validade cadastral continua no mesmo dia no Brasil
+ok 231 - validade cadastral continua no mesmo dia no Brasil
+  ---
+  duration_ms: 1.7143
+  type: 'test'
+  ...
+# Subtest: detecta ponto e vírgula, que é o padrão do Excel em português
+ok 232 - detecta ponto e vírgula, que é o padrão do Excel em português
+  ---
+  duration_ms: 1.9725
+  type: 'test'
+  ...
+# Subtest: detecta vírgula em exportações internacionais
+ok 233 - detecta vírgula em exportações internacionais
+  ---
+  duration_ms: 0.4505
+  type: 'test'
+  ...
+# Subtest: remove o BOM que o Excel escreve no início
+ok 234 - remove o BOM que o Excel escreve no início
+  ---
+  duration_ms: 0.3792
+  type: 'test'
+  ...
+# Subtest: respeita vírgula dentro de aspas
+ok 235 - respeita vírgula dentro de aspas
+  ---
+  duration_ms: 0.245
+  type: 'test'
+  ...
+# Subtest: cabeçalho é tolerante a acento, caixa e espaços
+ok 236 - cabeçalho é tolerante a acento, caixa e espaços
+  ---
+  duration_ms: 0.287
+  type: 'test'
+  ...
+# Subtest: numera as linhas como a planilha mostra
+ok 237 - numera as linhas como a planilha mostra
+  ---
+  duration_ms: 0.1249
+  type: 'test'
+  ...
+# Subtest: interpreta decimal com vírgula
+ok 238 - interpreta decimal com vírgula
+  ---
+  duration_ms: 0.2825
+  type: 'test'
+  ...
+# Subtest: distingue separador de milhar de separador decimal
+ok 239 - distingue separador de milhar de separador decimal
+  ---
+  duration_ms: 0.1479
+  type: 'test'
+  ...
+# Subtest: devolve null para texto que não é número
+ok 240 - devolve null para texto que não é número
+  ---
+  duration_ms: 0.1198
+  type: 'test'
+  ...
+# Subtest: aceita data brasileira e ISO
+ok 241 - aceita data brasileira e ISO
+  ---
+  duration_ms: 0.6261
+  type: 'test'
+  ...
+# Subtest: separa linhas válidas das inválidas sem enviar nada
+ok 242 - separa linhas válidas das inválidas sem enviar nada
+  ---
+  duration_ms: 1.5725
+  type: 'test'
+  ...
+# Subtest: uma linha ruim não derruba as boas
+ok 243 - uma linha ruim não derruba as boas
+  ---
+  duration_ms: 0.4194
+  type: 'test'
+  ...
+# Subtest: abastecimento exige veículo já cadastrado
+ok 244 - abastecimento exige veículo já cadastrado
+  ---
+  duration_ms: 1.0771
+  type: 'test'
+  ...
+# Subtest: o total enviado NÃO é calculado no cliente
+ok 245 - o total enviado NÃO é calculado no cliente
+  ---
+  duration_ms: 0.4083
+  type: 'test'
+  ...
+# Subtest: abastecimento de planilha exige produto e data explícitos e rejeita datas inexistentes
+ok 246 - abastecimento de planilha exige produto e data explícitos e rejeita datas inexistentes
+  ---
+  duration_ms: 1.5469
+  type: 'test'
+  ...
+# Subtest: o modelo tem cabeçalho, exemplo e BOM para o Excel
+ok 247 - o modelo tem cabeçalho, exemplo e BOM para o Excel
+  ---
+  duration_ms: 0.3152
+  type: 'test'
+  ...
+# Subtest: o modelo gerado é lido de volta sem erro
+ok 248 - o modelo gerado é lido de volta sem erro
+  ---
+  duration_ms: 0.3864
+  type: 'test'
+  ...
+# Subtest: todos os modelos declaram colunas com exemplo
+ok 249 - todos os modelos declaram colunas com exemplo
+  ---
+  duration_ms: 0.2261
+  type: 'test'
+  ...
+# Subtest: os sete modelos Excel oficiais são lidos e conferidos
+ok 250 - os sete modelos Excel oficiais são lidos e conferidos
+  ---
+  duration_ms: 112.4083
+  type: 'test'
+  ...
+# Subtest: datas numéricas do Excel e datas brasileiras viram data/hora local
+ok 251 - datas numéricas do Excel e datas brasileiras viram data/hora local
+  ---
+  duration_ms: 0.2347
+  type: 'test'
+  ...
+# Subtest: duplicidade dentro da mesma planilha é recusada antes de gravar
+ok 252 - duplicidade dentro da mesma planilha é recusada antes de gravar
+  ---
+  duration_ms: 0.2235
+  type: 'test'
+  ...
+# Subtest: importação da equipe detecta e-mail já vinculado e nunca pede senha em planilha
+ok 253 - importação da equipe detecta e-mail já vinculado e nunca pede senha em planilha
+  ---
+  duration_ms: 0.2332
+  type: 'test'
+  ...
+# Subtest: viagem e manutenção de planilha resolvem referências existentes
+ok 254 - viagem e manutenção de planilha resolvem referências existentes
+  ---
+  duration_ms: 0.2195
+  type: 'test'
+  ...
+# Subtest: o mínimo compartilhado é 12, alinhado ao Auth
+ok 255 - o mínimo compartilhado é 12, alinhado ao Auth
+  ---
+  duration_ms: 1.246
+  type: 'test'
+  ...
+# Subtest: senha com 11 caracteres é recusada pelo cliente
+ok 256 - senha com 11 caracteres é recusada pelo cliente
+  ---
+  duration_ms: 0.4855
+  type: 'test'
+  ...
+# Subtest: senha com exatamente 12 é aceita
+ok 257 - senha com exatamente 12 é aceita
+  ---
+  duration_ms: 0.2626
+  type: 'test'
+  ...
+# Subtest: senha vazia tem mensagem própria
+ok 258 - senha vazia tem mensagem própria
+  ---
+  duration_ms: 0.172
+  type: 'test'
+  ...
+# Subtest: senha só de espaços é recusada
+ok 259 - senha só de espaços é recusada
+  ---
+  duration_ms: 0.2651
+  type: 'test'
+  ...
+# Subtest: limite do bcrypt é respeitado
+ok 260 - limite do bcrypt é respeitado
+  ---
+  duration_ms: 0.2892
+  type: 'test'
+  ...
+# Subtest: caractere único repetido é recusado mesmo com 12+
+ok 261 - caractere único repetido é recusado mesmo com 12+
+  ---
+  duration_ms: 0.1643
+  type: 'test'
+  ...
+# Subtest: confirmação divergente é apontada no campo certo
+ok 262 - confirmação divergente é apontada no campo certo
+  ---
+  duration_ms: 0.2508
+  type: 'test'
+  ...
+# Subtest: confirmação igual passa
+ok 263 - confirmação igual passa
+  ---
+  duration_ms: 0.1961
+  type: 'test'
+  ...
+# Subtest: não há exigência de maiúscula, número ou símbolo
+ok 264 - não há exigência de maiúscula, número ou símbolo
+  ---
+  duration_ms: 0.2721
+  type: 'test'
+  ...
+# Subtest: força é orientação, não barreira
+ok 265 - força é orientação, não barreira
+  ---
+  duration_ms: 0.2119
+  type: 'test'
+  ...
+# Subtest: normalizeDigits mantém apenas dígitos
+ok 266 - normalizeDigits mantém apenas dígitos
+  ---
+  duration_ms: 1.1326
+  type: 'test'
+  ...
+# Subtest: normalizePlate remove separadores e sobe para caixa alta
+ok 267 - normalizePlate remove separadores e sobe para caixa alta
+  ---
+  duration_ms: 0.2239
+  type: 'test'
+  ...
+# Subtest: normalizeLabel colapsa espaços internos
+ok 268 - normalizeLabel colapsa espaços internos
+  ---
+  duration_ms: 0.1495
+  type: 'test'
+  ...
+# Subtest: isValidCnpj aceita CNPJs válidos
+ok 269 - isValidCnpj aceita CNPJs válidos
+  ---
+  duration_ms: 0.2366
+  type: 'test'
+  ...
+# Subtest: isValidCnpj recusa dígito verificador errado
+ok 270 - isValidCnpj recusa dígito verificador errado
+  ---
+  duration_ms: 1.1236
+  type: 'test'
+  ...
+# Subtest: isValidCnpj recusa sequências repetidas
+ok 271 - isValidCnpj recusa sequências repetidas
+  ---
+  duration_ms: 0.1856
+  type: 'test'
+  ...
+# Subtest: isValidCnpj recusa tamanho errado
+ok 272 - isValidCnpj recusa tamanho errado
+  ---
+  duration_ms: 0.1918
+  type: 'test'
+  ...
+# Subtest: isValidCnpj aceita entrada formatada — o banco normaliza no trigger
+ok 273 - isValidCnpj aceita entrada formatada — o banco normaliza no trigger
+  ---
+  duration_ms: 0.1581
+  type: 'test'
+  ...
+# Subtest: formatCnpj só formata para exibição
+ok 274 - formatCnpj só formata para exibição
+  ---
+  duration_ms: 0.2333
+  type: 'test'
+  ...
+# Subtest: isValidPlate aceita formato antigo e Mercosul
+ok 275 - isValidPlate aceita formato antigo e Mercosul
+  ---
+  duration_ms: 0.5568
+  type: 'test'
+  ...
+# Subtest: isValidPlate recusa formatos inválidos
+ok 276 - isValidPlate recusa formatos inválidos
+  ---
+  duration_ms: 0.2026
+  type: 'test'
+  ...
+# Subtest: isValidPlate normaliza antes de validar
+ok 277 - isValidPlate normaliza antes de validar
+  ---
+  duration_ms: 0.1147
+  type: 'test'
+  ...
+# Subtest: isValidEmail segue a mesma regra da check constraint
+ok 278 - isValidEmail segue a mesma regra da check constraint
+  ---
+  duration_ms: 0.4874
+  type: 'test'
+  ...
+# Subtest: isValidPhone exige de 10 a 13 dígitos
+ok 279 - isValidPhone exige de 10 a 13 dígitos
+  ---
+  duration_ms: 0.1421
+  type: 'test'
+  ...
+# Subtest: validarEtapa1Empresa exige razão social, nome fantasia e CNPJ
+ok 280 - validarEtapa1Empresa exige razão social, nome fantasia e CNPJ
+  ---
+  duration_ms: 0.517
+  type: 'test'
+  ...
+# Subtest: validarEtapa1Empresa aponta CNPJ inválido separadamente de CNPJ ausente
+ok 281 - validarEtapa1Empresa aponta CNPJ inválido separadamente de CNPJ ausente
+  ---
+  duration_ms: 0.3467
+  type: 'test'
+  ...
+# Subtest: validarEtapa1Empresa passa com dados corretos
+ok 282 - validarEtapa1Empresa passa com dados corretos
+  ---
+  duration_ms: 0.1505
+  type: 'test'
+  ...
+# Subtest: validarEtapaPrimeiroAdministrador valida os dados pessoais; a senha é validada separadamente
+ok 283 - validarEtapaPrimeiroAdministrador valida os dados pessoais; a senha é validada separadamente
+  ---
+  duration_ms: 0.198
+  type: 'test'
+  ...
+# Subtest: validarMovimentacao exige apenas veículo e local
+ok 284 - validarMovimentacao exige apenas veículo e local
+  ---
+  duration_ms: 0.18
+  type: 'test'
+  ...
+# Subtest: validarMovimentacao não valida data/hora, tipo nem viagem
+ok 285 - validarMovimentacao não valida data/hora, tipo nem viagem
+  ---
+  duration_ms: 0.9616
+  type: 'test'
+  ...
+# Subtest: computeFuelingTotal arredonda em 2 casas como a check constraint
+ok 286 - computeFuelingTotal arredonda em 2 casas como a check constraint
+  ---
+  duration_ms: 0.1473
+  type: 'test'
+  ...
+# Subtest: computeFuelingTotal arredonda meio-centavo para cima, como o numeric do banco
+ok 287 - computeFuelingTotal arredonda meio-centavo para cima, como o numeric do banco
+  ---
+  duration_ms: 0.0757
+  type: 'test'
+  ...
+# Subtest: computeFuelingTotal é exato em valores realistas de bomba
+ok 288 - computeFuelingTotal é exato em valores realistas de bomba
+  ---
+  duration_ms: 0.085
+  type: 'test'
+  ...
+# Subtest: validarAbastecimento avisa regressão de odômetro antes de o banco recusar
+ok 289 - validarAbastecimento avisa regressão de odômetro antes de o banco recusar
+  ---
+  duration_ms: 0.2475
+  type: 'test'
+  ...
+# Subtest: validarAbastecimento passa com leitura crescente
+ok 290 - validarAbastecimento passa com leitura crescente
+  ---
+  duration_ms: 0.0711
+  type: 'test'
+  ...
+# Subtest: validarViagem exige fim previsto posterior ao início
+ok 291 - validarViagem exige fim previsto posterior ao início
+  ---
+  duration_ms: 0.2381
+  type: 'test'
+  ...
+# Subtest: validarConclusaoViagem exige km final >= km inicial
+ok 292 - validarConclusaoViagem exige km final >= km inicial
+  ---
+  duration_ms: 0.1738
+  type: 'test'
+  ...
+# Subtest: validarAjusteOdometro exige justificativa
+ok 293 - validarAjusteOdometro exige justificativa
+  ---
+  duration_ms: 0.1731
+  type: 'test'
+  ...
+# Subtest: correção exige apontar o registro corrigido
+ok 294 - correção exige apontar o registro corrigido
+  ---
+  duration_ms: 0.1156
+  type: 'test'
+  ...
+# Subtest: correção pode ter leitura menor que o topo do ledger
+ok 295 - correção pode ter leitura menor que o topo do ledger
+  ---
+  duration_ms: 0.1037
+  type: 'test'
+  ...
+# Subtest: validarIntervaloDatas bloqueia intervalo invertido
+ok 296 - validarIntervaloDatas bloqueia intervalo invertido
+  ---
+  duration_ms: 0.1353
+  type: 'test'
+  ...
+# Subtest: nomeConfirmacaoConfere ignora espaçamento e caixa, mas não conteúdo
+ok 297 - nomeConfirmacaoConfere ignora espaçamento e caixa, mas não conteúdo
+  ---
+  duration_ms: 0.3119
+  type: 'test'
+  ...
+# Subtest: newIdempotencyKey respeita o tamanho aceito pelo banco (8..200)
+ok 298 - newIdempotencyKey respeita o tamanho aceito pelo banco (8..200)
+  ---
+  duration_ms: 4.0839
+  type: 'test'
+  ...
+1..298
+# tests 298
+# suites 0
+# pass 298
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1388.592

@@ -13,6 +13,7 @@ export function modal({
   dismissible: podeFechar = true,
   onClose: aoClose,
 }) {
+  const podeDispensar = () => typeof podeFechar === 'function' ? podeFechar() : podeFechar;
   const anterior = document.activeElement;
   const tituloIdentificador = `m-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -35,7 +36,7 @@ export function modal({
                 class: 'modal-close',
                 type: 'button',
                 'aria-label': 'Fechar',
-                onClick: () => fechar(),
+                onClick: () => { if (podeDispensar()) fechar(); },
               },
               [icone('close', { size: 'sm' })],
             )
@@ -51,14 +52,14 @@ export function modal({
     {
       class: 'modal-backdrop',
       onClick: (evento) => {
-        if (podeFechar && evento.target === fundoModal) fechar();
+        if (podeDispensar() && evento.target === fundoModal) fechar();
       },
     },
     [dialogo],
   );
 
   function aoTeclar(evento) {
-    if (evento.key === 'Escape' && podeFechar) {
+    if (evento.key === 'Escape' && podeDispensar()) {
       evento.preventDefault();
       fechar();
       return;

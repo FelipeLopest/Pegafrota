@@ -17,8 +17,12 @@ Esta é a estrutura real da versão reorganizada do PegaNaFrota. As telas e func
 | Endereços das telas | `navegacao/enderecos-das-telas.mjs` de cada aplicativo |
 | Validação de cadastros | `compartilhado/validacoes/` |
 | Regras finais do banco | Nova migration em `supabase/migrations/` |
+| Fluxo de viagens e disponibilidade | `formularios/formulario-viagem.mjs`, `formulario-operacao-viagem.mjs` e `regras-inicio-viagem.mjs` no programa da empresa |
+| Preferência de controle de garagem | `componentes/controle-de-garagem.mjs`, `dados/dados-empresa.mjs` e a migration `20261118000100_fluxo_simples_de_viagens.sql` |
 
 O programa da empresa e o painel da administração são separados. Escolha primeiro o aplicativo; depois a pasta e o assunto.
+
+O fluxo de uso atual está em `FLUXO_DE_USO.md`. Para atualizar esta entrega, siga `ATUALIZAR_PEGANAFROTA_1_2_6.md`.
 
 ## Pastas da raiz
 

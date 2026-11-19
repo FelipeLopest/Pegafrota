@@ -57,7 +57,10 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
   return tela(
     conteudoTela,
     PERMISSAO.DASHBOARD_READ,
-    () => dados.dashboard({ de, ate: hoje }),
+    async () => {
+      const [resumo, fluxo] = await Promise.all([dados.dashboard({ de, ate: hoje }), dados.company.workflow().catch(() => null)]);
+      return { ...resumo, fluxo };
+    },
     (dadosRegistro) => {
       const frota = dadosRegistro?.fleet ?? {};
       const operacoes = dadosRegistro?.operations ?? {};
@@ -106,6 +109,7 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
           .reverse()
           .join('/');
       const configuracao = dadosRegistro?.onboarding;
+      const controlarPatio = dadosRegistro.fluxo?.yardControlEnabled === true;
       const passos = configuracao
         ? [
             {
@@ -120,10 +124,11 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
               pronto: configuracao.drivers > 0,
               abrir: () => abrirEditorMotorista({ onDone: voltarAoResumo }),
               permissao: PERMISSAO.DRIVERS_WRITE,
-              orientacao: 'Adicione quem vai dirigir. Com veículo e motorista, você já pode planejar uma viagem.',
+              orientacao: 'Adicione quem vai dirigir. Com veículo e motorista, você já pode iniciar uma viagem.',
             },
             {
-              rotulo: 'Cadastrar pátio',
+              rotulo: 'Cadastrar pátio (opcional)',
+              garagem: true,
               pronto: configuracao.locations > 0,
               abrir: () => abrirEditorLocal({ onDone: voltarAoResumo }),
               permissao: PERMISSAO.LOCATIONS_WRITE,
@@ -131,10 +136,18 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
             },
             {
               rotulo: 'Informar onde estão os veículos',
+              garagem: true,
               pronto: configuracao.vehicles > 0 && configuracao.unknownPresence === 0,
               abrir: () => navegar('/patio'),
               permissao: PERMISSAO.MOVEMENTS_WRITE,
               orientacao: 'Informe quais veículos já estão no pátio antes de registrar a primeira saída pela portaria.',
+            },
+            {
+              rotulo: 'Registrar primeira viagem',
+              pronto: dadosRegistro.fluxo?.hasTrips === true,
+              abrir: () => navegar('/viagens?novo=1'),
+              permissao: PERMISSAO.TRIPS_WRITE,
+              orientacao: 'Veículo e motorista cadastrados? Informe o trajeto e siga para confirmar a saída. O controle de garagem é opcional.',
             },
             {
               rotulo: 'Lançar abastecimento',
@@ -143,7 +156,7 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
               permissao: PERMISSAO.FUELINGS_WRITE,
               orientacao: 'Quando tiver um comprovante, registre o combustível e o valor para acompanhar os gastos.',
             },
-          ].filter(({ permissao }) => contexto.can(permissao))
+          ].filter(({ permissao, garagem }) => contexto.can(permissao) && (!garagem || controlarPatio))
         : [];
       const proximoPasso = passos.find(({ pronto }) => !pronto);
       return criarElemento('div', { dataset: { screen: 'dashboard' } }, [
@@ -154,17 +167,17 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
             'Resumo operacional da frota, custos, pátio e pendências — tudo em uma única leitura.',
           actions: [
             botao({
-              label: 'Abrir pátio',
-              icon: 'yard',
-              permission: PERMISSAO.VEHICLES_READ,
-              onClick: () => navegar('/patio'),
+              label: 'Ver viagens',
+              icon: 'route',
+              permission: PERMISSAO.TRIPS_READ,
+              onClick: () => navegar('/viagens'),
             }),
             botao({
-              label: 'Registrar movimentação',
+              label: 'Nova viagem',
               variant: 'primary',
               icon: 'plus',
-              permission: PERMISSAO.MOVEMENTS_WRITE,
-              onClick: () => navegar('/patio?novo=1'),
+              permission: PERMISSAO.TRIPS_WRITE,
+              onClick: () => navegar('/viagens?novo=1'),
             }),
           ],
         }),
@@ -222,6 +235,7 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
                 ]),
                 criarElemento('details', { class: 'primeiros-passos-lista' }, [
                   criarElemento('summary', { text: 'Ver todos os passos' }),
+                  botao({ label: 'Configurar garagem (opcional)', variant: 'ghost', permission: PERMISSAO.COMPANY_READ, onClick: () => navegar('/empresa') }),
                   criarElemento(
                     'ul',
                     {},
@@ -286,8 +300,8 @@ export function telaPainel({ outlet: conteudoTela, setTitle: definirTitulo, quer
           ),
           cartaoPulso(
             'Dentro do pátio',
-            String(dentro),
-            totalPresenca ? `de ${totalPresenca} monitorados` : 'sem leitura',
+            controlarPatio ? String(dentro) : 'Opcional',
+            controlarPatio ? (totalPresenca ? `de ${totalPresenca} monitorados` : 'sem registro') : 'Ative em Empresa se precisar',
             'yard',
             'accent',
           ),

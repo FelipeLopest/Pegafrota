@@ -11,6 +11,8 @@ import { dados } from '../dados/dados-do-programa.mjs';
 import { abrirModalComVolta, dataHoraEmpresa, instanteEmpresa } from './apoio-operacoes.mjs';
 import { abrirEditorMotorista } from './formulario-motorista.mjs';
 import { abrirEditorVeiculo } from './formulario-veiculo.mjs';
+import { abrirOperacaoViagem } from './formulario-operacao-viagem.mjs';
+import { impedimentoInicio } from './regras-inicio-viagem.mjs';
 
 export function abrirFormularioViagem({
   vehicles: listaVeiculos,
@@ -19,6 +21,8 @@ export function abrirFormularioViagem({
   vehicleId = '',
   locations: locais = [],
   history: historico = [],
+  ongoingTrips: viagensEmAndamento = historico,
+  yardEnabled: controlarPatio = null,
   onVehicleAdded: aoAdicionarVeiculo,
   onDriverAdded: aoAdicionarMotorista,
   onDone: aoConcluir,
@@ -38,6 +42,7 @@ export function abrirFormularioViagem({
   };
   let janela;
   let ocupado = false;
+  const avisoInicio = criarElemento('p', { class: 'field-hint', 'aria-live': 'polite' });
   const entrada = (id, chave, rotulo) =>
     campo({
       id,
@@ -65,7 +70,10 @@ export function abrirFormularioViagem({
       'select',
       {
         class: 'select',
-        onChange: (evento) => (formulario[chave] = evento.target.value),
+        onChange: (evento) => {
+          formulario[chave] = evento.target.value;
+          atualizarSalvar();
+        },
       },
       [
         criarElemento('option', { value: '', text: 'Selecione' }),
@@ -103,7 +111,8 @@ export function abrirFormularioViagem({
             text: `Peça a quem administra a empresa para cadastrar um ${rotulo.toLowerCase()}.`,
           }),
     ]);
-    faltaCadastro.hidden = itens.length > 0;
+    // Cadastro rápido também fica disponível quando já há outros registros.
+    faltaCadastro.hidden = itens.length > 0 && !contexto.can(permissao);
     selecionar.disabled = !itens.length;
     if (!itens.length) selecionar.options[0].textContent = `Nenhum ${rotulo.toLowerCase()} ativo`;
     return criarElemento('div', {}, [
@@ -144,7 +153,7 @@ export function abrirFormularioViagem({
   const corpo = criarElemento('div', {}, [
     criarElemento('p', {
       class: 'field-hint',
-      text: 'Escolha veículo, motorista e rota. Depois de criar a viagem, clique em Iniciar para registrar a saída.',
+      text: 'Escolha veículo, motorista e trajeto. Siga para confirmar a saída ou salve o planejamento para depois. Pátio é opcional.',
     }),
     campoCadastro({
       id: 'tv-v',
@@ -161,6 +170,7 @@ export function abrirFormularioViagem({
         model: valores.model,
         status: resultado.status,
         current_odometer_km: resultado.currentOdometerKm,
+        active: true,
       }),
       aoAdicionar: aoAdicionarVeiculo,
     }),
@@ -172,10 +182,11 @@ export function abrirFormularioViagem({
       nomeItem: (item) => item.full_name,
       permissao: PERMISSAO.DRIVERS_WRITE,
       editor: abrirEditorMotorista,
-      converter: (resultado) => resultado && ({
+      converter: (resultado, valores) => resultado && ({
         id: resultado.driverId,
         full_name: resultado.fullName,
         active: true,
+        license_expires_on: valores?.licenseExpiresOn || null,
       }),
       aoAdicionar: aoAdicionarMotorista,
     }),
@@ -198,35 +209,57 @@ export function abrirFormularioViagem({
         .map((nome) => criarElemento('option', { value: nome })),
     ),
     detalhes,
+    avisoInicio,
   ]);
-  const salvar = botao({
-    label: viagem ? 'Salvar planejamento' : 'Criar viagem',
+  function validarPlanejamento() {
+    if (!formulario.vehicleId || !formulario.driverId || !formulario.originLabel.trim() || !formulario.destinationLabel.trim())
+      throw new Error('Preencha veículo, motorista, origem e destino.');
+    formulario.plannedDepartureAt = partida.value ? instanteEmpresa(partida.value) : '';
+    formulario.plannedReturnAt = retorno.value ? instanteEmpresa(retorno.value) : '';
+    if (formulario.plannedDepartureAt && formulario.plannedReturnAt &&
+        Date.parse(formulario.plannedReturnAt) <= Date.parse(formulario.plannedDepartureAt)) {
+      detalhes.open = true;
+      throw new Error('O retorno previsto deve ser posterior à saída.');
+    }
+  }
+  const iniciar = botao({
+    label: 'Continuar para saída',
     variant: 'primary',
+    onClick: () => {
+      try {
+        validarPlanejamento();
+        const veiculo = veiculos.find((item) => item.id === formulario.vehicleId);
+        const motorista = motoristas.find((item) => item.id === formulario.driverId);
+        const impedimento = impedimentoInicio(veiculo, motorista, viagensEmAndamento, dataHoraEmpresa().slice(0, 10));
+        if (impedimento) throw new Error(impedimento);
+        janela.close();
+        abrirOperacaoViagem({
+          trip: { vehicle_id: formulario.vehicleId, origin_label: formulario.originLabel, destination_label: formulario.destinationLabel },
+          vehicle: veiculo,
+          action: 'start',
+          locations: locais,
+          yardEnabled: controlarPatio,
+          onSubmit: (operacao) => dados.trips.createAndStart(formulario, operacao),
+          onCancel: montarJanela,
+          onDone: aoConcluir,
+        });
+      } catch (erro) {
+        notificacao(erro.message, { tone: 'warning' });
+      }
+    },
+  });
+  const salvar = botao({
+    label: 'Salvar planejamento',
+    variant: viagem ? 'primary' : 'secondary',
     onClick: async () => {
       if (ocupado) return;
       try {
-        if (
-          !formulario.vehicleId ||
-          !formulario.driverId ||
-          !formulario.originLabel.trim() ||
-          !formulario.destinationLabel.trim()
-        )
-          throw new Error('Preencha veículo, motorista, origem e destino.');
-        formulario.plannedDepartureAt = partida.value ? instanteEmpresa(partida.value) : '';
-        formulario.plannedReturnAt = retorno.value ? instanteEmpresa(retorno.value) : '';
-        if (
-          formulario.plannedDepartureAt &&
-          formulario.plannedReturnAt &&
-          Date.parse(formulario.plannedReturnAt) <= Date.parse(formulario.plannedDepartureAt)
-        ) {
-          detalhes.open = true;
-          throw new Error('O retorno previsto deve ser posterior à saída.');
-        }
+        validarPlanejamento();
         ocupado = true;
-        salvar.disabled = true;
+        atualizarSalvar();
         await dados.trips.create(formulario);
         janela.close();
-        notificacao(viagem ? 'Planejamento atualizado.' : 'Viagem criada. Use Iniciar para registrar a saída.', {
+        notificacao(viagem ? 'Planejamento atualizado.' : 'Planejamento salvo. Inicie a viagem quando o veículo sair.', {
           tone: 'success',
         });
         aoConcluir?.();
@@ -239,16 +272,25 @@ export function abrirFormularioViagem({
     },
   });
   function atualizarSalvar() {
+    corpo.inert = ocupado;
     salvar.disabled = ocupado || !veiculos.length || !motoristas.length;
+    iniciar.disabled = salvar.disabled;
+    avisoInicio.textContent = viagem ? '' : impedimentoInicio(
+      veiculos.find((item) => item.id === formulario.vehicleId),
+      motoristas.find((item) => item.id === formulario.driverId),
+      viagensEmAndamento, dataHoraEmpresa().slice(0, 10),
+    );
   }
   function montarJanela() {
     janela = modal({
       title: viagem ? 'Editar planejamento' : 'Nova viagem',
       size: 'lg',
+      dismissible: () => !ocupado,
       body: corpo,
       footer: criarElemento('div', { class: 'modal-actions' }, [
-        botao({ label: 'Cancelar', onClick: () => janela.close() }),
+        botao({ label: 'Cancelar', onClick: () => { if (!ocupado) janela.close(); } }),
         salvar,
+        !viagem ? iniciar : null,
       ]),
     });
   }

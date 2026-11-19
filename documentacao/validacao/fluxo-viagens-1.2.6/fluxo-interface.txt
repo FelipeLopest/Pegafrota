@@ -1,0 +1,12 @@
+(node:26776) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+OK Fluxo completo sem garagem, leitura obrigatória, retorno ao rascunho e repetição segura depois de falha
+OK Planejar, editar e iniciar continuam disponíveis separadamente
+OK Preferência da empresa salva e cadastro rápido de garagem abre no local correto
+OK Viagem registra saída e entrada junto, com seleção automática da garagem única
+OK Falha de presença exige nova conferência; envio pendente não permite fechar nem duplicar a confirmação
+OK Motorista ocupado recebe orientação e ainda permite planejar para depois
+OK Preferência de garagem fica somente para consulta para quem não pode editar a empresa
+OK Salvar planejamento bloqueia outro fluxo e o fechamento durante o envio
+OK Primeiros passos levam à primeira viagem sem exigir pátio quando a garagem está desativada
+9 jornadas de interface aprovadas; zero erros JavaScript e chamadas de câmera.

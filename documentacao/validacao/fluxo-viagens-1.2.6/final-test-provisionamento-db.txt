@@ -1,0 +1,9 @@
+
+> peganafrota@1.2.6 test:provisionamento:db
+> node ferramentas/testes/evolucao/testar-provisionamento.cjs
+
+OK Busca direta de identidade normaliza e-mail, detecta ambiguidade e só permite service_role
+E-mail existente deixa zero empresa, revisão permite prosseguir e replay preserva um vínculo.
+Falha no vínculo reverte a empresa e a retentativa usa a identidade da operação.
+Dois pedidos concorrentes para o CNPJ mantêm uma empresa, sem expor o primeiro usuário à exclusão.
+Provisionamento aprovado com 65 migrations em PostgreSQL descartável.

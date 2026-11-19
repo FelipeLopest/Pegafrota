@@ -1,31 +1,18 @@
 #!/usr/bin/env node
-import postgres from 'pg';
 import arquivosSistema from 'node:fs';
 import caminhosSistema from 'node:path';
+import { listarArquivos } from '../apoio/arquivos.mjs';
 
-const { Client: ClienteBanco } = postgres;
 const enderecoBanco = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL;
-if (!enderecoBanco) {
-  console.error(
-    'NÃO EXECUTADO — defina SUPABASE_DB_URL ou DATABASE_URL com a connection string do banco remoto.',
-  );
-  process.exit(2);
-}
 
 const raiz = process.cwd();
-const arquivoDados = caminhosSistema.join(
-  raiz,
-  'apps',
-  'company-desktop',
-  'src',
-  'renderer',
-  'lib',
-  'data.mjs',
-);
-const fonte = arquivosSistema.readFileSync(arquivoDados, 'utf8');
+const fonte = listarArquivos(caminhosSistema.join(raiz, 'aplicativos/programa-empresa'), {
+  ignorar: new Set(['dist', 'testes', 'node_modules']),
+}).filter((arquivo) => arquivo.endsWith('.mjs'))
+  .map((arquivo) => arquivosSistema.readFileSync(arquivo, 'utf8')).join('\n');
 const funcaoBancoNomes = [
   ...new Set(
-    [...fonte.matchAll(/\brpc\(\s*['\"]([A-Za-z0-9_]+)['\"]/g)].map(
+    [...fonte.matchAll(/\b(?:rpc|executarFuncaoBanco)\(\s*['\"]([A-Za-z0-9_]+)['\"]/g)].map(
       (correspondenciaItem) => correspondenciaItem[1],
     ),
   ),
@@ -40,9 +27,22 @@ const exatoObrigatorio = [
   'public.unarchive_location(uuid)',
   'public.yard_snapshot()',
   'public.company_members()',
+  'public.fleet_workflow_settings(boolean)',
+  'public.create_and_start_trip(jsonb,numeric,timestamptz,uuid,uuid)',
 ];
-const obrigatorioMigration = '20260808000200';
+const obrigatorioMigration = '20261118000100';
 
+if (process.argv.includes('--listar-contratos')) {
+  console.log(JSON.stringify({ migration: obrigatorioMigration, functions: funcaoBancoNomes, signatures: exatoObrigatorio }, null, 2));
+  process.exit(0);
+}
+if (!enderecoBanco) {
+  console.error('NÃO EXECUTADO — defina SUPABASE_DB_URL ou DATABASE_URL com a connection string do banco remoto.');
+  process.exit(2);
+}
+
+const { default: postgres } = await import('pg');
+const { Client: ClienteBanco } = postgres;
 const cliente = new ClienteBanco({
   connectionString: enderecoBanco,
   ssl: { rejectUnauthorized: false },

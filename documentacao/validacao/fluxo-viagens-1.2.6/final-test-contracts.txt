@@ -1,0 +1,13 @@
+
+> peganafrota@1.2.6 test:contracts
+> node ferramentas/verificacoes/verificar-contratos.mjs
+
+test:contracts — Desktop ↔ banco
+
+  funções públicas nas migrations: 82
+  tabelas/views nas migrations:    23
+  chamadas rpc() no cliente:       54
+  selects no cliente:              19
+  relatórios no catálogo:          5
+
+test:contracts  PASS — todo contrato do cliente existe no banco

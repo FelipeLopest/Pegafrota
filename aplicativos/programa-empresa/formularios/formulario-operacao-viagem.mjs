@@ -23,6 +23,9 @@ export function abrirOperacaoViagem({
   vehicle: veiculo,
   action: acao,
   locations: locais = [],
+  yardEnabled: controlarPatio = null,
+  onSubmit: enviarOperacao = (formulario) => dados.trips.operate(formulario),
+  onCancel: aoCancelar,
   onLocationsChanged: aoAtualizarLocais,
   onDone: aoConcluir,
 }) {
@@ -33,7 +36,7 @@ export function abrirOperacaoViagem({
     : interromper
       ? 'Encerrar viagem interrompida'
       : 'Concluir viagem';
-  const podeRegistrarPassagem = contexto.can(PERMISSAO.MOVEMENTS_WRITE);
+  const podeRegistrarPassagem = controlarPatio !== false && contexto.can(PERMISSAO.MOVEMENTS_WRITE);
   const podeCadastrarPatio = contexto.can(PERMISSAO.LOCATIONS_WRITE);
   let basesAtivas = locais?.filter((item) => item.active && !item.archived_at) ?? null;
   let presenca;
@@ -49,11 +52,18 @@ export function abrirOperacaoViagem({
   };
   let janela;
   let ocupado = false;
+  let trocandoJanela = false;
+  let erroPresenca = false;
+  const abrirAuxiliar = (editor, aoSalvar) => {
+    trocandoJanela = true;
+    abrirModalComVolta(janela, editor, montarJanela, aoSalvar);
+  };
   const km = criarElemento('input', {
     class: 'input',
     type: 'number',
     min: '0',
     step: '.1',
+    placeholder: inicio ? String(veiculo?.current_odometer_km ?? '') : '',
     onInput: (evento) => (formulario.odometerKm = evento.target.value),
   });
   const data = criarElemento('input', {
@@ -97,10 +107,8 @@ export function abrirOperacaoViagem({
     }
   }
   function cadastrarPatio() {
-    abrirModalComVolta(
-      janela,
+    abrirAuxiliar(
       (opcoes) => abrirEditorLocal({ title: 'Cadastrar pátio', ...opcoes }),
-      montarJanela,
       (resultado) => {
         if (!resultado?.locationId) return;
         basesAtivas = [{ id: resultado.locationId, name: resultado.name, active: true }];
@@ -147,7 +155,8 @@ export function abrirOperacaoViagem({
   async function conferirPresenca() {
     const atual = ++consultaPresenca;
     presenca = undefined;
-    consultandoPresenca = inicio && integrar.checked;
+    erroPresenca = false;
+    consultandoPresenca = integrar.checked;
     atualizarConfirmacao();
     avisoPresenca.replaceChildren();
     if (!consultandoPresenca) return;
@@ -157,14 +166,16 @@ export function abrirOperacaoViagem({
       if (atual !== consultaPresenca) return;
       avisoPresenca.replaceChildren();
       presenca = resultado?.presence || resultado?.currentPresence;
-      if (presenca === 'unknown') {
+      if (!['unknown', 'inside', 'outside'].includes(presenca)) throw new Error('Presença indisponível');
+      if (inicio && presenca === 'inside' && resultado.locationId &&
+          basesAtivas.some((item) => item.id === resultado.locationId)) local.value = resultado.locationId;
+      if (inicio && presenca === 'unknown') {
         avisoPresenca.replaceChildren(
           dica('Para registrar a primeira saída do pátio, confira onde o veículo está.'),
           botao({
             label: 'Conferir presença inicial',
             size: 'sm',
-            onClick: () => abrirModalComVolta(
-              janela,
+            onClick: () => abrirAuxiliar(
               (opcoes) => abrirFormularioMovimentacao({
                 vehicle: { ...veiculo, id: viagem.vehicle_id },
                 locations: basesAtivas,
@@ -172,7 +183,6 @@ export function abrirOperacaoViagem({
                 initial: true,
                 ...opcoes,
               }),
-              montarJanela,
               (confirmada) => {
                 if (confirmada?.locationId) local.value = confirmada.locationId;
                 conferirPresenca();
@@ -180,12 +190,19 @@ export function abrirOperacaoViagem({
             ),
           }),
         );
-      } else if (presenca === 'outside') {
+      } else if (inicio && presenca === 'outside') {
         avisoPresenca.textContent = 'O veículo está fora do pátio. Para registrar só a viagem, desmarque a saída na portaria.';
+      } else if (!inicio && presenca === 'inside') {
+        avisoPresenca.textContent = 'O veículo já consta dentro do pátio. Desmarque a entrada para encerrar somente a viagem.';
       }
     } catch {
-      if (atual === consultaPresenca)
-        avisoPresenca.textContent = 'Não foi possível consultar a presença atual. Confira a passagem antes de confirmar.';
+      if (atual === consultaPresenca) {
+        erroPresenca = true;
+        avisoPresenca.replaceChildren(
+          dica('Não foi possível consultar a presença. Tente novamente ou desmarque a passagem para registrar somente a viagem.'),
+          botao({ label: 'Conferir novamente', size: 'sm', onClick: conferirPresenca }),
+        );
+      }
     } finally {
       if (atual === consultaPresenca) {
         consultandoPresenca = false;
@@ -206,13 +223,20 @@ export function abrirOperacaoViagem({
     }),
     campo({
       id: 'odo-action',
-      label: inicio ? 'Quilometragem na saída' : 'Quilometragem no retorno',
+      label: inicio ? 'Quilometragem na saída' : 'Quilometragem ao encerrar',
       required: true,
       control: km,
     }),
+    inicio && Number.isFinite(Number(veiculo?.current_odometer_km))
+      ? botao({ label: 'Usar última quilometragem', size: 'sm', onClick: () => {
+          km.value = String(veiculo.current_odometer_km);
+          formulario.odometerKm = km.value;
+          km.focus();
+        } })
+      : null,
     campo({
       id: 'tv-op-data',
-      label: inicio ? 'Data e hora da saída' : 'Data e hora do retorno',
+      label: inicio ? 'Data e hora da saída' : 'Data e hora do encerramento',
       required: true,
       control: data,
     }),
@@ -232,7 +256,7 @@ export function abrirOperacaoViagem({
     podeRegistrarPassagem ? areaPortaria : null,
   ]);
   const salvar = botao({
-    label: 'Confirmar',
+    label: inicio ? 'Confirmar saída' : 'Confirmar encerramento',
     variant: 'primary',
     onClick: async () => {
       if (ocupado || consultandoPresenca) return;
@@ -245,8 +269,10 @@ export function abrirOperacaoViagem({
         formulario.locationId = registrarPassagem ? local.value : '';
         if (registrarPassagem && !formulario.locationId)
           throw new Error('Selecione o pátio para registrar a passagem.');
-        if (registrarPassagem && presenca === 'unknown')
+        if (registrarPassagem && inicio && presenca === 'unknown')
           throw new Error('Confira a presença inicial para registrar a primeira saída.');
+        if (registrarPassagem && (erroPresenca || (inicio ? presenca === 'outside' : presenca === 'inside')))
+          throw new Error('Confira a presença ou desmarque a passagem para registrar somente a viagem.');
         if (
           Number(formulario.odometerKm) <
           Number(inicio ? veiculo?.current_odometer_km : viagem.start_odometer_km)
@@ -254,10 +280,10 @@ export function abrirOperacaoViagem({
           throw new Error('A leitura é menor que a referência da operação. Confira o valor.');
         ocupado = true;
         atualizarConfirmacao();
-        await dados.trips.operate(formulario);
-        janela.close();
+        const resultado = await enviarOperacao(formulario);
+        janela.close(true);
         notificacao(`${titulo}: operação registrada.`, { tone: 'success' });
-        aoConcluir?.();
+        aoConcluir?.(resultado);
       } catch (erro) {
         notificacao(erro.message, { tone: 'danger' });
       } finally {
@@ -268,14 +294,20 @@ export function abrirOperacaoViagem({
   });
   function atualizarConfirmacao() {
     salvar.disabled = ocupado || consultandoPresenca;
+    corpo.inert = ocupado;
     areaPortaria.inert = ocupado;
   }
   function montarJanela() {
+    trocandoJanela = false;
     janela = modal({
       title: titulo,
       body: corpo,
+      dismissible: () => !ocupado,
+      onClose: (concluida) => {
+        if (!concluida && !trocandoJanela) aoCancelar?.();
+      },
       footer: criarElemento('div', { class: 'modal-actions' }, [
-        botao({ label: 'Cancelar', onClick: () => janela.close() }),
+        botao({ label: 'Voltar', onClick: () => { if (!ocupado) janela.close(); } }),
         salvar,
       ]),
     });

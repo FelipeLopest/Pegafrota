@@ -1,0 +1,8 @@
+(node:27952) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+OK Cadastro em Nova viagem mantém o rascunho, inclusive após Esc; criação de pátio e presença inicial devolvem ao registro de saída com data e km mantidos.
+OK Operador sem permissão de cadastro inicia uma viagem sem pátio.
+OK Operador recebe orientação quando falta um veículo e não pode abrir o cadastro.
+OK Consulta de pátios pode ser repetida; botão fica desativado enquanto busca e com dois pátios a escolha é da pessoa.
+OK A confirmação aguarda a consulta vinculada, ignora resposta antiga e mantém o comando ao repetir depois de falha.
+OK Zero erros JavaScript ou chamadas de câmera.

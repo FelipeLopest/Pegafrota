@@ -34,20 +34,24 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
     conteudoTela,
     PERMISSAO.TRIPS_READ,
     async () => {
-      const [viagens, veiculos, motoristas, locais] = await Promise.all([
+      const [viagens, veiculos, motoristas, locais, emAndamento, fluxo] = await Promise.all([
         dados.trips.page(),
         dados.vehicles.list(),
         dados.drivers.list(),
         dados.locations.eligible().catch(() => null),
+        dados.trips.list({ status: 'eq.in_progress' }),
+        dados.company.workflow().catch(() => null),
       ]);
       return {
         trips: viagens,
         vehicles: veiculos,
         drivers: motoristas,
         locais,
+        emAndamento,
+        fluxo,
       };
     },
-    ({ trips: viagens, vehicles: veiculos, drivers: motoristas, locais }) => {
+    ({ trips: viagens, vehicles: veiculos, drivers: motoristas, locais, emAndamento, fluxo }) => {
       const indiceVeiculo = indice(veiculos),
         indiceDestino = indice(motoristas);
       let patios = locais;
@@ -59,6 +63,8 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
           trip,
           locations: patios || [],
           history: viagens,
+          ongoingTrips: emAndamento,
+          yardEnabled: fluxo?.yardControlEnabled ?? null,
           onVehicleAdded: (veiculo) => {
             veiculos.push(veiculo);
             indiceVeiculo.set(veiculo.id, veiculo);
@@ -76,12 +82,13 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
           action,
           vehicle: indiceVeiculo.get(trip.vehicle_id),
           locations: patios,
+          yardEnabled: fluxo?.yardControlEnabled ?? null,
           onLocationsChanged: (atualizados) => (patios = atualizados),
           onDone: recarregar,
         });
       const cabecalho = cabecalhoPagina({
         title: 'Viagens',
-        subtitle: 'Planeje, registre as saídas e acompanhe os retornos.',
+        subtitle: 'Escolha veículo e motorista, confirme a saída e encerre ao terminar. Você também pode planejar para depois.',
         actions: [
           botao({
             label: 'Importar planilha',
@@ -281,7 +288,11 @@ export function telaViagens({ outlet: conteudoTela, setTitle: definirTitulo }) {
         ],
         { colecao: viagens },
       );
-      return criarElemento('div', {}, [cabecalho, estatisticas, explorador]);
+      return criarElemento('div', {}, [
+        cabecalho,
+        !fluxo ? criarElemento('p', { class: 'field-hint', text: 'Não foi possível carregar a configuração de garagem. As passagens continuam opcionais. Confira a atualização do Supabase em Empresa.' }) : null,
+        estatisticas, explorador,
+      ]);
     },
   );
 }

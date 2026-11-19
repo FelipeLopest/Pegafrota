@@ -1,0 +1,6 @@
+
+> peganafrota@1.2.6 test:exclusoes:db
+> node ferramentas/testes/evolucao/testar-exclusoes-administrativas.cjs
+
+PASSOU revogação com autoria preservada, edição de viagem, conta exclusiva e último administrador
+PASSOU purge com odômetro original, corrigido e anulado, duplicatas de placa e isolamento (65 migrations)

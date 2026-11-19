@@ -1,0 +1,16 @@
+
+> peganafrota@1.2.6 test:auditoria:db
+> node ferramentas/testes/evolucao/testar-auditoria.cjs
+
+{
+  "migracoes": 65,
+  "mesmoDia": 3,
+  "buscaParcial": 3,
+  "fusoDaExibicao": [
+    "local.last",
+    "local.midnight"
+  ],
+  "buscaAntesDaPaginacao": 1,
+  "listaAdministradoresPorEmail": 1,
+  "acessoProtegido": true
+}

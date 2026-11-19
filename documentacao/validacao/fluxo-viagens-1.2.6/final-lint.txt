@@ -1,0 +1,9 @@
+
+> peganafrota@1.2.6 lint
+> node ferramentas/verificacoes/analisar-codigo.mjs
+
+lint  PASS
+  arquivos analisados: 268
+  regras: syntax, unresolved-import, undeclared-dependency,
+          no-console-log, no-debugger, trailing-whitespace,
+          final-newline, dead-script

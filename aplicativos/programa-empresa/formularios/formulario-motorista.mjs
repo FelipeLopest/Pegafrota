@@ -100,7 +100,7 @@ export function abrirEditorMotorista({
         : await dados.drivers.create(formulario);
       correspondenciaItem.close(true);
       notificacao(editar ? 'Motorista atualizado.' : 'Motorista cadastrado.', { tone: 'success' });
-      aoConcluir?.(resultado);
+      aoConcluir?.(resultado, formulario);
     } catch (erroCapturado) {
       notificacao(erroCapturado.message, { tone: 'danger' });
     }

@@ -1,0 +1,44 @@
+
+> peganafrota@1.2.6 verify:electron
+> node ferramentas/verificacoes/verificar-electron.mjs
+
+  OK    CONTEXT_ISOLATION              contextIsolation habilitado
+  OK    NO_NODE_INTEGRATION            nodeIntegration desabilitado
+  OK    NO_NODE_IN_WORKER              nodeIntegrationInWorker desabilitado
+  OK    NO_NODE_IN_SUBFRAMES           nodeIntegrationInSubFrames desabilitado
+  OK    SANDBOX                        sandbox habilitado
+  OK    WEB_SECURITY                   webSecurity habilitado
+  OK    NO_INSECURE_CONTENT            conteúdo inseguro bloqueado
+  OK    NO_EXPERIMENTAL                recursos experimentais desligados
+  OK    CSP_PRESENT                    CSP aplicada por cabeçalho
+  OK    CSP_NO_UNSAFE_INLINE_SCRIPT    script-src sem 'unsafe-inline'
+  OK    CSP_NO_UNSAFE_EVAL             nenhum 'unsafe-eval'
+  OK    CSP_SCRIPT_SELF_ONLY           script-src 'self' sem origem remota
+  OK    CSP_OBJECT_NONE                object-src 'none'
+  OK    CSP_FRAME_ANCESTORS_NONE       frame-ancestors 'none'
+  OK    CSP_BASE_URI_NONE              base-uri 'none'
+  OK    BLOCK_NAVIGATION               navegação externa bloqueada
+  OK    WINDOW_OPEN_DENIED             abertura de janela negada
+  OK    BLOCK_WEBVIEW                  webview bloqueada
+  OK    HARDEN_ALL_CONTENTS            travas aplicadas a todo webContents
+  OK    EXTERNAL_SCHEME_ALLOWLIST      openExternal restrito a https e mailto
+  OK    CERT_ERROR_REJECTED            certificado inválido recusado
+  OK    PERMISSIONS_DENIED             permissões de dispositivo negadas por padrão
+  OK    DEVICE_PERMISSION_DENIED       USB, serial e HID negados
+  OK    SANDBOX_PRELOAD_NO_LOCAL_REQUIRE preload sandboxed não importa módulos locais por require
+  OK    IPC_CHANNELS_SYNC              canais IPC do preload estão sincronizados com o processo principal
+  OK    CONTEXT_BRIDGE                 ponte exposta por contextBridge
+  OK    NO_RAW_IPC_EXPOSED             ipcRenderer cru não é exposto
+  OK    FROZEN_API                     objeto exposto congelado
+  OK    NO_ARBITRARY_INVOKE            nenhum invoke genérico com canal parametrizado
+  OK    SESSION_NOT_IN_WEB_STORAGE     sessão não usa localStorage/sessionStorage
+  OK    NO_TOKEN_IN_WEB_STORAGE        nenhum token trafega para armazenamento do navegador
+  OK    SAFE_STORAGE_USED              sessão cifrada por safeStorage no processo principal
+  OK    SAFE_STORAGE_AVAILABILITY_CHECKED disponibilidade do chaveiro é verificada antes de gravar
+  OK    SESSION_IPC_NARROW             ponte de sessão expõe apenas save/load/clear
+  OK    NO_SERVICE_ROLE                nenhuma menção a service_role em código
+  OK    FIXED_IMAGE_PROCESSOR          processamento usa executável fixo, sem shell
+  OK    IMAGE_PROCESSOR_LIMIT          imagem limitada antes de encaminhar ao processo
+  OK    NO_ADMIN_WEB                   Admin Web ausente do Electron
+
+verify:electron  PASS  — 38/38 invariantes

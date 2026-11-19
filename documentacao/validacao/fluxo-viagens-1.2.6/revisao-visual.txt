@@ -1,0 +1,17 @@
+build:desktop PASS — 131 arquivos
+build:admin PASS — 82 arquivos
+programa-empresa light a 1440 px: 18 rotas aprovadas.
+programa-empresa light a 1024 px: 18 rotas aprovadas.
+Importação light: 7 modelos Excel selecionáveis, guia, colunas e modelo CSV encontrados.
+programa-empresa dark a 1440 px: 18 rotas aprovadas.
+programa-empresa dark a 1024 px: 18 rotas aprovadas.
+Importação dark: 7 modelos Excel selecionáveis, guia, colunas e modelo CSV encontrados.
+painel-administracao light a 1440 px: 9 rotas aprovadas.
+painel-administracao light a 1024 px: 9 rotas aprovadas.
+painel-administracao light a 820 px: 9 rotas aprovadas.
+painel-administracao light a 390 px: 9 rotas aprovadas.
+painel-administracao dark a 1440 px: 9 rotas aprovadas.
+painel-administracao dark a 1024 px: 9 rotas aprovadas.
+painel-administracao dark a 820 px: 9 rotas aprovadas.
+painel-administracao dark a 390 px: 9 rotas aprovadas.
+Revisão visual: 166 combinações de tela/tema/largura aprovadas; logins e diálogos funcionais.

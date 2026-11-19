@@ -1,0 +1,14 @@
+
+> peganafrota@1.2.6 compilar
+> npm run build:admin && npm run build:desktop
+
+
+> peganafrota@1.2.6 build:admin
+> node aplicativos/painel-administracao/compilar-aplicativo.mjs
+
+build:admin PASS — 82 arquivos
+
+> peganafrota@1.2.6 build:desktop
+> node aplicativos/programa-empresa/compilar-aplicativo.mjs
+
+build:desktop PASS — 131 arquivos

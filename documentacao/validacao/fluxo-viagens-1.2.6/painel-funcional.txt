@@ -1,0 +1,18 @@
+PASSOU Login, erro de senha, entrada e painel inicial
+PASSOU Conta de empresa sem acesso ao painel
+PASSOU Solicitar e concluir recuperação de senha com e-mail simulado
+PASSOU Empresa encontrada por busca e filtro
+PASSOU Provisionamento com CNPJ, CEP e senha forte
+PASSOU CNPJ duplicado com atalho para a empresa já cadastrada
+PASSOU Usuários da empresa, alterar senha, proteção do último admin e remoção
+PASSOU Editar cadastro, suspender com motivo e reativar empresa
+PASSOU Arquivar e excluir empresa, com confirmação e retorno à lista
+PASSOU Contagem e navegação de lista com 101 usuários
+PASSOU Administradores, pesquisa, suspender acesso separado de bloquear conta
+PASSOU Busca por e-mail e reenvio do convite em ambiente simulado
+PASSOU Detalhes de evento e de provisionamento
+PASSOU Escopo da busca textual em auditoria
+PASSOU Falha transitória do servidor na entrada
+PASSOU Renova sessão no login inicial e consulta em uso
+PASSOU Consulta do painel repete uma vez após renovar
+PASSOU Falha transitória na renovação mantém a sessão

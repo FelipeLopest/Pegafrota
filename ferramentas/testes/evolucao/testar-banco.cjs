@@ -608,6 +608,75 @@ const minuto = (deslocamento = 0) => new Date(Date.now() + deslocamento * 60000)
     verificar.equal(await limiteProxima(), 1500);
     passou('Odômetro corrigido recalcula preventiva pendente e preserva a revisão iniciada');
 
+    const novoMotorista = randomUUID();
+    await banco.query("insert into public.drivers(id,company_id,full_name,license_expires_on) values($1,$2,'Motorista do fluxo simples',current_date+100)", [novoMotorista, empresa]);
+    verificar.equal((await rpc('fleet_workflow_settings')).yardControlEnabled, false);
+    verificar.equal((await rpc('fleet_workflow_settings', [true])).yardControlEnabled, true);
+    verificar.equal((await rpc('fleet_workflow_settings', [], outroUsuario)).yardControlEnabled, false);
+    await rpc('fleet_workflow_settings', [false]);
+    passou('Preferência de garagem é opcional, persistente e isolada por empresa');
+
+    const veiculoSimples = await veiculo(1000);
+    const planejamento = {
+      vehicleId: veiculoSimples, driverId: novoMotorista,
+      originLabel: 'Rua da empresa', destinationLabel: 'Cliente sem cadastro de pátio',
+    };
+    const chaveSaida = randomUUID();
+    const parametrosSaida = [planejamento, 1000, minuto(-8), null, chaveSaida];
+    const saidaSimples = await rpc('create_and_start_trip', parametrosSaida);
+    verificar.equal(saidaSimples.status, 'in_progress');
+    verificar.equal((await linha('select status from public.vehicles where id=$1', [veiculoSimples])).status, 'in_use');
+    verificar.equal((await linha('select count(*)::int n from public.vehicle_movements where vehicle_id=$1', [veiculoSimples])).n, 0);
+    verificar.deepEqual(await rpc('create_and_start_trip', parametrosSaida), saidaSimples);
+    verificar.equal((await linha('select count(*)::int n from public.trips where vehicle_id=$1', [veiculoSimples])).n, 1);
+    await verificar.rejects(() => rpc('create_and_start_trip', [planejamento, 1001, parametrosSaida[2], null, chaveSaida]), /IDEMPOTENCY/);
+    passou('Criar e iniciar sem garagem ocupa o veículo e a repetição não duplica a viagem');
+
+    const antesFalha = (await linha('select count(*)::int n from public.trips')).n;
+    const outroAtivo = await veiculo(1000);
+    await verificar.rejects(() => rpc('create_and_start_trip', [{ ...planejamento, vehicleId: outroAtivo }, 1000, minuto(-7), null, randomUUID()]), /DRIVER_BUSY/);
+    verificar.equal((await linha('select count(*)::int n from public.trips')).n, antesFalha);
+    verificar.equal((await linha('select status from public.vehicles where id=$1', [outroAtivo])).status, 'available');
+    await rpc('trip_operation', [saidaSimples.tripId, 'complete', 1050, minuto(-6), null, null, randomUUID()]);
+    verificar.equal((await linha('select status from public.vehicles where id=$1', [veiculoSimples])).status, 'available');
+    passou('Motorista ocupado bloqueia a saída sem deixar planejamento solto; encerramento libera recursos');
+
+    const depoisEncerrar = (await linha('select count(*)::int n from public.trips')).n;
+    const saidaComPatio = [planejamento, 1050, minuto(-5), local, randomUUID()];
+    await verificar.rejects(() => rpc('create_and_start_trip', saidaComPatio), /MOVEMENT_DIRECTION_CONFLICT/);
+    verificar.equal((await linha('select count(*)::int n from public.trips')).n, depoisEncerrar);
+    verificar.equal((await linha('select status from public.vehicles where id=$1', [veiculoSimples])).status, 'available');
+    await rpc('set_initial_presence', [veiculoSimples, 'inside', local, 'Veículo conferido na garagem', randomUUID()]);
+    const comPassagem = await rpc('create_and_start_trip', saidaComPatio);
+    verificar.equal(comPassagem.movement.movementType, 'exit');
+    await verificar.rejects(() => rpc('trip_operation', [comPassagem.tripId, 'complete', 1080, minuto(-4), outroLocal, null, randomUUID()]), /LOCATION_NOT_FOUND/);
+    verificar.equal((await linha('select status from public.trips where id=$1', [comPassagem.tripId])).status, 'in_progress');
+    const retornoGaragem = await rpc('trip_operation', [comPassagem.tripId, 'complete', 1080, minuto(-3), local, null, randomUUID()]);
+    verificar.equal(retornoGaragem.movement.movementType, 'entry');
+    verificar.equal((await linha('select count(*)::int n from public.vehicle_movements where vehicle_id=$1', [veiculoSimples])).n, 2);
+    passou('Saída e retorno com garagem são atômicos e não aceitam local de outra empresa');
+
+    const outraGaragem = randomUUID();
+    await banco.query("insert into public.locations(id,company_id,name) values($1,$2,'Segunda garagem')", [outraGaragem, empresa]);
+    await verificar.rejects(() => rpc('create_and_start_trip', [planejamento, 1080, minuto(-2), outraGaragem, randomUUID()]), /MOVEMENT_LOCATION_CONFLICT/);
+    verificar.equal((await linha('select status from public.vehicles where id=$1', [veiculoSimples])).status, 'available');
+    passou('Veículo presente em uma garagem não pode registrar saída de outra');
+
+    const operador = randomUUID();
+    await banco.query("insert into auth.users(id,email,raw_user_meta_data) values($1,'operador@example.test','{}')", [operador]);
+    await banco.query("insert into public.profiles(id,full_name) values($1,'Operador')", [operador]);
+    await banco.query("insert into public.company_memberships(company_id,user_id,role) values($1,$2,'operator')", [empresa, operador]);
+    verificar.equal((await rpc('fleet_workflow_settings', [], operador)).yardControlEnabled, false);
+    await verificar.rejects(() => rpc('fleet_workflow_settings', [true], operador), /FORBIDDEN/);
+    passou('Operador consulta a rotina e somente administrador autorizado altera a preferência');
+
+    const veiculoKmInvalido = await veiculo(100);
+    await verificar.rejects(() => rpc('create_and_start_trip', [{ ...planejamento, vehicleId: veiculoKmInvalido }, 99, minuto(-2), null, randomUUID()]), /ODOMETER_REGRESSION/);
+    await verificar.rejects(() => rpc('create_and_start_trip', [planejamento, 1080, minuto(60), null, randomUUID()]), /futuro/);
+    await verificar.rejects(() => rpc('create_and_start_trip', [planejamento, 1080, minuto(-1), null, randomUUID()], outroUsuario), /FORBIDDEN|NOT_FOUND|TENANT/);
+    await verificar.rejects(() => rpc('fleet_workflow_settings', [], usuario, 'anon'), /permission denied/);
+    passou('Saída valida quilometragem, horário, acesso e isolamento no servidor');
+
     process.stdout.write(
       `${aprovados} cenários operacionais aprovados com ${migracoes.length} migrations em PostgreSQL descartável.\n`,
     );
